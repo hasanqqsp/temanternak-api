@@ -8,7 +8,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         api: __DIR__.'/../app/Interfaces/Http/Routes/api.php',
         commands: __DIR__.'/../app/Interfaces/Http/Routes/console.php',
-        health: '/up',
         apiPrefix: ""
     )
     ->withMiddleware(function (Middleware $middleware) {

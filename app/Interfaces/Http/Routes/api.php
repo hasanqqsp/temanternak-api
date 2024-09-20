@@ -16,3 +16,7 @@ Route::get('/users/authentications', function (Request $request) {
         "token" => $user->createToken($user->id)->plainTextToken
     ];
 });
+
+Route::get('/up',function(){
+    return "OK";
+});
