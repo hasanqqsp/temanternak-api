@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 
+
+
 Route::get('/users', function (Request $request) {
     $allUsers =  User::all()->toArray();
 
@@ -116,8 +118,4 @@ Route::middleware('auth:sanctum')->group(function () {
             'path' => $path,
         ]);
     });
-});
-
-Route::get('/up',function(){
-    return "OK";
 });
