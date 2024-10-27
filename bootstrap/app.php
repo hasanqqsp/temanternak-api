@@ -11,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -62,6 +64,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 "message" => "Unauthorized. Access Denied",
             ], 403);
         });
+        $exceptions->render(function (NotFoundHttpException $exception) {
+            return response()->json([
+                "status" => "fail",
+                "message" => "Resource not found",
+            ], 404);
+        });
+        $exceptions->render(function (MethodNotAllowedHttpException $exception) {
+            return response()->json([
+                "status" => "fail",
+                "message" => "Method not allowed",
+            ], 404);
+        });
+
         $exceptions->shouldRenderJsonWhen(
             fn() => true
         );

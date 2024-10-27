@@ -2,16 +2,18 @@
 
 namespace App\Domain\Users\Entities;
 
+use DateTime;
+
 class User
 {
-    public string $id;
-    public string $name;
-    public string $email;
-    public string $createdAt;
-    public string $updatedAt;
-    public string $role;
-    public string $phone;
-    public string $username;
+    private string $id;
+    private string $name;
+    private string $email;
+    private \DateTime $createdAt;
+    private \DateTime $updatedAt;
+    private string $role;
+    private string $phone;
+    private string $username;
 
     public function __construct(
         string $id,
@@ -26,8 +28,8 @@ class User
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
-        $this->createdAt = $createdAt;
-        $this->updatedAt = $updatedAt;
+        $this->createdAt = new \DateTime($createdAt);
+        $this->updatedAt = new \DateTime($updatedAt);
         $this->role = $role;
         $this->phone = $phone;
         $this->username = strtolower($username);
@@ -50,12 +52,12 @@ class User
 
     public function getCreatedAt(): string
     {
-        return (new \DateTime($this->createdAt))->format(\DateTime::ATOM);
+        return $this->createdAt->format(\DateTime::ATOM);
     }
 
     public function getUpdatedAt(): string
     {
-        return (new \DateTime($this->updatedAt))->format(\DateTime::ATOM);
+        return $this->updatedAt->format(\DateTime::ATOM);
     }
 
     public function getRole(): string
@@ -83,14 +85,14 @@ class User
         $this->email = $email;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(string $createdAt): void
     {
-        $this->createdAt = $createdAt;
+        $this->createdAt = new \DateTime($createdAt);
     }
 
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(string $updatedAt): void
     {
-        $this->updatedAt = $updatedAt;
+        $this->updatedAt = new \DateTime($updatedAt);
     }
 
     public function setRole(string $role): void

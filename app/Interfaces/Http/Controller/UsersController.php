@@ -57,7 +57,7 @@ class UsersController extends Controller
     {
         $responseArray = [
             "status" => "success",
-            "data" => $this->getUserByIdUseCase->execute($id)
+            "data" => $this->getUserByIdUseCase->execute($id)->toArray()
         ];
         return response()->json($responseArray);
     }

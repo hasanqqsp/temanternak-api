@@ -1,6 +1,7 @@
 <?php
 
 use App\Interfaces\Http\Controller\AuthenticationsController;
+use App\Interfaces\Http\Controller\UserFilesController;
 use Illuminate\Support\Facades\Route;
 use App\Interfaces\Http\Controller\UsersController;
 
@@ -10,6 +11,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/users/my/password', [UsersController::class, 'changeUserPassword']);
     Route::put('/users/my/profile/', [UsersController::class, 'updateMyProfile']);
     Route::delete('/authentications', [AuthenticationsController::class, 'logout']);
+    Route::post('/users/my/files', [UserFilesController::class, 'store']);
+    Route::get('/users/my/files', [UserFilesController::class, 'index']);
+    Route::delete('/users/my/files', [UserFilesController::class, 'delete']);
+    Route::get('/users/my/files/{fileId}', [UserFilesController::class, 'getById']);
+    Route::delete('/users/my/files/{fileId}', [UserFilesController::class, 'deleteById']);
+    Route::get('/users/my/files', [UserFilesController::class, 'index']);
     Route::middleware('ability:role-superadmin,role-admin')->group(function () {
         Route::get('/users/{id}', [UsersController::class, 'getUserById']);
         Route::delete('/users/{id}', [UsersController::class, 'deleteUser']);
