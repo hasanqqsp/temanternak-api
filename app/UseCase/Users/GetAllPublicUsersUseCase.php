@@ -4,17 +4,17 @@ namespace App\UseCase\Users;
 
 use App\Domain\Users\UserRepository;
 
-class GetUserByIdUseCase
+class GetAllPublicUsersUseCase
 {
-    private $userRepository;
+    protected $userRepository;
 
     public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
     }
 
-    public function execute(string $userId)
+    public function execute()
     {
-        return $this->userRepository->getById($userId);
+        return $this->userRepository->getAllPublic();
     }
 }

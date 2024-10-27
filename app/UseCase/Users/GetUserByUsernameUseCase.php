@@ -4,7 +4,7 @@ namespace App\UseCase\Users;
 
 use App\Domain\Users\UserRepository;
 
-class GetUserByIdUseCase
+class GetUserByUsernameUseCase
 {
     private $userRepository;
 
@@ -13,8 +13,8 @@ class GetUserByIdUseCase
         $this->userRepository = $userRepository;
     }
 
-    public function execute(string $userId)
+    public function execute(string $username)
     {
-        return $this->userRepository->getById($userId);
+        return $this->userRepository->getByUsername($username);
     }
 }

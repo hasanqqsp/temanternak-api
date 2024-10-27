@@ -4,7 +4,7 @@ namespace App\UseCase\Users;
 
 use App\Domain\Users\UserRepository;
 
-class GetUserByIdUseCase
+class DeleteUserUseCase
 {
     private $userRepository;
 
@@ -13,8 +13,9 @@ class GetUserByIdUseCase
         $this->userRepository = $userRepository;
     }
 
-    public function execute(string $userId)
+    public function execute(string $userId): bool
     {
-        return $this->userRepository->getById($userId);
+        $this->userRepository->verifyUserExist($userId);
+        return $this->userRepository->deleteById($userId);
     }
 }

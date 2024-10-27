@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace App\Infrastructure\Providers;
 
 use App\Infrastructure\Tokenizer\PersonalAccessTokenMongo;
 use Illuminate\Foundation\AliasLoader;

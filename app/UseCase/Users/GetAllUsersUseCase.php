@@ -2,7 +2,7 @@
 
 namespace App\UseCase\Users;
 
-use App\Domain\User\UserRepository;
+use App\Domain\Users\UserRepository;
 
 class GetAllUsersUseCase
 {
@@ -15,6 +15,6 @@ class GetAllUsersUseCase
 
     public function execute()
     {
-        return $this->userRepository->findAll();
+        return $this->userRepository->getAll();
     }
 }
