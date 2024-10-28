@@ -1,6 +1,7 @@
 <?php
 
 use App\Interfaces\Http\Controller\AuthenticationsController;
+use App\Interfaces\Http\Controller\InvitationsController;
 use App\Interfaces\Http\Controller\UserFilesController;
 use Illuminate\Support\Facades\Route;
 use App\Interfaces\Http\Controller\UsersController;
@@ -22,8 +23,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/users/{id}', [UsersController::class, 'deleteUser']);
         Route::put('/users/{id}', [UsersController::class, 'updateUser']);
         Route::get('/users', [UsersController::class, 'getAllUsers']);
+        Route::post('/invitations', [InvitationsController::class, 'create']);
+        Route::get('/invitations', [InvitationsController::class, 'getAll']);
+        Route::delete('/invitations/{id}', [InvitationsController::class, 'revoke']);
     });
 });
+Route::get('/invitations/{id}', [InvitationsController::class, 'get']);
 
 Route::post('/users', [UsersController::class, 'addUser']);
 
