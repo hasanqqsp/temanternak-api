@@ -2,7 +2,7 @@
 
 namespace App\Domain\VeterinarianRegistrations\Entities;
 
-class WorkingExperience
+class OrganizationExperience
 {
     private $institution;
     private $year;

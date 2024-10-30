@@ -7,11 +7,21 @@ use App\Domain\Invitations\Entities\AddedInvitation;
 use App\Domain\Invitations\Entities\Invitation;
 use App\Domain\Invitations\Entities\NewInvitation;
 use App\Domain\Invitations\InvitationRepository;
+use App\Domain\Users\Entities\User;
 use App\Infrastructure\Repository\Models\Invitation as EloquentInvitation;
-use Barryvdh\LaravelIdeHelper\Eloquent;
 
 class InvitationRepositoryEloquent implements InvitationRepository
 {
+    public function setInvitationAccepted($invitationId)
+    {
+        $invitation = EloquentInvitation::find($invitationId);
+        if ($invitation) {
+            $invitation->is_accepted = true;
+            $invitation->save();
+        }
+
+        return $invitation;
+    }
 
     public function create(NewInvitation $invitationData)
     {
@@ -41,12 +51,22 @@ class InvitationRepositoryEloquent implements InvitationRepository
             $invitation->id,
             $invitation->email,
             $invitation->name,
-            $invitation->inviter_id,
+            new User(
+                $invitation->inviter_id,
+                $invitation->inviter->name,
+                $invitation->inviter->email,
+                $invitation->inviter->created_at,
+                $invitation->inviter->updated_at,
+                $invitation->inviter->phone,
+                $invitation->inviter->role,
+                $invitation->inviter->username
+            ),
             $invitation->message,
             $invitation->phone,
             $invitation->created_at,
             $invitation->updated_at,
-            $invitation->is_revoked
+            $invitation->is_revoked,
+            $invitation->is_accepted
         );
     }
 
@@ -59,7 +79,16 @@ class InvitationRepositoryEloquent implements InvitationRepository
                 $invitation->id,
                 $invitation->email,
                 $invitation->name,
-                $invitation->inviter_id,
+                new User(
+                    $invitation->inviter_id,
+                    $invitation->inviter->name,
+                    $invitation->inviter->email,
+                    $invitation->inviter->created_at,
+                    $invitation->inviter->updated_at,
+                    $invitation->inviter->phone,
+                    $invitation->inviter->role,
+                    $invitation->inviter->username
+                ),
                 $invitation->message,
                 $invitation->phone,
                 $invitation->created_at,

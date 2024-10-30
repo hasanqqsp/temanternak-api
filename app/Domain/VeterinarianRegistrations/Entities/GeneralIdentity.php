@@ -2,6 +2,8 @@
 
 namespace App\Domain\VeterinarianRegistrations\Entities;
 
+use DateTime;
+
 class GeneralIdentity
 {
     private string $frontTitle;
@@ -15,7 +17,7 @@ class GeneralIdentity
     public function __construct(
         string $frontTitle,
         string $backTitle,
-        \DateTime $dateOfBirth,
+        string $dateOfBirth,
         string $whatsappNumber,
         string $formalPictureId,
         string $nik,
@@ -23,7 +25,7 @@ class GeneralIdentity
     ) {
         $this->frontTitle = $frontTitle;
         $this->backTitle = $backTitle;
-        $this->dateOfBirth = $dateOfBirth;
+        $this->dateOfBirth = new \DateTime($dateOfBirth);
         $this->whatsappNumber = $whatsappNumber;
         $this->formalPictureId = $formalPictureId;
         $this->nik = $nik;
@@ -50,14 +52,14 @@ class GeneralIdentity
         $this->backTitle = $backTitle;
     }
 
-    public function getDateOfBirth(): \DateTime
+    public function getDateOfBirth(): string
     {
-        return $this->dateOfBirth;
+        return $this->dateOfBirth->format(DateTime::ATOM);
     }
 
-    public function setDateOfBirth(\DateTime $dateOfBirth): void
+    public function setDateOfBirth(string $dateOfBirth): void
     {
-        $this->dateOfBirth = $dateOfBirth;
+        $this->dateOfBirth = new DateTime($dateOfBirth);
     }
 
     public function getWhatsappNumber(): string

@@ -7,11 +7,12 @@ class NewUser
     private string $name;
     private string $email;
     private string $password;
-    private string $role;
+    private ?string $role;
     private string $phone;
     private string $username;
+    private ?string $invitationId;
 
-    public function __construct(string $name, string $email, string $hashedPassword, string $role, string $phone, string $username)
+    public function __construct(string $name, string $email, string $hashedPassword, string $phone, string $username, ?string $invitationId = null, ?string $role = 'basic')
     {
         $this->name = $name;
         $this->email = $email;
@@ -19,6 +20,7 @@ class NewUser
         $this->role = $role;
         $this->phone = $phone;
         $this->username = strtolower($username);
+        $this->invitationId = $invitationId;
     }
 
     public function getName(): string
@@ -36,7 +38,7 @@ class NewUser
         return $this->password;
     }
 
-    public function getRole(): string
+    public function getRole(): ?string
     {
         return $this->role;
     }
@@ -49,6 +51,11 @@ class NewUser
     public function getUsername(): string
     {
         return $this->username;
+    }
+
+    public function getInvitationId(): ?string
+    {
+        return $this->invitationId;
     }
 
     public function setName(string $name): void
@@ -79,5 +86,10 @@ class NewUser
     public function setUsername(string $username): void
     {
         $this->username = $username;
+    }
+
+    public function setInvitationId(?string $invitationId): void
+    {
+        $this->invitationId = $invitationId;
     }
 }

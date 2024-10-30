@@ -133,7 +133,7 @@ class UserRepositoryEloquent implements UserRepository
     {
         $users = User::all()->toArray();
         return array_map(function ($user) {
-            return new UserEntity(
+            return (new UserEntity(
                 $user["id"],
                 $user["name"],
                 $user["email"],
@@ -142,7 +142,7 @@ class UserRepositoryEloquent implements UserRepository
                 $user["role"],
                 $user["phone"],
                 $user["username"]
-            );
+            ))->toArray();
         }, $users);
     }
 

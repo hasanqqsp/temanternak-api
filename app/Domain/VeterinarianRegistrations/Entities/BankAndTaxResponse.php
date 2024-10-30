@@ -2,28 +2,28 @@
 
 namespace App\Domain\VeterinarianRegistrations\Entities;
 
-class BankAndTax
+class BankAndTaxResponse
 {
     private string $npwp;
-    private string $npwpFileId;
+    private string $npwpFilePath;
     private string $bankName;
     private string $bankAccountNumber;
-    private string $bankAccountFileId;
+    private string $bankAccountFilePath;
     private string $bankAccountName;
 
     public function __construct(
         string $npwp,
-        string $npwpFileId,
+        string $npwpFilePath,
         string $bankName,
         string $bankAccountNumber,
-        string $bankAccountFileId,
+        string $bankAccountFilePath,
         string $bankAccountName
     ) {
         $this->npwp = $npwp;
-        $this->npwpFileId = $npwpFileId;
+        $this->npwpFilePath = $npwpFilePath;
         $this->bankName = $bankName;
         $this->bankAccountNumber = $bankAccountNumber;
-        $this->bankAccountFileId = $bankAccountFileId;
+        $this->bankAccountFilePath = $bankAccountFilePath;
         $this->bankAccountName = $bankAccountName;
     }
 
@@ -37,14 +37,14 @@ class BankAndTax
         $this->npwp = $npwp;
     }
 
-    public function getNpwpFileId(): string
+    public function getNpwpFilePath(): string
     {
-        return $this->npwpFileId;
+        return $this->npwpFilePath;
     }
 
-    public function setNpwpFileId(string $npwpFileId): void
+    public function setNpwpFilePath(string $npwpFilePath): void
     {
-        $this->npwpFileId = $npwpFileId;
+        $this->npwpFilePath = $npwpFilePath;
     }
 
     public function getBankName(): string
@@ -67,14 +67,14 @@ class BankAndTax
         $this->bankAccountNumber = $bankAccountNumber;
     }
 
-    public function getBankAccountFileId(): string
+    public function getBankAccountFilePath(): string
     {
-        return $this->bankAccountFileId;
+        return $this->bankAccountFilePath;
     }
 
-    public function setBankAccountFileId(string $bankAccountFileId): void
+    public function setBankAccountFilePath(string $bankAccountFilePath): void
     {
-        $this->bankAccountFileId = $bankAccountFileId;
+        $this->bankAccountFilePath = $bankAccountFilePath;
     }
 
     public function getBankAccountName(): string
@@ -91,10 +91,10 @@ class BankAndTax
     {
         return [
             'npwp' => $this->npwp,
-            'npwpFileId' => $this->npwpFileId,
+            'npwpFilePath' => $this->npwpFilePath,
             'bankName' => $this->bankName,
             'bankAccountNumber' => $this->bankAccountNumber,
-            'bankAccountFileId' => $this->bankAccountFileId,
+            'bankAccountFilePath' => $this->bankAccountFilePath,
             'bankAccountName' => $this->bankAccountName,
         ];
     }

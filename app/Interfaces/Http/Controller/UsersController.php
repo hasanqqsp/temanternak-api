@@ -2,11 +2,13 @@
 
 namespace App\Interfaces\Http\Controller;
 
+use App\Domain\Invitations\InvitationRepository;
 use App\Domain\Users\Entities\ChangeUserPassword;
 use App\Domain\Users\Entities\NewUser;
 use App\Domain\Users\Entities\UpdateUser;
 use App\Domain\Users\UserRepository;
 use App\Services\Hash\HashingServiceInterface;
+use App\UseCase\Users\AddUserByInvitationUseCase;
 use App\UseCase\Users\AddUserUseCase;
 use App\UseCase\Users\ChangeUserPasswordUseCase;
 use App\UseCase\Users\DeleteUserUseCase;
@@ -29,9 +31,11 @@ class UsersController extends Controller
     private $getUserByUsernameUseCase;
     private $updateUserUseCase;
     private $changeUserPasswordUseCase;
+    private $addUserByInvitationUseCase;
 
     public function __construct(
         UserRepository $userRepository,
+        InvitationRepository $invitationRepository,
         HashingServiceInterface $hashingService,
     ) {
         $this->getAllUsersUseCase = new GetAllUsersUseCase($userRepository);
@@ -42,6 +46,7 @@ class UsersController extends Controller
         $this->getUserByUsernameUseCase = new GetUserByUsernameUseCase($userRepository);
         $this->updateUserUseCase = new UpdateUserUseCase($userRepository);
         $this->changeUserPasswordUseCase = new ChangeUserPasswordUseCase($userRepository, $hashingService);
+        $this->addUserByInvitationUseCase = new AddUserByInvitationUseCase($userRepository, $invitationRepository);
     }
 
     public function getAllUsers()
@@ -68,21 +73,26 @@ class UsersController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|string',
+            'role' => 'string',
             'phone' => 'required|string|max:15',
             'username' => 'required|string|max:255|unique:users',
+            'invitation_id' => 'string'
         ]);
+
+        $useCase = ($request->has('invitationId')) ? $this->addUserByInvitationUseCase : $this->addUserUseCase;
+        $data = $useCase->execute(new NewUser(
+            $request->name,
+            $request->email,
+            Hash::make($request->password),
+            $request->phone,
+            $request->username,
+            $request->invitationId,
+            $request->role
+        ))->toArray();
 
         $responseArray = [
             "status" => "success",
-            "data" => $this->addUserUseCase->execute(new NewUser(
-                $request->name,
-                $request->email,
-                Hash::make($request->password),
-                $request->role,
-                $request->phone,
-                $request->username,
-            ))->toArray()
+            "data" => $data
         ];
         return response()->json($responseArray, 201);
     }

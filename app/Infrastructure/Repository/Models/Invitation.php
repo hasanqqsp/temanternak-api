@@ -24,4 +24,9 @@ class Invitation extends Model
         'updated_at' => 'datetime',
         'is_revoked' => 'boolean'
     ];
+
+    public function inviter()
+    {
+        return $this->hasOne(User::class, 'id', 'inviter_id');
+    }
 }

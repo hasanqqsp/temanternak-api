@@ -5,7 +5,8 @@ use App\Interfaces\Http\Controller\InvitationsController;
 use App\Interfaces\Http\Controller\UserFilesController;
 use Illuminate\Support\Facades\Route;
 use App\Interfaces\Http\Controller\UsersController;
-
+use App\Interfaces\Http\Controller\VeterinarianRegistrationController;
+use App\Interfaces\Http\Controller\VeterinarianRegistrationsController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/my', [AuthenticationsController::class, 'getMyAccount'])->middleware('auth:sanctum');
@@ -18,14 +19,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/my/files/{fileId}', [UserFilesController::class, 'getById']);
     Route::delete('/users/my/files/{fileId}', [UserFilesController::class, 'deleteById']);
     Route::get('/users/my/files', [UserFilesController::class, 'index']);
+    Route::middleware('ability:role-invited-user')->group(function () {
+        Route::get('/users/my/registrations', [VeterinarianRegistrationsController::class, 'getMy']);
+        Route::get('/registrations/veterinarians/my', [VeterinarianRegistrationsController::class, 'getMy']);
+        Route::post('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'create']);
+        Route::put('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'revise']);
+    });
     Route::middleware('ability:role-superadmin,role-admin')->group(function () {
         Route::get('/users/{id}', [UsersController::class, 'getUserById']);
         Route::delete('/users/{id}', [UsersController::class, 'deleteUser']);
         Route::put('/users/{id}', [UsersController::class, 'updateUser']);
+        Route::get('/users/{userId}/registrations', [VeterinarianRegistrationsController::class, 'getByUserId']);
         Route::get('/users', [UsersController::class, 'getAllUsers']);
         Route::post('/invitations', [InvitationsController::class, 'create']);
         Route::get('/invitations', [InvitationsController::class, 'getAll']);
         Route::delete('/invitations/{id}', [InvitationsController::class, 'revoke']);
+        Route::get('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'getAll']);
+        Route::get('/registrations/veterinarians/{registrationId}', [VeterinarianRegistrationsController::class, 'getById']);
     });
 });
 Route::get('/invitations/{id}', [InvitationsController::class, 'get']);
@@ -33,26 +43,3 @@ Route::get('/invitations/{id}', [InvitationsController::class, 'get']);
 Route::post('/users', [UsersController::class, 'addUser']);
 
 Route::post('/authentications', [AuthenticationsController::class, 'login']);
-
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::get('/users/files', function (Request $request) {
-//         // Your logic to handle the request and return user files
-//         return response()->json([
-//             'files' => [
-//                 // Example file data
-//                 ['id' => 1, 'name' => 'file1.txt', 'size' => '15KB'],
-//                 ['id' => 2, 'name' => 'file2.jpg', 'size' => '200KB'],
-//             ],
-//         ]);
-//     });
-
-//     Route::post('/users/files', function (Request $request) {
-//         $file = $request->file('file');
-//         $path = Storage::disk('s3')->put('user_files', $file);
-
-//         return response()->json([
-//             'message' => 'File uploaded successfully to S3',
-//             'path' => $path,
-//         ]);
-//     });
-// });

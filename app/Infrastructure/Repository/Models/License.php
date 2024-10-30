@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Repository\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class License extends Model
 {

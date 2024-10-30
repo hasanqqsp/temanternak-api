@@ -11,8 +11,8 @@ class NewVetRegistration
     private array $workingExperiences;
     private array $organizationExperiences;
     private BankAndTax $bankAndTax;
-    private int $inviterId;
-    private int $userId;
+    private string $invitationId;
+    private string $userId;
 
     public function __construct(
         $generalIdentity,
@@ -22,8 +22,8 @@ class NewVetRegistration
         $workingExperiences,
         $organizationExperiences,
         $bankAndTax,
-        $inviterId,
-        $userId
+        string $invitationId,
+        string $userId
     ) {
         $this->generalIdentity = $generalIdentity;
         $this->license = $license;
@@ -32,7 +32,7 @@ class NewVetRegistration
         $this->workingExperiences = $workingExperiences;
         $this->organizationExperiences = $organizationExperiences;
         $this->bankAndTax = $bankAndTax;
-        $this->inviterId = $inviterId;
+        $this->invitationId = $invitationId;
         $this->userId = $userId;
     }
 
@@ -72,9 +72,9 @@ class NewVetRegistration
         return $this->bankAndTax;
     }
 
-    public function getInviterId()
+    public function getInvitationId()
     {
-        return $this->inviterId;
+        return $this->invitationId;
     }
 
     public function getUserId()
@@ -118,12 +118,12 @@ class NewVetRegistration
         $this->bankAndTax = $bankAndTax;
     }
 
-    public function setInviterId($inviterId)
+    public function setInvitationId(string $invitationId)
     {
-        $this->inviterId = $inviterId;
+        $this->invitationId = $invitationId;
     }
 
-    public function setUserId($userId)
+    public function setUserId(string $userId)
     {
         $this->userId = $userId;
     }
@@ -152,7 +152,7 @@ class NewVetRegistration
             'workingExperiences' => $workingExperiences,
             'organizationExperiences' => $organizationExperiences,
             'bankAndTax' => $this->bankAndTax,
-            'inviterId' => $this->inviterId,
+            'invitationId' => $this->invitationId,
             'userId' => $this->userId,
         ];
     }

@@ -4,7 +4,7 @@ namespace App\Infrastructure\Repository\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
 
-class VeterinarianRegistrations extends Model
+class VeterinarianRegistration extends Model
 {
     public function generalIdentity()
     {
@@ -29,5 +29,13 @@ class VeterinarianRegistrations extends Model
     public function license()
     {
         return $this->embedsOne(License::class);
+    }
+    public function invitation()
+    {
+        return $this->hasOne(Invitation::class, 'id', 'invitation_id');
+    }
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 }

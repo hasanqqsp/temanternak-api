@@ -6,34 +6,19 @@ class AddedVeterinarianRegistration
 {
     private string $id;
     private string $status;
-    private GeneralIdentity $generalIdentity;
-    private License $license;
-    private array $specializations;
-    private array $educations;
-    private array $workingExperiences;
-    private array $organizationExperiences;
-    private BankAndTax $bankAndTax;
+    private string $userId;
+    private string $invitationId;
 
     public function __construct(
         $id,
         $status,
-        $generalIdentity,
-        $license,
-        $specializations,
-        $educations,
-        $workingExperiences,
-        $organizationExperiences,
-        $bankAndTax
+        $userId,
+        $invitationId
     ) {
         $this->id = $id;
         $this->status = $status;
-        $this->generalIdentity = $generalIdentity;
-        $this->license = $license;
-        $this->specializations = $specializations;
-        $this->educations = $educations;
-        $this->workingExperiences = $workingExperiences;
-        $this->organizationExperiences = $organizationExperiences;
-        $this->bankAndTax = $bankAndTax;
+        $this->userId = $userId;
+        $this->invitationId = $invitationId;
     }
 
     // Getters
@@ -47,83 +32,24 @@ class AddedVeterinarianRegistration
         return $this->status;
     }
 
-    public function getGeneralIdentity()
+    public function getUserId()
     {
-        return $this->generalIdentity;
+        return $this->userId;
     }
 
-    public function getLicense()
+    public function getInvitationId()
     {
-        return $this->license;
-    }
-
-    public function getSpecializations()
-    {
-        return $this->specializations;
-    }
-
-    public function getEducations()
-    {
-        return $this->educations;
-    }
-
-    public function getWorkingExperiences()
-    {
-        return $this->workingExperiences;
-    }
-
-    public function getOrganizationExperiences()
-    {
-        return $this->organizationExperiences;
-    }
-
-    public function getBankAndTax()
-    {
-        return $this->bankAndTax;
-    }
-
-    // Setters
-    public function setGeneralIdentity($generalIdentity)
-    {
-        $this->generalIdentity = $generalIdentity;
-    }
-
-    public function setLicense($license)
-    {
-        $this->license = $license;
-    }
-
-    public function setSpecializations($specializations) {}
-
-    public function setBankAndTax($bankAndTax)
-    {
-        $this->bankAndTax = $bankAndTax;
+        return $this->invitationId;
     }
 
     // toArray method
     public function toArray()
     {
-        $specializations = array_map(function ($specialization) {
-            return $specialization->toArray();
-        }, $this->getSpecializations());
-        $educations = array_map(function ($education) {
-            return $education->toArray();
-        }, $this->getEducations());
-        $workingExperiences = array_map(function ($workingExperience) {
-            return $workingExperience->toArray();
-        }, $this->getWorkingExperiences());
-        $organizationExperiences = array_map(function ($organizationExperiences) {
-            return $organizationExperiences->toArray();
-        }, $this->getWorkingExperiences());
-
         return [
-            'generalIdentity' => $this->generalIdentity,
-            'license' => $this->license,
-            'specializations' => $specializations,
-            'educations' => $educations,
-            'workingExperiences' => $workingExperiences,
-            'organizationExperiences' => $organizationExperiences,
-            'bankAndTax' => $this->bankAndTax,
+            'id' => $this->id,
+            'status' => $this->status,
+            'userId' => $this->userId,
+            'invitationId' => $this->invitationId,
         ];
     }
 }

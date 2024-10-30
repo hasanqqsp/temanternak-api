@@ -12,4 +12,5 @@ interface InvitationRepository
     public function getAll();
     public function revoke(string $id);
     public function checkInvitationExists(string $id);
+    public function setInvitationAccepted(string $id);
 }

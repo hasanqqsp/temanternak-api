@@ -60,6 +60,13 @@ class InvitationsController extends Controller
     public function create(Request $request)
     {
 
+        $request->validate([
+            'email' => 'required|email',
+            'name' => 'required|string|max:255',
+            'message' => 'nullable|string',
+            'phone' => 'nullable|string|max:15'
+        ]);
+
         $invitation = $this->createInvitationUseCase->execute(new NewInvitation(
             $request->email,
             $request->name,
