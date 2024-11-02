@@ -53,3 +53,5 @@ Route::post('/authentications', [AuthenticationsController::class, 'login']);
 
 Route::get('/veterinarians/{id}', [VeterinariansController::class, 'getById']);
 Route::get('/veterinarians', [VeterinariansController::class, 'get']);
+
+Route::get('/user_files/{pathname}', [UserFilesController::class, 'getByPathname'])->where('pathname', '.*');

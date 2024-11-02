@@ -16,7 +16,6 @@ class S3FileRepository
         $extension = $file->getClientOriginalExtension();
         $path = "user_files/{$userId}/{$documentType}/{$timestamp}.{$extension}";
         Storage::disk('s3')->put($path, file_get_contents($file));
-
         return $path;
     }
 

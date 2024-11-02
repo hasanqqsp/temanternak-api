@@ -5,6 +5,7 @@ namespace App\Interfaces\Http\Controller;
 use App\Commons\Exceptions\ClientException;
 use App\Commons\Exceptions\UserInputException;
 use App\Domain\UserFiles\UserFileRepository;
+use App\Infrastructure\Repository\Storage\S3Compatible\S3FileRepository;
 use Illuminate\Http\Request;
 use App\Models\UserFile;
 use App\UseCase\UserFiles\DeleteFileByIdUseCase;
@@ -25,8 +26,9 @@ class UserFilesController extends Controller
     protected $getFileByUserByTypeUseCase;
     protected $deleteFileByIdUseCase;
     protected $deleteFileByUserByTypeUseCase;
+    protected $s3FileRepository;
 
-    public function __construct(UserFileRepository $userFileRepository)
+    public function __construct(UserFileRepository $userFileRepository, S3FileRepository $s3FileRepository)
     {
         $this->uploadUserFileUseCase = new UploadUserFileUseCase($userFileRepository);
         $this->getFilesByUserUseCase = new GetFilesByUserUseCase($userFileRepository);
@@ -34,6 +36,7 @@ class UserFilesController extends Controller
         $this->getFileByUserByTypeUseCase = new GetFileByUserByType($userFileRepository);
         $this->deleteFileByIdUseCase = new DeleteFileByIdUseCase($userFileRepository);
         $this->deleteFileByUserByTypeUseCase = new DeleteFileByUserByType($userFileRepository);
+        $this->s3FileRepository = $s3FileRepository;
     }
     /**
      * Display a listing of the user files.
@@ -105,5 +108,12 @@ class UserFilesController extends Controller
             "message" => "Files successfully deleted",
             "count" => $deletedCount
         ]);
+    }
+
+    public function getByPathname($pathname)
+    {
+        $pathname = "user_files/" . $pathname;
+        $url = $this->s3FileRepository->getUrl($pathname, 60 * 24);
+        return redirect($url);
     }
 }
