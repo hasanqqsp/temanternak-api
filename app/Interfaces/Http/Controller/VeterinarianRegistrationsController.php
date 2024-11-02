@@ -37,6 +37,7 @@ class VeterinarianRegistrationsController extends Controller
             'generalIdentity.formalPictureId' => 'required|string',
             'generalIdentity.nik' => 'required|string|max:16',
             'generalIdentity.ktpFileId' => 'required|string',
+            'generalIdentity.biodata' => 'required|string',
             'license.strvFileId' => 'required|string',
             'license.strvValidUntil' => 'required|date',
             'license.strvNumber' => 'required|string|max:255',

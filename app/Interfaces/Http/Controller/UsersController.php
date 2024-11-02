@@ -17,9 +17,11 @@ use App\UseCase\Users\GetAllUsersUseCase;
 use App\UseCase\Users\GetUserByIdUseCase;
 use App\UseCase\Users\GetUserByUsernameUseCase;
 use App\UseCase\Users\UpdateUserUseCase;
+use Hidehalo\Nanoid\Client;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
@@ -73,19 +75,23 @@ class UsersController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'string',
-            'phone' => 'required|string|max:15',
-            'username' => 'required|string|max:255|unique:users',
+            'phone' => 'string|max:15',
+            'username' => 'string|max:255|unique:users',
             'invitation_id' => 'string'
         ]);
-
+        $username = (new Client())->generateId(8);
+        if (!$request->has("username")) {
+            $username = Str::slug($request->name) . "-" . $username;
+        } else {
+            $username = $request->username;
+        }
         $useCase = ($request->has('invitationId')) ? $this->addUserByInvitationUseCase : $this->addUserUseCase;
         $data = $useCase->execute(new NewUser(
             $request->name,
             $request->email,
             Hash::make($request->password),
+            $username,
             $request->phone,
-            $request->username,
             $request->invitationId,
             $request->role
         ))->toArray();
@@ -156,7 +162,6 @@ class UsersController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
-            'role' => 'required|string',
             'phone' => 'required|string|max:15',
             'username' => 'required|string|max:255',
         ]);
@@ -181,7 +186,7 @@ class UsersController extends Controller
     {
         $id = request()->user()->id;
         $request->validate([
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
             'old_password' => 'required'
         ]);
 

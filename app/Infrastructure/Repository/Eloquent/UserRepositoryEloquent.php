@@ -208,6 +208,15 @@ class UserRepositoryEloquent implements UserRepository
             throw new NotFoundException("Email does not exist.");
         }
     }
+    public function changeRole(string $id, string $newRole): void
+    {
+        $user = User::find($id);
+        if ($user) {
+            $user->role = $newRole;
+            $user->save();
+        }
+    }
+
     public function createTokenByEmail(string $email): string
     {
         $user = User::where('email', $email)->first();

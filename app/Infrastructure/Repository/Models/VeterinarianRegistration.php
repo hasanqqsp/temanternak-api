@@ -38,4 +38,8 @@ class VeterinarianRegistration extends Model
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
+    public function verificationResult()
+    {
+        return $this->embedsOne(VeterinarianVerification::class);
+    }
 }

@@ -2,17 +2,16 @@
 
 namespace App\Domain\VeterinarianRegistrations\Entities;
 
-use DateTime;
-
 class GeneralIdentity
 {
     private string $frontTitle;
     private string $backTitle;
-    private \DateTime $dateOfBirth;
+    private string $dateOfBirth;
     private string $whatsappNumber;
     private string $formalPictureId;
     private string $nik;
     private string $ktpFileId;
+    private string $biodata;
 
     public function __construct(
         string $frontTitle,
@@ -21,15 +20,17 @@ class GeneralIdentity
         string $whatsappNumber,
         string $formalPictureId,
         string $nik,
-        string $ktpFileId
+        string $ktpFileId,
+        string $biodata
     ) {
         $this->frontTitle = $frontTitle;
         $this->backTitle = $backTitle;
-        $this->dateOfBirth = new \DateTime($dateOfBirth);
+        $this->dateOfBirth = $dateOfBirth;
         $this->whatsappNumber = $whatsappNumber;
         $this->formalPictureId = $formalPictureId;
         $this->nik = $nik;
         $this->ktpFileId = $ktpFileId;
+        $this->biodata = $biodata;
     }
 
     public function getFrontTitle(): string
@@ -54,12 +55,12 @@ class GeneralIdentity
 
     public function getDateOfBirth(): string
     {
-        return $this->dateOfBirth->format(DateTime::ATOM);
+        return $this->dateOfBirth;
     }
 
     public function setDateOfBirth(string $dateOfBirth): void
     {
-        $this->dateOfBirth = new DateTime($dateOfBirth);
+        $this->dateOfBirth = $dateOfBirth;
     }
 
     public function getWhatsappNumber(): string
@@ -102,16 +103,27 @@ class GeneralIdentity
         $this->ktpFileId = $ktpFileId;
     }
 
+    public function getBiodata(): string
+    {
+        return $this->biodata;
+    }
+
+    public function setBiodata(string $biodata): void
+    {
+        $this->biodata = $biodata;
+    }
+
     public function toArray(): array
     {
         return [
             'frontTitle' => $this->frontTitle,
             'backTitle' => $this->backTitle,
-            'dateOfBirth' => $this->dateOfBirth->format('Y-m-d'),
+            'dateOfBirth' => $this->dateOfBirth,
             'whatsappNumber' => $this->whatsappNumber,
             'formalPictureId' => $this->formalPictureId,
             'nik' => $this->nik,
             'ktpFileId' => $this->ktpFileId,
+            'biodata' => $this->biodata,
         ];
     }
 }

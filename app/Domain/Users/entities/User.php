@@ -2,17 +2,15 @@
 
 namespace App\Domain\Users\Entities;
 
-use DateTime;
-
 class User
 {
     private string $id;
     private string $name;
     private string $email;
-    private \DateTime $createdAt;
-    private \DateTime $updatedAt;
+    private string $createdAt;
+    private string $updatedAt;
     private string $role;
-    private string $phone;
+    private ?string $phone;
     private string $username;
 
     public function __construct(
@@ -22,14 +20,14 @@ class User
         string $createdAt,
         string $updatedAt,
         string $role,
-        string $phone,
+        ?string $phone,
         string $username
     ) {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
-        $this->createdAt = new \DateTime($createdAt);
-        $this->updatedAt = new \DateTime($updatedAt);
+        $this->createdAt = $createdAt;
+        $this->updatedAt = $updatedAt;
         $this->role = $role;
         $this->phone = $phone;
         $this->username = strtolower($username);
@@ -52,12 +50,12 @@ class User
 
     public function getCreatedAt(): string
     {
-        return $this->createdAt->format(\DateTime::ATOM);
+        return $this->createdAt;
     }
 
     public function getUpdatedAt(): string
     {
-        return $this->updatedAt->format(\DateTime::ATOM);
+        return $this->updatedAt;
     }
 
     public function getRole(): string
@@ -65,7 +63,7 @@ class User
         return $this->role;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
@@ -87,12 +85,12 @@ class User
 
     public function setCreatedAt(string $createdAt): void
     {
-        $this->createdAt = new \DateTime($createdAt);
+        $this->createdAt = $createdAt;
     }
 
     public function setUpdatedAt(string $updatedAt): void
     {
-        $this->updatedAt = new \DateTime($updatedAt);
+        $this->updatedAt = $updatedAt;
     }
 
     public function setRole(string $role): void
@@ -100,7 +98,7 @@ class User
         $this->role = $role;
     }
 
-    public function setPhone(string $phone): void
+    public function setPhone(?string $phone): void
     {
         $this->phone = $phone;
     }
@@ -116,8 +114,8 @@ class User
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'createdAt' => $this->getCreatedAt(),
-            'updatedAt' => $this->getUpdatedAt(),
+            'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt,
             'role' => $this->role,
             'phone' => $this->phone,
             'username' => $this->username,

@@ -4,7 +4,7 @@ namespace App\Domain\VeterinarianRegistrations\Entities;
 
 use App\Domain\Invitations\Entities\Invitation;
 use App\Domain\Users\Entities\User;
-use DateTime;
+use App\Infrastructure\Repository\Models\VeterinarianVerification;
 
 class VeterinarianRegistration
 {
@@ -13,7 +13,7 @@ class VeterinarianRegistration
     private User $user;
     private string $frontTitle;
     private string $backTitle;
-    private \DateTime $dateOfBirth;
+    private string $dateOfBirth;
     private string $whatsappNumber;
     private string $formalPictureFilePath;
     private string $nik;
@@ -28,6 +28,7 @@ class VeterinarianRegistration
     private BankAndTaxResponse $bankAndTax;
     private Invitation $invitation;
     private string $biodata;
+    private ?VeterinarianVerification $verificationResult = null;
 
     public function __construct(
         string $id,
@@ -56,7 +57,7 @@ class VeterinarianRegistration
         $this->user = $user;
         $this->frontTitle = $frontTitle;
         $this->backTitle = $backTitle;
-        $this->dateOfBirth = new \DateTime($dateOfBirth);
+        $this->dateOfBirth = $dateOfBirth;
         $this->whatsappNumber = $whatsappNumber;
         $this->formalPictureFilePath = $formalPictureFilePath;
         $this->nik = $nik;
@@ -123,14 +124,14 @@ class VeterinarianRegistration
         $this->backTitle = $backTitle;
     }
 
-    public function getDateOfBirth(): \DateTime
+    public function getDateOfBirth(): string
     {
         return $this->dateOfBirth;
     }
 
     public function setDateOfBirth(string $dateOfBirth): void
     {
-        $this->dateOfBirth = new DateTime($dateOfBirth);
+        $this->dateOfBirth = $dateOfBirth;
     }
 
     public function getWhatsappNumber(): string
@@ -273,6 +274,16 @@ class VeterinarianRegistration
         $this->biodata = $biodata;
     }
 
+    public function getVerificationResult(): ?VeterinarianVerification
+    {
+        return $this->verificationResult;
+    }
+
+    public function setVerificationResult(?VeterinarianVerification $verificationResult): void
+    {
+        $this->verificationResult = $verificationResult;
+    }
+
     public function toArray(): array
     {
         return [
@@ -281,7 +292,7 @@ class VeterinarianRegistration
             'user' => $this->user->toArray(),
             'frontTitle' => $this->frontTitle,
             'backTitle' => $this->backTitle,
-            'dateOfBirth' => $this->dateOfBirth->format('Y-m-d'),
+            'dateOfBirth' => $this->dateOfBirth,
             'whatsappNumber' => $this->whatsappNumber,
             'formalPictureFilePath' => $this->formalPictureFilePath,
             'nik' => $this->nik,
@@ -302,6 +313,7 @@ class VeterinarianRegistration
             'bankAndTax' => $this->bankAndTax->toArray(),
             'invitation' => $this->invitation->toArray(),
             'biodata' => $this->biodata,
+            'verificationResult' => $this->verificationResult ? $this->verificationResult->toArray() : null,
         ];
     }
 }

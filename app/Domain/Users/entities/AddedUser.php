@@ -2,14 +2,12 @@
 
 namespace App\Domain\Users\Entities;
 
-use DateTime;
-
 class AddedUser
 {
     private string $id;
-    private \DateTime $createdAt;
+    private string $createdAt;
 
-    public function __construct(string $id, \DateTime $createdAt)
+    public function __construct(string $id, string $createdAt)
     {
         $this->id = $id;
         $this->createdAt = $createdAt;
@@ -22,7 +20,7 @@ class AddedUser
 
     public function getCreatedAt(): string
     {
-        return $this->createdAt->format(DateTime::ATOM);
+        return $this->createdAt;
     }
 
     public function toArray(): array

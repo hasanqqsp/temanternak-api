@@ -8,11 +8,11 @@ class NewUser
     private string $email;
     private string $password;
     private ?string $role;
-    private string $phone;
+    private ?string $phone;
     private string $username;
     private ?string $invitationId;
 
-    public function __construct(string $name, string $email, string $hashedPassword, string $phone, string $username, ?string $invitationId = null, ?string $role = 'basic')
+    public function __construct(string $name, string $email, string $hashedPassword, string $username, ?string $phone = null, ?string $invitationId = null, ?string $role = 'basic')
     {
         $this->name = $name;
         $this->email = $email;
@@ -43,7 +43,7 @@ class NewUser
         return $this->role;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
@@ -78,7 +78,7 @@ class NewUser
         $this->role = $role;
     }
 
-    public function setPhone(string $phone): void
+    public function setPhone(?string $phone): void
     {
         $this->phone = $phone;
     }

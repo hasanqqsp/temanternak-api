@@ -8,16 +8,14 @@ class UpdateUser
     private string $name;
     private string $email;
     private ?string $phone;
-    private string $role;
     private string $username;
 
-    public function __construct(string $id, string $name, string $email, ?string $phone = null, string $role, string $username)
+    public function __construct(string $id, string $name, string $email, ?string $phone = null, string $username)
     {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
         $this->phone = $phone;
-        $this->role = $role;
         $this->username = strtolower($username);
     }
 
@@ -41,11 +39,6 @@ class UpdateUser
         return $this->phone;
     }
 
-    public function getRole(): string
-    {
-        return $this->role;
-    }
-
     public function getUsername(): string
     {
         return $this->username;
@@ -64,11 +57,6 @@ class UpdateUser
     public function setPhone(?string $phone): void
     {
         $this->phone = $phone;
-    }
-
-    public function setRole(string $role): void
-    {
-        $this->role = $role;
     }
 
     public function setUsername(string $username): void

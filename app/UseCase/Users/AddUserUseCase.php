@@ -20,6 +20,7 @@ class AddUserUseCase
         // Add user logic here
         $this->userRepository->verifyEmailAvailable($userData->getEmail());
         $this->userRepository->verifyUsernameAvailable($userData->getUsername());
+        $userData->setRole('basic');
         return $this->userRepository->create($userData);
     }
 }

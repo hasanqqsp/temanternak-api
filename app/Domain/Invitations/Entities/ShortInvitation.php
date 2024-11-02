@@ -3,24 +3,23 @@
 namespace App\Domain\Invitations\Entities;
 
 use App\Domain\Users\Entities\ShortUser;
-use DateTime;
 
 class ShortInvitation
 {
     private string $id;
     private ShortUser $inviter;
     private string $message;
-    private DateTime $createdAt;
+    private string $createdAt;
 
     public function __construct(string $id, ShortUser $inviter, string $message, string $createdAt)
     {
         $this->id = $id;
         $this->inviter = $inviter;
         $this->message = $message;
-        $this->createdAt = new DateTime($createdAt);
+        $this->createdAt = $createdAt;
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
@@ -37,7 +36,7 @@ class ShortInvitation
 
     public function getCreatedAt(): string
     {
-        return $this->createdAt->format(DateTime::ATOM);
+        return $this->createdAt;
     }
 
     public function setId(string $id): void
@@ -55,7 +54,7 @@ class ShortInvitation
         $this->message = $message;
     }
 
-    public function setCreatedAt(DateTime $createdAt): void
+    public function setCreatedAt(string $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
@@ -66,7 +65,7 @@ class ShortInvitation
             'id' => $this->id,
             'inviter' => $this->inviter->toArray(),
             'message' => $this->message,
-            'createdAt' => $this->getCreatedAt(),
+            'createdAt' => $this->createdAt,
         ];
     }
 }

@@ -2,26 +2,25 @@
 
 namespace App\Domain\Invitations\Entities;
 
-use App\Domain\Users\Entities\User;
-use DateTime;
+use App\Domain\Users\Entities\ShortUser;
 
 class Invitation
 {
     private string $id;
     private string $email;
     private string $name;
-    private User $inviter;
+    private ShortUser $inviter;
     private ?string $message;
     private ?string $phone;
-    private \DateTime $createdAt;
-    private \DateTime $updatedAt;
+    private string $createdAt;
+    private string $updatedAt;
     private ?bool $isRevoked;
 
     public function __construct(
         string $id,
         string $email,
         string $name,
-        User $inviter,
+        ShortUser $inviter,
         ?string $message = null,
         ?string $phone = null,
         string $createdAt,
@@ -34,12 +33,12 @@ class Invitation
         $this->inviter = $inviter;
         $this->message = $message;
         $this->phone = $phone;
-        $this->createdAt = new \DateTime($createdAt);
-        $this->updatedAt = new \DateTime($updatedAt);
+        $this->createdAt = $createdAt;
+        $this->updatedAt = $updatedAt;
         $this->isRevoked = $isRevoked;
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
@@ -54,7 +53,7 @@ class Invitation
         return $this->name;
     }
 
-    public function getInviter(): User
+    public function getInviter(): ShortUser
     {
         return $this->inviter;
     }
@@ -71,12 +70,12 @@ class Invitation
 
     public function getCreatedAt(): string
     {
-        return $this->createdAt->format(DateTime::ATOM);
+        return $this->createdAt;
     }
 
     public function getUpdatedAt(): string
     {
-        return $this->updatedAt->format(DateTime::ATOM);
+        return $this->updatedAt;
     }
 
     public function getIsRevoked(): ?bool
@@ -99,7 +98,7 @@ class Invitation
         $this->name = $name;
     }
 
-    public function setInviter(User $inviter): void
+    public function setInviter(ShortUser $inviter): void
     {
         $this->inviter = $inviter;
     }
@@ -116,12 +115,12 @@ class Invitation
 
     public function setCreatedAt(string $createdAt): void
     {
-        $this->createdAt = new \DateTime($createdAt);
+        $this->createdAt = $createdAt;
     }
 
     public function setUpdatedAt(string $updatedAt): void
     {
-        $this->updatedAt = new \DateTime($updatedAt);
+        $this->updatedAt = $updatedAt;
     }
 
     public function setIsRevoked(?bool $isRevoked): void
@@ -138,8 +137,8 @@ class Invitation
             'inviter' => $this->inviter->toArray(),
             'message' => $this->message,
             'phone' => $this->phone,
-            'createdAt' => $this->createdAt->format(DateTime::ATOM),
-            'updatedAt' => $this->updatedAt->format(DateTime::ATOM),
+            'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt,
             'isRevoked' => $this->isRevoked,
         ];
     }

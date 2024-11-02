@@ -28,6 +28,33 @@ use App\Infrastructure\Repository\Models\WorkingExperience;
 
 class VeterinarianRegistrationRepositoryEloquent implements VeterinarianRegistrationRepository
 {
+    public function checkIfExists($registrationId)
+    {
+        if (!VeterinarianRegistration::where('id', $registrationId)->exists()) {
+            throw new ClientException("The registration with ID $registrationId does not exist.");
+        }
+    }
+
+    public function verifyIsPending($registrationId)
+    {
+        $registration = VeterinarianRegistration::find($registrationId);
+        if ($registration && $registration->status !== 'PENDING') {
+            throw new ClientException(
+                "The registration with ID $registrationId not need verification because status is ($registration->status)."
+            );
+        }
+    }
+
+    public function verifyNotRevised($registrationId)
+    {
+        $registration = VeterinarianRegistration::find($registrationId);
+        if ($registration->revised_by) {
+            throw new ClientException(
+                "The registration with ID $registrationId has already been revised."
+            );
+        }
+    }
+
     public function verifyNotAccepted($registrationId)
     {
         $registration = VeterinarianRegistration::find($registrationId);
@@ -112,7 +139,7 @@ class VeterinarianRegistrationRepositoryEloquent implements VeterinarianRegistra
                 );
             },);
 
-        return new EntitiesVeterinarianRegistration(
+        $registration =  new EntitiesVeterinarianRegistration(
             $registrationData->id,
             $registrationData->status,
             new User(
@@ -158,15 +185,10 @@ class VeterinarianRegistrationRepositoryEloquent implements VeterinarianRegistra
                 $registrationData->invitation->id,
                 $registrationData->invitation->email,
                 $registrationData->invitation->name,
-                new User(
+                new ShortUser(
                     $registrationData->invitation->inviter->id,
                     $registrationData->invitation->inviter->name,
-                    $registrationData->invitation->inviter->email,
-                    $registrationData->invitation->inviter->created_at,
-                    $registrationData->invitation->inviter->updated_at,
                     $registrationData->invitation->inviter->role,
-                    $registrationData->invitation->inviter->phone,
-                    $registrationData->invitation->inviter->username,
                 ),
                 $registrationData->invitation->message,
                 $registrationData->invitation->phone,
@@ -174,8 +196,15 @@ class VeterinarianRegistrationRepositoryEloquent implements VeterinarianRegistra
                 $registrationData->invitation->updated_at,
                 $registrationData->invitation->is_revoked
             ),
-            $registrationData->generalIdentity->biodata
+            $registrationData->generalIdentity->biodata,
         );
+        if ($registrationData->verificationResult) {
+            $registration->setVerificationResult($registrationData->verificationResult);
+        }
+        if ($registrationData->verificationResult) {
+            $registration->setVerificationResult($registrationData->verificationResult);
+        }
+        return $registration;
     }
 
     public function verifyNotExistsForInvitation($invitationId)

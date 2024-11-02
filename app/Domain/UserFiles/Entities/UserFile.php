@@ -2,30 +2,28 @@
 
 namespace App\Domain\UserFiles\Entities;
 
-use DateTime;
-
 class UserFile
 {
     private string $id;
     private FileOwner $owner;
     private string $httpUrl;
-    private string $filename;
-    private \DateTime $createdAt;
+    private string $pathname;
+    private string $createdAt;
     private string $documentType;
 
     public function __construct(
         string $id,
         FileOwner $owner,
         string $httpUrl,
-        string $filename,
+        string $pathname,
         string $createdAt,
         string $documentType
     ) {
         $this->id = $id;
         $this->owner = $owner;
         $this->httpUrl = $httpUrl;
-        $this->filename = $filename;
-        $this->createdAt = new \DateTime($createdAt);
+        $this->pathname = $pathname;
+        $this->createdAt = $createdAt;
         $this->documentType = $documentType;
     }
 
@@ -59,24 +57,24 @@ class UserFile
         $this->httpUrl = $httpUrl;
     }
 
-    public function getFilename(): string
+    public function getPathname(): string
     {
-        return $this->filename;
+        return $this->pathname;
     }
 
-    public function setFilename(string $filename): void
+    public function setPathname(string $pathname): void
     {
-        $this->filename = $filename;
+        $this->pathname = $pathname;
     }
 
     public function getCreatedAt(): string
     {
-        return $this->createdAt->format(DateTime::ATOM);
+        return $this->createdAt;
     }
 
     public function setCreatedAt(string $createdAt): void
     {
-        $this->createdAt = new DateTime($createdAt);
+        $this->createdAt = $createdAt;
     }
 
     public function getDocumentType(): string
@@ -93,9 +91,9 @@ class UserFile
     {
         return [
             'id' => $this->getId(),
-            'owner' => $this->getOwner()->toArray(), // Assuming FileOwner has a __toString() method or similar
+            'owner' => $this->getOwner()->toArray(), // Assuming FileOwner has a toArray() method or similar
             'httpUrl' => $this->getHttpUrl(),
-            'filename' => $this->getFilename(),
+            'pathname' => $this->getPathname(),
             'createdAt' => $this->getCreatedAt(),
             'documentType' => $this->getDocumentType(),
         ];

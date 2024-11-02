@@ -9,7 +9,6 @@ use App\Domain\Users\Entities\User;
 
 interface UserRepository
 {
-
     public function create(NewUser $userData): AddedUser;
     public function deleteById(string $id): bool;
     public function update(UpdateUser $userData): bool;
@@ -28,4 +27,5 @@ interface UserRepository
     public function getHashedPasswordById(string $id): string;
     public function getHashedPasswordByEmail(string $id): string;
     public function createTokenByEmail(string $email): string;
+    public function changeRole(string $id, string $role): void;
 }
