@@ -3,9 +3,11 @@
 namespace App\Infrastructure\Repository\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\SoftDeletes;
 
 class VeterinarianRegistration extends Model
 {
+    use SoftDeletes;
     public function generalIdentity()
     {
         return $this->embedsOne(GeneralIdentity::class);

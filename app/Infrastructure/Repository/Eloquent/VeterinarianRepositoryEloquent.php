@@ -2,12 +2,14 @@
 
 namespace App\Infrastructure\Repository\Eloquent;
 
+use App\Commons\Utils\StringUtils;
 use App\Domain\VeterinarianRegistrations\Entities\Education;
 use App\Domain\VeterinarianRegistrations\Entities\OrganizationExperience;
 use App\Domain\VeterinarianRegistrations\Entities\WorkingExperience;
 use App\Domain\Veterinarians\Entities\Veterinarian;
 use App\Domain\Veterinarians\Entities\VeterinarianShort;
 use App\Domain\Veterinarians\VeterinarianRepository;
+use App\Domain\VeterinarianServices\Entities\VetServiceOnly;
 use App\Infrastructure\Repository\Models\User;
 
 
@@ -18,7 +20,7 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
         $registrationData = $user->veterinarianRegistration->where("status", "ACCEPTED")->first();
         $frontTitle = $registrationData->generalIdentity->front_title;
         $backTitle = $registrationData->generalIdentity->back_title;
-        $nameAndTitle = $frontTitle . " " . $user->name . ", " . $backTitle;
+        $nameAndTitle = StringUtils::nameAndTitle($frontTitle, $user->name, $backTitle);
         $license = $registrationData->license;
         $educations = $registrationData->educations()->map(function ($educationData) {
             return (new Education(
@@ -48,6 +50,16 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
                     $organizationExperienceData->is_active
                 ))->toArray();
             },)->toArray();
+        $services = $user->services->whereNotNull('approved_at')
+            ->whereNull('suspended_at')->map(function ($service) {
+                return (new VetServiceOnly(
+                    $service->id,
+                    $service->price,
+                    $service->duration,
+                    $service->description,
+                    $service->name
+                ))->toArray();
+            })->toArray();
 
         return new Veterinarian(
             $user->id,
@@ -63,7 +75,8 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
             $educations,
             $workingExperiences,
             $organizationExperiences,
-            $registrationData->generalIdentity->biodata
+            $registrationData->generalIdentity->biodata,
+            $services
         );
     }
 
