@@ -18,6 +18,7 @@ class Veterinarian
     public array $workingExperiences;
     public array $organizationExperiences;
     public string $biodata;
+    public array $services;
 
     public function __construct(
         string $id,
@@ -33,7 +34,8 @@ class Veterinarian
         array $educations,
         array $workingExperiences,
         array $organizationExperiences,
-        string $biodata
+        string $biodata,
+        array $services
     ) {
         $this->id = $id;
         $this->nameAndTitle = $nameAndTitle;
@@ -49,6 +51,7 @@ class Veterinarian
         $this->workingExperiences = $workingExperiences;
         $this->organizationExperiences = $organizationExperiences;
         $this->biodata = $biodata;
+        $this->services = $services;
     }
 
     public function getId(): string
@@ -191,6 +194,16 @@ class Veterinarian
         $this->biodata = $biodata;
     }
 
+    public function getServices(): array
+    {
+        return $this->services;
+    }
+
+    public function setServices(array $services): void
+    {
+        $this->services = $services;
+    }
+
     public function toArray(): array
     {
         return [
@@ -208,6 +221,7 @@ class Veterinarian
             'workingExperiences' => $this->workingExperiences,
             'organizationExperiences' => $this->organizationExperiences,
             'biodata' => $this->biodata,
+            'services' => $this->services,
         ];
     }
 }

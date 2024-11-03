@@ -1,5 +1,6 @@
 <?php
 
+use App\Infrastructure\Repository\Models\VeterinarianService;
 use App\Interfaces\Http\Controller\AuthenticationsController;
 use App\Interfaces\Http\Controller\InvitationsController;
 use App\Interfaces\Http\Controller\UserFilesController;
@@ -9,6 +10,7 @@ use App\Interfaces\Http\Controller\VeterinariansController;
 
 
 use App\Interfaces\Http\Controller\VeterinarianRegistrationsController;
+use App\Interfaces\Http\Controller\VeterinarianServicesController;
 use App\Interfaces\Http\Controller\VeterinarianVerificationController;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -26,9 +28,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'revise']);
         Route::post('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'create']);
     });
+    Route::middleware('ability:role-veterinarian,role-admin,role-superadmin')->group(function () {
+        Route::delete('/veterinarians/services/{serviceId}', [VeterinarianServicesController::class, 'delete']);
+    });
     Route::middleware('ability:role-veterinarian,role-invited-user')->group(function () {
         Route::get('/users/my/registrations', [VeterinarianRegistrationsController::class, 'getMy']);
-        Route::get('/registrations/veterinarians/my', [VeterinarianRegistrationsController::class, 'getMy']);
+    });
+    Route::middleware('ability:role-veterinarian')->group(function () {
+        Route::post('/veterinarians/services', [VeterinarianServicesController::class, 'add']);
+        Route::put('/veterinarians/services/{serviceId}', [VeterinarianServicesController::class, 'edit']);
     });
     Route::middleware('ability:role-superadmin,role-admin')->group(function () {
         Route::get('/users/{id}', [UsersController::class, 'getUserById']);
@@ -43,13 +51,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/registrations/veterinarians/{registrationId}', [VeterinarianRegistrationsController::class, 'getById']);
         Route::post('/registrations/veterinarians/{registrationId}/verification', [VeterinarianVerificationController::class, 'add']);
         Route::put('/registrations/veterinarians/{registrationId}/verification', [VeterinarianVerificationController::class, 'edit']);
+
+        Route::post('/veterinarians/services/{serviceId}/approval', [VeterinarianServicesController::class, "approve"]);
+        Route::post('/veterinarians/services/{serviceId}/suspension', [VeterinarianServicesController::class, "suspend"]);
+        Route::delete('/veterinarians/services/{serviceId}/suspension', [VeterinarianServicesController::class, "unsuspend"]);
     });
 });
 Route::get('/invitations/{id}', [InvitationsController::class, 'get']);
 
 Route::post('/users', [UsersController::class, 'addUser']);
-
 Route::post('/authentications', [AuthenticationsController::class, 'login']);
+
+Route::get('/veterinarians/services', [VeterinarianServicesController::class, 'getAll']);
+Route::get('/veterinarians/services/{id}', [VeterinarianServicesController::class, 'getById']);
 
 Route::get('/veterinarians/{id}', [VeterinariansController::class, 'getById']);
 Route::get('/veterinarians', [VeterinariansController::class, 'get']);

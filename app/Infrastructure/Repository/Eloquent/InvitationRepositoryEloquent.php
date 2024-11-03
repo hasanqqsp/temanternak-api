@@ -7,7 +7,7 @@ use App\Domain\Invitations\Entities\AddedInvitation;
 use App\Domain\Invitations\Entities\Invitation;
 use App\Domain\Invitations\Entities\NewInvitation;
 use App\Domain\Invitations\InvitationRepository;
-use App\Domain\Users\Entities\User;
+use App\Domain\Users\Entities\ShortUser;
 use App\Infrastructure\Repository\Models\Invitation as EloquentInvitation;
 
 class InvitationRepositoryEloquent implements InvitationRepository
@@ -51,15 +51,10 @@ class InvitationRepositoryEloquent implements InvitationRepository
             $invitation->id,
             $invitation->email,
             $invitation->name,
-            new User(
-                $invitation->inviter_id,
-                $invitation->inviter->name,
-                $invitation->inviter->email,
-                $invitation->inviter->created_at,
-                $invitation->inviter->updated_at,
-                $invitation->inviter->phone,
-                $invitation->inviter->role,
-                $invitation->inviter->username
+            new ShortUser(
+                $invitation->inviter->id,
+                $invitation->inviter->user,
+                $invitation->inviter->id,
             ),
             $invitation->message,
             $invitation->phone,
@@ -79,15 +74,10 @@ class InvitationRepositoryEloquent implements InvitationRepository
                 $invitation->id,
                 $invitation->email,
                 $invitation->name,
-                new User(
+                new ShortUser(
                     $invitation->inviter_id,
                     $invitation->inviter->name,
-                    $invitation->inviter->email,
-                    $invitation->inviter->created_at,
-                    $invitation->inviter->updated_at,
-                    $invitation->inviter->phone,
                     $invitation->inviter->role,
-                    $invitation->inviter->username
                 ),
                 $invitation->message,
                 $invitation->phone,

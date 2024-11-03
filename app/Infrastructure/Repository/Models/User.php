@@ -54,4 +54,12 @@ class User extends AuthUser
         }
         return null;
     }
+
+    public function services()
+    {
+        if ($this->role === 'veterinarian') {
+            return $this->hasMany(VeterinarianService::class, 'veterinarian_id', 'id');
+        }
+        return null;
+    }
 }

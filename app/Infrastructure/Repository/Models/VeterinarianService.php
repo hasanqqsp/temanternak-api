@@ -5,12 +5,11 @@ namespace App\Infrastructure\Repository\Models;
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
-class Invitation extends Model
+class VeterinarianService extends Model
 {
     use SoftDeletes;
-
-    public function inviter()
+    public function veterinarian()
     {
-        return $this->hasOne(User::class, 'id', 'inviter_id');
+        return $this->belongsTo(User::class);
     }
 }
