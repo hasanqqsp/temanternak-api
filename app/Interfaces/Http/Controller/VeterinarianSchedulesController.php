@@ -16,7 +16,7 @@ class VeterinarianSchedulesController extends Controller
     private $removeVeterinarianScheduleUseCase;
     private $getScheduleByVeterinarianIdUseCase;
 
-    public function __construct(VeterinarianScheduleRepository $repository, VeterinarianScheduleRepository $scheduleRepository)
+    public function __construct(VeterinarianScheduleRepository $repository)
     {
         $this->addVeterinarianScheduleUseCase = new AddVeterinarianScheduleUseCase($repository);
         $this->removeVeterinarianScheduleUseCase = new RemoveVeterinarianScheduleUseCase($repository);
