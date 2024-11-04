@@ -14,6 +14,13 @@ use App\Infrastructure\Repository\Models\User;
 
 class UserRepositoryEloquent implements UserRepository
 {
+    public function removeAllToken(string $userId): void
+    {
+        $user = User::find($userId);
+        if ($user) {
+            $user->tokens()->delete();
+        }
+    }
     public function deleteById(string $id): bool
     {
         return User::destroy($id) > 0;

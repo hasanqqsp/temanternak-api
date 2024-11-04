@@ -28,4 +28,5 @@ interface UserRepository
     public function getHashedPasswordByEmail(string $id): string;
     public function createTokenByEmail(string $email): string;
     public function changeRole(string $id, string $role): void;
+    public function removeAllToken(string $id): void;
 }

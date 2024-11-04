@@ -3,6 +3,7 @@
 namespace App\Interfaces\Http\Controller;
 
 use App\Domain\Veterinarians\VeterinarianRepository;
+use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 use App\UseCase\Veterinarians\GetAllVeterinarianUseCase;
 use App\UseCase\Veterinarians\GetVeterinarianByIdUseCase;
 use App\UseCase\Veterinarians\GetVeterinarianByUsernameUseCase;
@@ -15,9 +16,9 @@ class VeterinariansController extends Controller
     private $getVeterinarianByUsernameUseCase;
     private $getAllVeterinarianUseCase;
 
-    public function __construct(VeterinarianRepository $veterinarianRepository)
+    public function __construct(VeterinarianRepository $veterinarianRepository, VeterinarianScheduleRepository $scheduleRepository)
     {
-        $this->getVeterinarianByIdUseCase = new GetVeterinarianByIdUseCase($veterinarianRepository);
+        $this->getVeterinarianByIdUseCase = new GetVeterinarianByIdUseCase($veterinarianRepository, $scheduleRepository);
         $this->getVeterinarianByUsernameUseCase = new GetVeterinarianByUsernameUseCase($veterinarianRepository);
         $this->getAllVeterinarianUseCase = new GetAllVeterinarianUseCase($veterinarianRepository);
     }
@@ -26,7 +27,7 @@ class VeterinariansController extends Controller
     {
         $responseArray = [
             "status" => "success",
-            "data" => $this->getVeterinarianByIdUseCase->execute($id)
+            "data" => $this->getVeterinarianByIdUseCase->execute($id)->toArray()
         ];
         return response()->json($responseArray);
     }

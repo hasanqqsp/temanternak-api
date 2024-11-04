@@ -4,21 +4,22 @@ namespace App\Domain\Veterinarians\Entities;
 
 class Veterinarian
 {
-    public string $id;
-    public string $nameAndTitle;
-    public string $strvNumber;
-    public string $strvValidUntil;
-    public string $sipNumber;
-    public string $sipValidUntil;
-    public string $registeredAt;
-    public string $username;
-    public string $formalPicturePath;
-    public array $specializations;
-    public array $educations;
-    public array $workingExperiences;
-    public array $organizationExperiences;
-    public string $biodata;
-    public array $services;
+    private string $id;
+    private string $nameAndTitle;
+    private string $strvNumber;
+    private string $strvValidUntil;
+    private string $sipNumber;
+    private string $sipValidUntil;
+    private string $registeredAt;
+    private string $username;
+    private string $formalPicturePath;
+    private array $specializations;
+    private array $educations;
+    private array $workingExperiences;
+    private array $organizationExperiences;
+    private string $biodata;
+    private array $services;
+    private ?array $schedules;
 
     public function __construct(
         string $id,
@@ -35,7 +36,8 @@ class Veterinarian
         array $workingExperiences,
         array $organizationExperiences,
         string $biodata,
-        array $services
+        array $services,
+        ?array $schedules = null
     ) {
         $this->id = $id;
         $this->nameAndTitle = $nameAndTitle;
@@ -52,6 +54,7 @@ class Veterinarian
         $this->organizationExperiences = $organizationExperiences;
         $this->biodata = $biodata;
         $this->services = $services;
+        $this->schedules = $schedules;
     }
 
     public function getId(): string
@@ -204,6 +207,16 @@ class Veterinarian
         $this->services = $services;
     }
 
+    public function getSchedules(): ?array
+    {
+        return $this->schedules;
+    }
+
+    public function setSchedules(?array $schedules): void
+    {
+        $this->schedules = $schedules;
+    }
+
     public function toArray(): array
     {
         return [
@@ -222,6 +235,7 @@ class Veterinarian
             'organizationExperiences' => $this->organizationExperiences,
             'biodata' => $this->biodata,
             'services' => $this->services,
+            'schedules' => $this->schedules ?? [],
         ];
     }
 }

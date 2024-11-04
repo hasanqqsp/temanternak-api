@@ -26,6 +26,7 @@ class EditVeterinarianVerificationUseCase
         $this->registrationRepository->verifyNotRevised($data->getRegistrationId());
         if ($data->getStatus() == "ACCEPTED") {
             $registrationData = $this->registrationRepository->getById($data->getRegistrationId());
+            $this->userRepository->removeAllToken($registrationData->getUser()->getId());
             $this->userRepository->changeRole($registrationData->getUser()->getId(), "veterinarian");
         }
         $this->repository->edit($data);

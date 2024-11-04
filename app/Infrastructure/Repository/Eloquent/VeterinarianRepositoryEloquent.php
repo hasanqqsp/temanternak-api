@@ -9,6 +9,7 @@ use App\Domain\VeterinarianRegistrations\Entities\WorkingExperience;
 use App\Domain\Veterinarians\Entities\Veterinarian;
 use App\Domain\Veterinarians\Entities\VeterinarianShort;
 use App\Domain\Veterinarians\VeterinarianRepository;
+use App\Domain\VeterinarianSchedules\Entities\VeterinarianSchedule;
 use App\Domain\VeterinarianServices\Entities\VetServiceOnly;
 use App\Infrastructure\Repository\Models\User;
 
@@ -111,7 +112,7 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
     public function getAll(): array
     {
         return User::where("role", "veterinarian")->get()->map(function ($user) {
-            return $this->mapUserToVeterinarianShort($user);
+            return $this->mapUserToVeterinarianShort($user)->toArray();
         })->toArray();
     }
 }

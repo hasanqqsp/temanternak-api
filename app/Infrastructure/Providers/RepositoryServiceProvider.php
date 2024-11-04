@@ -7,6 +7,7 @@ use App\Domain\UserFiles\UserFileRepository;
 use App\Domain\Users\UserRepository;
 use App\Domain\VeterinarianRegistrations\VeterinarianRegistrationRepository;
 use App\Domain\Veterinarians\VeterinarianRepository;
+use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\Domain\VeterinarianVerifications\VeterinarianVerificationRepository;
 use App\Infrastructure\Repository\Eloquent\InvitationRepositoryEloquent;
@@ -14,9 +15,11 @@ use App\Infrastructure\Repository\Eloquent\UserFileRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\UserRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\VeterinarianRegistrationRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\VeterinarianRepositoryEloquent;
+use App\Infrastructure\Repository\Eloquent\VeterinarianScheduleRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\VeterinarianServiceRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\VeterinarianVerificationRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
+
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -35,6 +38,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(VeterinarianVerificationRepository::class, VeterinarianVerificationRepositoryEloquent::class);
         $this->app->singleton(VeterinarianRepository::class, VeterinarianRepositoryEloquent::class);
         $this->app->singleton(VeterinarianServiceRepository::class, VeterinarianServiceRepositoryEloquent::class);
+        $this->app->singleton(VeterinarianScheduleRepository::class, VeterinarianScheduleRepositoryEloquent::class);
     }
 
     /**

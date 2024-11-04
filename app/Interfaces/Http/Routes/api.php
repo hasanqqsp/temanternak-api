@@ -1,15 +1,14 @@
 <?php
 
-use App\Infrastructure\Repository\Models\VeterinarianService;
+use Illuminate\Support\Facades\Route;
+
 use App\Interfaces\Http\Controller\AuthenticationsController;
 use App\Interfaces\Http\Controller\InvitationsController;
 use App\Interfaces\Http\Controller\UserFilesController;
-use Illuminate\Support\Facades\Route;
 use App\Interfaces\Http\Controller\UsersController;
 use App\Interfaces\Http\Controller\VeterinariansController;
-
-
 use App\Interfaces\Http\Controller\VeterinarianRegistrationsController;
+use App\Interfaces\Http\Controller\VeterinarianSchedulesController;
 use App\Interfaces\Http\Controller\VeterinarianServicesController;
 use App\Interfaces\Http\Controller\VeterinarianVerificationController;
 
@@ -24,12 +23,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/my/files/{fileId}', [UserFilesController::class, 'getById']);
     Route::delete('/users/my/files/{fileId}', [UserFilesController::class, 'deleteById']);
     Route::get('/users/my/files', [UserFilesController::class, 'index']);
+
     Route::middleware('ability:role-invited-user')->group(function () {
         Route::put('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'revise']);
         Route::post('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'create']);
     });
     Route::middleware('ability:role-veterinarian,role-admin,role-superadmin')->group(function () {
         Route::delete('/veterinarians/services/{serviceId}', [VeterinarianServicesController::class, 'delete']);
+        Route::delete('/veterinarians/schedules/{scheduleId}', [VeterinarianSchedulesController::class, 'remove']);
     });
     Route::middleware('ability:role-veterinarian,role-invited-user')->group(function () {
         Route::get('/users/my/registrations', [VeterinarianRegistrationsController::class, 'getMy']);
@@ -37,6 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('ability:role-veterinarian')->group(function () {
         Route::post('/veterinarians/services', [VeterinarianServicesController::class, 'add']);
         Route::put('/veterinarians/services/{serviceId}', [VeterinarianServicesController::class, 'edit']);
+        Route::post('/veterinarians/schedules', [VeterinarianSchedulesController::class, 'add']);
+        Route::get('/users/my/schedules', [VeterinarianSchedulesController::class, 'getMy']);
     });
     Route::middleware('ability:role-superadmin,role-admin')->group(function () {
         Route::get('/users/{id}', [UsersController::class, 'getUserById']);
@@ -51,21 +54,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/registrations/veterinarians/{registrationId}', [VeterinarianRegistrationsController::class, 'getById']);
         Route::post('/registrations/veterinarians/{registrationId}/verification', [VeterinarianVerificationController::class, 'add']);
         Route::put('/registrations/veterinarians/{registrationId}/verification', [VeterinarianVerificationController::class, 'edit']);
-
         Route::post('/veterinarians/services/{serviceId}/approval', [VeterinarianServicesController::class, "approve"]);
         Route::post('/veterinarians/services/{serviceId}/suspension', [VeterinarianServicesController::class, "suspend"]);
         Route::delete('/veterinarians/services/{serviceId}/suspension', [VeterinarianServicesController::class, "unsuspend"]);
     });
 });
-Route::get('/invitations/{id}', [InvitationsController::class, 'get']);
 
+Route::get('/invitations/{id}', [InvitationsController::class, 'get']);
 Route::post('/users', [UsersController::class, 'addUser']);
 Route::post('/authentications', [AuthenticationsController::class, 'login']);
-
 Route::get('/veterinarians/services', [VeterinarianServicesController::class, 'getAll']);
 Route::get('/veterinarians/services/{id}', [VeterinarianServicesController::class, 'getById']);
-
 Route::get('/veterinarians/{id}', [VeterinariansController::class, 'getById']);
 Route::get('/veterinarians', [VeterinariansController::class, 'get']);
-
 Route::get('/user_files/{pathname}', [UserFilesController::class, 'getByPathname'])->where('pathname', '.*');
