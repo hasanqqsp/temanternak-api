@@ -77,23 +77,23 @@ class TransactionsController extends Controller
             ], 400);
         }
 
-        if ($transaction == 'capture') {
-            if ($type == 'credit_card') {
-                if ($fraud == 'accept') {
-                    $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
-                }
-            }
-        } else if ($transaction == 'settlement') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
-        } else if ($transaction == 'pending') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'PENDING');
-        } else if ($transaction == 'deny') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'DENIED');
-        } else if ($transaction == 'expire') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'EXPIRED');
-        } else if ($transaction == 'cancel') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'CANCELLED');
-        }
+        // if ($transaction == 'capture') {
+        //     if ($type == 'credit_card') {
+        //         if ($fraud == 'accept') {
+        //             $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
+        //         }
+        //     }
+        // } else if ($transaction == 'settlement') {
+        //     $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
+        // } else if ($transaction == 'pending') {
+        //     $this->changeTransactionStatusUseCase->execute($order_id, 'PENDING');
+        // } else if ($transaction == 'deny') {
+        //     $this->changeTransactionStatusUseCase->execute($order_id, 'DENIED');
+        // } else if ($transaction == 'expire') {
+        //     $this->changeTransactionStatusUseCase->execute($order_id, 'EXPIRED');
+        // } else if ($transaction == 'cancel') {
+        //     $this->changeTransactionStatusUseCase->execute($order_id, 'CANCELLED');
+        // }
         return response()->json([
             "status" => "success",
         ]);
