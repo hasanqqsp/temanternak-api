@@ -14,6 +14,7 @@ use App\Interfaces\Http\Controller\VeterinarianSchedulesController;
 use App\Interfaces\Http\Controller\VeterinarianServicesController;
 use App\Interfaces\Http\Controller\VeterinarianVerificationController;
 
+Route::post('/transactions/hooks', [TransactionsController::class, 'midtransHooks']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/my', [AuthenticationsController::class, 'getMyAccount'])->middleware('auth:sanctum');
     Route::patch('/users/my/password', [UsersController::class, 'changeUserPassword']);
@@ -26,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/my/files/{fileId}', [UserFilesController::class, 'deleteById']);
     Route::get('/users/my/files', [UserFilesController::class, 'index']);
     Route::get('/transactions', [TransactionsController::class, 'getAll']);
-    Route::get('/transactions/{id}', [TransactionsController::class, 'getById']);
+    Route::get('{id}', [TransactionsController::class, 'getById']);
     Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
     Route::get('/bookings', [ServiceBookingsController::class, 'getAll']);
 
@@ -79,4 +80,3 @@ Route::get('/veterinarians/services/{id}', [VeterinarianServicesController::clas
 Route::get('/veterinarians/{id}', [VeterinariansController::class, 'getById']);
 Route::get('/veterinarians', [VeterinariansController::class, 'get']);
 Route::get('/user_files/{pathname}', [UserFilesController::class, 'getByPathname'])->where('pathname', '.*');
-Route::post('/transactions/hooks', [TransactionsController::class, 'midtransHooks']);
