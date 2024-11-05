@@ -70,6 +70,7 @@ class TransactionsController extends Controller
         $status_code = $request->status_code;
 
         $expectedSignature = hash('sha512', $order_id . $status_code . $gross_amount . env('MIDTRANS_SERVER_KEY'));
+
         if ($request->signature_key != $expectedSignature) {
             return response()->json([
                 "status" => "error",
@@ -77,23 +78,23 @@ class TransactionsController extends Controller
             ], 400);
         }
 
-        // if ($transaction == 'capture') {
-        //     if ($type == 'credit_card') {
-        //         if ($fraud == 'accept') {
-        //             $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
-        //         }
-        //     }
-        // } else if ($transaction == 'settlement') {
-        //     $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
-        // } else if ($transaction == 'pending') {
-        //     $this->changeTransactionStatusUseCase->execute($order_id, 'PENDING');
-        // } else if ($transaction == 'deny') {
-        //     $this->changeTransactionStatusUseCase->execute($order_id, 'DENIED');
-        // } else if ($transaction == 'expire') {
-        //     $this->changeTransactionStatusUseCase->execute($order_id, 'EXPIRED');
-        // } else if ($transaction == 'cancel') {
-        //     $this->changeTransactionStatusUseCase->execute($order_id, 'CANCELLED');
-        // }
+        if ($transaction == 'capture') {
+            if ($type == 'credit_card') {
+                if ($fraud == 'accept') {
+                    $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
+                }
+            }
+        } else if ($transaction == 'settlement') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
+        } else if ($transaction == 'pending') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'PENDING');
+        } else if ($transaction == 'deny') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'DENIED');
+        } else if ($transaction == 'expire') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'EXPIRED');
+        } else if ($transaction == 'cancel') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'CANCELLED');
+        }
         return response()->json([
             "status" => "success",
         ]);
