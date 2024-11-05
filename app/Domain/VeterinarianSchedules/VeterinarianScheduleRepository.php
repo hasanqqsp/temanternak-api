@@ -15,4 +15,6 @@ interface VeterinarianScheduleRepository
     public function checkIfExist(string $id);
     public function checkIsNotOverlapping(string $veterinarianId, DateTime $startTime, DateTime $endTime);
     public function getNormalizeScheduleByVeterinarianId(string $veterinarianId);
+    public function getAvailableStartTimes(string $serviceId, int $bufferTime, int $minGap);
+    public function checkIfTimeIsAvailable(string $veterinarianId, DateTime $startTime, DateTime $endTime);
 }

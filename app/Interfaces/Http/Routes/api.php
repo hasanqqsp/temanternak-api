@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Interfaces\Http\Controller\AuthenticationsController;
 use App\Interfaces\Http\Controller\InvitationsController;
+use App\Interfaces\Http\Controller\ServiceBookingsController;
+use App\Interfaces\Http\Controller\TransactionsController;
 use App\Interfaces\Http\Controller\UserFilesController;
 use App\Interfaces\Http\Controller\UsersController;
 use App\Interfaces\Http\Controller\VeterinariansController;
@@ -23,7 +25,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/my/files/{fileId}', [UserFilesController::class, 'getById']);
     Route::delete('/users/my/files/{fileId}', [UserFilesController::class, 'deleteById']);
     Route::get('/users/my/files', [UserFilesController::class, 'index']);
-
+    Route::get('/transactions', [TransactionsController::class, 'getAll']);
+    Route::get('/transactions/{id}', [TransactionsController::class, 'getById']);
+    Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
     Route::middleware('ability:role-invited-user')->group(function () {
         Route::put('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'revise']);
         Route::post('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'create']);
@@ -57,6 +61,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/veterinarians/services/{serviceId}/approval', [VeterinarianServicesController::class, "approve"]);
         Route::post('/veterinarians/services/{serviceId}/suspension', [VeterinarianServicesController::class, "suspend"]);
         Route::delete('/veterinarians/services/{serviceId}/suspension', [VeterinarianServicesController::class, "unsuspend"]);
+        Route::get('/users/{customerId}/transactions', [TransactionsController::class, 'getAllByCustomerId']);
+    });
+    Route::middleware('ability:role-basic')->group(function () {
+        Route::get('/veterinarians/services/{id}/startTimes', [VeterinarianSchedulesController::class, 'getAvailableStartTimes']);
+        Route::post('/veterinarians/{veterinarianId}/services/{serviceId}/bookings', [ServiceBookingsController::class, 'add']);
     });
 });
 

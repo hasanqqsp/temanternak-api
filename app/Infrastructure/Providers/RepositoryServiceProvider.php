@@ -3,6 +3,8 @@
 namespace App\Infrastructure\Providers;
 
 use App\Domain\Invitations\InvitationRepository;
+use App\Domain\ServiceBookings\ServiceBookingRepository;
+use App\Domain\Transactions\TransactionRepository;
 use App\Domain\UserFiles\UserFileRepository;
 use App\Domain\Users\UserRepository;
 use App\Domain\VeterinarianRegistrations\VeterinarianRegistrationRepository;
@@ -11,6 +13,8 @@ use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\Domain\VeterinarianVerifications\VeterinarianVerificationRepository;
 use App\Infrastructure\Repository\Eloquent\InvitationRepositoryEloquent;
+use App\Infrastructure\Repository\Eloquent\ServiceBookingRepositoryEloquent;
+use App\Infrastructure\Repository\Eloquent\TransactionRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\UserFileRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\UserRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\VeterinarianRegistrationRepositoryEloquent;
@@ -39,6 +43,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(VeterinarianRepository::class, VeterinarianRepositoryEloquent::class);
         $this->app->singleton(VeterinarianServiceRepository::class, VeterinarianServiceRepositoryEloquent::class);
         $this->app->singleton(VeterinarianScheduleRepository::class, VeterinarianScheduleRepositoryEloquent::class);
+        $this->app->singleton(ServiceBookingRepository::class, ServiceBookingRepositoryEloquent::class);
+        $this->app->singleton(TransactionRepository::class, TransactionRepositoryEloquent::class);
     }
 
     /**

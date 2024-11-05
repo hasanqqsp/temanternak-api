@@ -7,12 +7,106 @@ use App\Commons\Exceptions\NotFoundException;
 use App\Domain\VeterinarianSchedules\Entities\NewVeterinarianSchedule;
 use App\Domain\VeterinarianSchedules\Entities\VeterinarianSchedule;
 use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
+use App\Infrastructure\Repository\Models\ServiceBooking;
 use App\Infrastructure\Repository\Models\User;
 use App\Infrastructure\Repository\Models\VeterinarianSchedule as ModelVeterinarianSchedule;
-use DateTimeZone;
+use App\Infrastructure\Repository\Models\VeterinarianService;
 
 class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepository
 {
+    public function checkIfTimeIsAvailable($veterinarianId, $startTime, $endTime)
+    {
+        $overlappingBookings = ServiceBooking::where('veterinarian_id', $veterinarianId)
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->whereBetween('start_time', [$startTime, $endTime])
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($query) use ($startTime, $endTime) {
+                        $query->where('start_time', '<=', $startTime)
+                            ->where('end_time', '>=', $endTime);
+                    });
+            })->count();
+
+        if ($overlappingBookings > 0) {
+            throw new ClientException('The time slot is not available.');
+        }
+
+        $overlappingSchedules = ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->whereBetween('start_time', [$startTime, $endTime])
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($query) use ($startTime, $endTime) {
+                        $query->where('start_time', '<=', $startTime)
+                            ->where('end_time', '>=', $endTime);
+                    });
+            })->count();
+
+        if ($overlappingSchedules === 0) {
+            throw new ClientException('The time slot is not available.');
+        }
+    }
+
+    function getAvailableStartTimes($serviceId, $bufferTime, $timeGap)
+    {
+        $veterinarian = VeterinarianService::find($serviceId);
+        $sessionDuration = $veterinarian->duration;
+        $veterinarianId = $veterinarian->veterinarian_id;
+
+        $sessionDuration = $sessionDuration * 60;
+        $minGap = $bufferTime * 60;
+
+        $currentTime = now();
+        $schedules = ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)
+            ->where('start_time', '>=', $currentTime)
+            ->orderBy('start_time')
+            ->get()
+            ->map(function ($schedule) {
+                return [
+                    'start_time' => $schedule->start_time->getTimestamp(),
+                    'end_time' => $schedule->end_time->getTimestamp()
+                ];
+            })
+            ->toArray();
+
+
+
+        $bookedSchedules = ServiceBooking::where('veterinarian_id', $veterinarianId)
+            ->where('start_time', '>=', $currentTime)
+            ->orderBy('start_time')
+            ->get()
+            ->map(function ($schedule) {
+                return [
+                    'start_time' => $schedule->start_time->getTimestamp(),
+                    'end_time' => $schedule->end_time->getTimestamp()
+                ];
+            })->toArray();
+
+        $availableSlots = [];
+        foreach ($schedules as $schedule) {
+            $start = $schedule['start_time'];
+            $end = $schedule['end_time'];
+            $currentSlotStart = $start;
+            while (($currentSlotStart + $sessionDuration) - 1 <= $end) {
+                $isAvailable = true;
+                $currentSlotEnd = $currentSlotStart + $sessionDuration;
+
+                foreach ($bookedSchedules as $booked) {
+                    if (($currentSlotStart <= $booked['end_time'] + $minGap) && ($currentSlotEnd >= $booked['start_time'] - $minGap)) {
+                        $isAvailable = false;
+                        break;
+                    }
+                }
+
+                if ($isAvailable) {
+                    $availableSlots[] = date('Y-m-d\TH:i:s.up', $currentSlotStart);
+                }
+
+                $currentSlotStart += $bufferTime * 60;
+            }
+        }
+
+        return $availableSlots;
+    }
+
     public function getNormalizeScheduleByVeterinarianId($veterinarianId): array
     {
         $schedules = ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)

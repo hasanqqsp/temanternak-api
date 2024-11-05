@@ -4,7 +4,9 @@ namespace App\Interfaces\Http\Controller;
 
 use App\Domain\VeterinarianSchedules\Entities\NewVeterinarianSchedule;
 use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
+use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\UseCase\VeterinarianSchedules\AddVeterinarianScheduleUseCase;
+use App\UseCase\VeterinarianSchedules\GetAllAvailableStartTimesByServiceId;
 use App\UseCase\VeterinarianSchedules\GetScheduleByVeterinarianIdUseCase;
 use App\UseCase\VeterinarianSchedules\RemoveVeterinarianScheduleUseCase;
 use Illuminate\Http\Request;
@@ -15,12 +17,15 @@ class VeterinarianSchedulesController extends Controller
     private $addVeterinarianScheduleUseCase;
     private $removeVeterinarianScheduleUseCase;
     private $getScheduleByVeterinarianIdUseCase;
+    private $getAllAvailableStartTimesByServiceId;
 
-    public function __construct(VeterinarianScheduleRepository $repository)
+
+    public function __construct(VeterinarianScheduleRepository $repository, VeterinarianServiceRepository $veterinarianServiceRepository)
     {
         $this->addVeterinarianScheduleUseCase = new AddVeterinarianScheduleUseCase($repository);
         $this->removeVeterinarianScheduleUseCase = new RemoveVeterinarianScheduleUseCase($repository);
         $this->getScheduleByVeterinarianIdUseCase = new GetScheduleByVeterinarianIdUseCase($repository);
+        $this->getAllAvailableStartTimesByServiceId = new GetAllAvailableStartTimesByServiceId($repository, $veterinarianServiceRepository);
     }
 
     public function add(Request $request)
@@ -50,6 +55,15 @@ class VeterinarianSchedulesController extends Controller
         $responseArray = [
             "status" => "success",
             "data" => $this->getScheduleByVeterinarianIdUseCase->execute($request->user()->id)
+        ];
+        return response()->json($responseArray);
+    }
+
+    public function getAvailableStartTimes(Request $request, $serviceId)
+    {
+        $responseArray = [
+            "status" => "success",
+            "data" => $this->getAllAvailableStartTimesByServiceId->execute($serviceId)
         ];
         return response()->json($responseArray);
     }
