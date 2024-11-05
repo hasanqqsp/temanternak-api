@@ -10,4 +10,6 @@ interface TransactionRepository
     public function getByTransactionId(string $id);
     public function getAll();
     public function getByCustomerId(string $customerId);
+    public function updateStatus(string $transactionId, string $status);
+    public function checkIfExist(string $transactionId);
 }

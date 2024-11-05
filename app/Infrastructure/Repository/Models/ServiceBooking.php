@@ -9,7 +9,7 @@ class ServiceBooking extends Model
 {
     public function transaction()
     {
-        return $this->hasOne(Transaction::class);
+        return $this->hasOne(Transaction::class, 'id', 'transaction_id');
     }
 
     public function service()

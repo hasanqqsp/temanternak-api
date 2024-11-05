@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository\Eloquent;
 
+use App\Commons\Exceptions\NotFoundException;
 use App\Domain\Transactions\Entities\NewTransaction;
 use App\Domain\Transactions\Entities\Transaction as EntitiesTransaction;
 use App\Domain\Transactions\TransactionRepository;
@@ -41,7 +42,26 @@ class TransactionRepositoryEloquent implements TransactionRepository
 
     public function getByTransactionId(string $id)
     {
-        return $this->createTransactionEntity(Transaction::where('id', $id)->first());;
+        $transaction = Transaction::where('id', $id)->first();
+
+        return $this->createTransactionEntity($transaction);
+    }
+
+    public function updateStatus(string $transactionId, string $status)
+    {
+        $transaction = Transaction::where('id', $transactionId)->first();
+        if ($transaction) {
+            $transaction->status = $status;
+            $transaction->save();
+        }
+    }
+
+    public function checkIfExist(string $transactionId)
+    {
+        $transaction = Transaction::where('id', $transactionId)->exists();
+        if (!$transaction) {
+            throw new NotFoundException("Transaction not found");
+        }
     }
 
     private function createTransactionEntity(Transaction $transaction): EntitiesTransaction

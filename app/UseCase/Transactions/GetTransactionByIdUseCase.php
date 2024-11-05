@@ -15,6 +15,7 @@ class GetTransactionByIdUseCase
 
     public function execute($transactionId)
     {
+        $this->transactionRepository->checkIfExist($transactionId);
         return $this->transactionRepository->getByTransactionId($transactionId);
     }
 }

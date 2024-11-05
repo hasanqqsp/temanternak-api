@@ -2,7 +2,9 @@
 
 namespace App\Interfaces\Http\Controller;
 
+use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Transactions\TransactionRepository;
+use App\UseCase\Transactions\ChangeTransactionStatusById;
 use App\UseCase\Transactions\GetAllTransactionsByCustomerIdUseCase;
 use App\UseCase\Transactions\GetAllTransactionsUseCase;
 use App\UseCase\Transactions\GetTransactionByIdUseCase;
@@ -14,12 +16,14 @@ class TransactionsController extends Controller
     private $getAllTransactionsUseCase;
     private $getAllTransactionsByCustomerIdUseCase;
     private $getTransactionByIdUseCase;
+    private $changeTransactionStatusUseCase;
 
-    public function __construct(TransactionRepository $repository)
+    public function __construct(TransactionRepository $repository, ServiceBookingRepository $serviceBookingRepository)
     {
         $this->getAllTransactionsUseCase = new GetAllTransactionsUseCase($repository);
         $this->getAllTransactionsByCustomerIdUseCase = new GetAllTransactionsByCustomerIdUseCase($repository);
         $this->getTransactionByIdUseCase = new GetTransactionByIdUseCase($repository);
+        $this->changeTransactionStatusUseCase = new ChangeTransactionStatusById($repository, $serviceBookingRepository);
     }
 
     public function getAll()
@@ -54,5 +58,44 @@ class TransactionsController extends Controller
             "data" => $this->getTransactionByIdUseCase->execute($id)->toArray()
         ];
         return response()->json($responseArray);
+    }
+
+    public function midtransHooks(Request $request)
+    {
+        $order_id = $request->order_id;
+        $transaction = $request->transaction_status;
+        $fraud = $request->fraud_status;
+        $type = $request->payment_type;
+        $gross_amount = $request->gross_amount;
+
+        $expectedSignature = hash('sha512', $order_id . $transaction . $gross_amount . env('MIDTRANS_SERVER_KEY'));
+
+        if ($request->signature_key != $expectedSignature) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Invalid signature"
+            ], 400);
+        }
+
+        if ($transaction == 'capture') {
+            if ($type == 'credit_card') {
+                if ($fraud == 'accept') {
+                    $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
+                }
+            }
+        } else if ($transaction == 'settlement') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
+        } else if ($transaction == 'pending') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'PENDING');
+        } else if ($transaction == 'deny') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'DENIED');
+        } else if ($transaction == 'expire') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'EXPIRED');
+        } else if ($transaction == 'cancel') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'CANCELLED');
+        }
+        return response()->json([
+            "status" => "success",
+        ]);
     }
 }

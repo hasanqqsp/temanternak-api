@@ -103,7 +103,7 @@ class Transaction
             'id' => $this->id,
             'price' => $this->price,
             'platformFee' => $this->platformFee,
-            'customer' => $this->customer,
+            'customer' => $this->customer->toArray(),
             'products' => $this->products,
             'paymentToken' => $this->paymentToken,
             'status' => $this->status,

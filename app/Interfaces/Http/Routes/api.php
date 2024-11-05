@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions', [TransactionsController::class, 'getAll']);
     Route::get('/transactions/{id}', [TransactionsController::class, 'getById']);
     Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
+    Route::get('/bookings', [ServiceBookingsController::class, 'getAll']);
+
     Route::middleware('ability:role-invited-user')->group(function () {
         Route::put('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'revise']);
         Route::post('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'create']);
@@ -77,3 +79,4 @@ Route::get('/veterinarians/services/{id}', [VeterinarianServicesController::clas
 Route::get('/veterinarians/{id}', [VeterinariansController::class, 'getById']);
 Route::get('/veterinarians', [VeterinariansController::class, 'get']);
 Route::get('/user_files/{pathname}', [UserFilesController::class, 'getByPathname'])->where('pathname', '.*');
+Route::post('/transactions/hooks', [TransactionsController::class, 'midtransHooks']);
