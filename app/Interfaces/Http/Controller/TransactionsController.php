@@ -67,9 +67,9 @@ class TransactionsController extends Controller
         $fraud = $request->fraud_status;
         $type = $request->payment_type;
         $gross_amount = $request->gross_amount;
+        $status_code = $request->status_code;
 
-        $expectedSignature = hash('sha512', $order_id . $transaction . $gross_amount . env('MIDTRANS_SERVER_KEY'));
-
+        $expectedSignature = hash('sha512', $order_id . $status_code . $gross_amount . env('MIDTRANS_SERVER_KEY'));
         if ($request->signature_key != $expectedSignature) {
             return response()->json([
                 "status" => "error",
