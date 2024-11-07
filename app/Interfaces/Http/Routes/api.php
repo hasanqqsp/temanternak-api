@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/my/files/{fileId}', [UserFilesController::class, 'deleteById']);
     Route::get('/users/my/files', [UserFilesController::class, 'index']);
     Route::get('/transactions', [TransactionsController::class, 'getAll']);
-    Route::get('{id}', [TransactionsController::class, 'getById']);
+    Route::get('/transactions/{id}', [TransactionsController::class, 'getById']);
     Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
     Route::get('/bookings', [ServiceBookingsController::class, 'getAll']);
 
