@@ -14,6 +14,72 @@ use App\Infrastructure\Repository\Models\VeterinarianService;
 
 class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepository
 {
+    public function getAvailableStartTimesForReschedule($serviceId, $bufferTime, $timeGap, $excludeBookingId)
+    {
+        $veterinarian = VeterinarianService::find($serviceId);
+        $sessionDuration = $veterinarian->duration;
+        $veterinarianId = $veterinarian->veterinarian_id;
+
+        $sessionDuration = $sessionDuration * 60;
+        $minGap = $bufferTime * 60;
+
+        $currentTime = now();
+        $schedules = ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)
+            ->where('end_time', '>=', $currentTime)
+            ->orderBy('start_time')
+            ->get()
+            ->map(function ($schedule) {
+                return [
+                    'start_time' => $schedule->start_time->getTimestamp(),
+                    'end_time' => $schedule->end_time->getTimestamp()
+                ];
+            })
+            ->toArray();
+
+        $bookedSchedules = ServiceBooking::where('veterinarian_id', $veterinarianId)
+            ->where('status', '!=', 'CANCELLED')
+            ->where('id', '!=', $excludeBookingId)
+            ->where('start_time', '>=', $currentTime)
+            ->orderBy('start_time')
+            ->get()
+            ->map(function ($schedule) {
+                return [
+                    'start_time' => $schedule->start_time->getTimestamp(),
+                    'end_time' => $schedule->end_time->getTimestamp()
+                ];
+            })->toArray();
+
+        $availableSlots = [];
+        foreach ($schedules as $schedule) {
+            $start = $schedule['start_time'];
+            $end = $schedule['end_time'];
+            $currentSlotStart = $start;
+            while (($currentSlotStart + $sessionDuration) - 1 <= $end) {
+                $isAvailable = true;
+                $currentSlotEnd = $currentSlotStart + $sessionDuration;
+
+                foreach ($bookedSchedules as $booked) {
+                    if (($currentSlotStart <= $booked['end_time'] + $minGap) && ($currentSlotEnd >= $booked['start_time'] - $minGap)) {
+                        $isAvailable = false;
+                        break;
+                    }
+                }
+
+                if ($currentSlotStart < $currentTime->getTimestamp() + 600) {
+                    $isAvailable = false;
+                }
+
+                if ($isAvailable) {
+                    $availableSlots[] = date('Y-m-d\TH:i:s.up', $currentSlotStart);
+                }
+
+                $currentSlotStart += $bufferTime * 60;
+            }
+        }
+
+        return $availableSlots;
+    }
+
     public function checkIfTimeIsAvailable($veterinarianId, $startTime, $endTime)
     {
         $overlappingBookings = ServiceBooking::where('veterinarian_id', $veterinarianId)->where('status', '!=', 'CANCELLED')
@@ -94,7 +160,7 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
                     }
                 }
 
-                if ($currentSlotStart < $currentTime->getTimestamp()) {
+                if ($currentSlotStart < $currentTime->getTimestamp() + 600) {
                     $isAvailable = false;
                 }
 
