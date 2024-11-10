@@ -11,14 +11,54 @@ use App\Infrastructure\Repository\Models\ServiceBooking;
 use App\Infrastructure\Repository\Models\User;
 use App\Infrastructure\Repository\Models\VeterinarianSchedule as ModelVeterinarianSchedule;
 use App\Infrastructure\Repository\Models\VeterinarianService;
+use Carbon\Carbon;
 
 class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepository
 {
-    public function getAvailableStartTimesForReschedule($serviceId, $bufferTime, $timeGap, $excludeBookingId)
+    public function checkIfTimeIsAvailableForReschedule($bookingId, $startTime)
     {
-        $veterinarian = VeterinarianService::find($serviceId);
-        $sessionDuration = $veterinarian->duration;
-        $veterinarianId = $veterinarian->veterinarian_id;
+        $booking = ServiceBooking::find($bookingId);
+        $service = $booking->service;
+        $veterinarianId = $service->veterinarian_id;
+        $endTime = (new Carbon($startTime))->addMinutes($service->duration * 60);
+
+        $overlappingBookings = ServiceBooking::where('veterinarian_id', $veterinarianId)
+            ->where('status', '!=', 'CANCELLED')
+            ->where('id', '!=', $bookingId)
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->whereBetween('start_time', [$startTime, $endTime])
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($query) use ($startTime, $endTime) {
+                        $query->where('start_time', '<=', $startTime)
+                            ->where('end_time', '>=', $endTime);
+                    });
+            })->count();
+
+        if ($overlappingBookings > 0) {
+            throw new ClientException('The time slot is not available for reschedule.');
+        }
+
+        $overlappingSchedules = ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->whereBetween('start_time', [$startTime, $endTime])
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($query) use ($startTime, $endTime) {
+                        $query->where('start_time', '<=', $startTime)
+                            ->where('end_time', '>=', $endTime);
+                    });
+            })->count();
+
+        if ($overlappingSchedules === 0) {
+            throw new ClientException('The time slot is not available for reschedule.');
+        }
+    }
+
+    public function getAvailableStartTimesForReschedule($bookingId, $bufferTime, $timeGap)
+    {
+        $booking = ServiceBooking::find($bookingId);
+        $service = $booking->service;
+        $sessionDuration = $service->duration;
+        $veterinarianId = $service->veterinarian_id;
 
         $sessionDuration = $sessionDuration * 60;
         $minGap = $bufferTime * 60;
@@ -38,7 +78,7 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
 
         $bookedSchedules = ServiceBooking::where('veterinarian_id', $veterinarianId)
             ->where('status', '!=', 'CANCELLED')
-            ->where('id', '!=', $excludeBookingId)
+            ->where('id', '!=', $bookingId)
             ->where('start_time', '>=', $currentTime)
             ->orderBy('start_time')
             ->get()

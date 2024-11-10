@@ -114,6 +114,6 @@ class UserFilesController extends Controller
     {
         $pathname = "user_files/" . $pathname;
         $url = $this->s3FileRepository->getUrl($pathname, 60 * 24);
-        return redirect($url);
+        return redirect($url, 301);
     }
 }

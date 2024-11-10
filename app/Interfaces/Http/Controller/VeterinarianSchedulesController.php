@@ -2,10 +2,12 @@
 
 namespace App\Interfaces\Http\Controller;
 
+use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\VeterinarianSchedules\Entities\NewVeterinarianSchedule;
 use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\UseCase\VeterinarianSchedules\AddVeterinarianScheduleUseCase;
+use App\UseCase\VeterinarianSchedules\GetAllAvailableStartTimeForRescheduleUseCase;
 use App\UseCase\VeterinarianSchedules\GetAllAvailableStartTimesByServiceId;
 use App\UseCase\VeterinarianSchedules\GetFutureSchedulesUseCaseByVeterinarianIdUseCase;
 use App\UseCase\VeterinarianSchedules\GetScheduleByVeterinarianIdUseCase;
@@ -20,15 +22,20 @@ class VeterinarianSchedulesController extends Controller
     private $getScheduleByVeterinarianIdUseCase;
     private $getAllAvailableStartTimesByServiceId;
     private $getAllFutureScheduleByVeterinarianId;
+    private $getAllAvailableStartTimesForReschedule;
 
 
-    public function __construct(VeterinarianScheduleRepository $repository, VeterinarianServiceRepository $veterinarianServiceRepository)
-    {
+    public function __construct(
+        VeterinarianScheduleRepository $repository,
+        VeterinarianServiceRepository $veterinarianServiceRepository,
+        ServiceBookingRepository $serviceBookingRepository
+    ) {
         $this->addVeterinarianScheduleUseCase = new AddVeterinarianScheduleUseCase($repository);
         $this->removeVeterinarianScheduleUseCase = new RemoveVeterinarianScheduleUseCase($repository);
         $this->getScheduleByVeterinarianIdUseCase = new GetScheduleByVeterinarianIdUseCase($repository);
         $this->getAllAvailableStartTimesByServiceId = new GetAllAvailableStartTimesByServiceId($repository, $veterinarianServiceRepository);
         $this->getAllFutureScheduleByVeterinarianId = new GetFutureSchedulesUseCaseByVeterinarianIdUseCase($repository);
+        $this->getAllAvailableStartTimesForReschedule = new GetAllAvailableStartTimeForRescheduleUseCase($repository, $serviceBookingRepository);
     }
 
     public function add(Request $request)
@@ -74,6 +81,15 @@ class VeterinarianSchedulesController extends Controller
         $responseArray = [
             "status" => "success",
             "data" => $this->getAllAvailableStartTimesByServiceId->execute($serviceId)
+        ];
+        return response()->json($responseArray);
+    }
+
+    public function startTimesForReschedule($bookingId)
+    {
+        $responseArray = [
+            "status" => "success",
+            "data" => $this->getAllAvailableStartTimesForReschedule->execute($bookingId)
         ];
         return response()->json($responseArray);
     }

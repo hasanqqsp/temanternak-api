@@ -16,21 +16,21 @@ class ChangeTransactionStatusById
         $this->serviceBookingRepository = $serviceBookingRepository;
     }
 
-    public function execute(string $transactionId, string $newStatus)
+    public function execute(string $transactionId, string $newStatus, $paymentType)
     {
-        if (!in_array($newStatus, ['PENDING', 'PAID', 'DENIED', "EXPIRED", "CANCELLED"])) {
+        if (!in_array($newStatus, ['PENDING', 'PAID', 'DENIED', "EXPIRED", "CANCELLED", "REFUNDED"])) {
             throw new \InvalidArgumentException('Invalid status provided');
         }
         $this->transactionRepository->checkIfExist($transactionId);
         if ($newStatus == "PAID") {
             $this->transactionRepository->updateStatus($transactionId, $newStatus);
-            $this->serviceBookingRepository->updateStatusByTransactionId($transactionId, "CONFIRMED");
+            $this->serviceBookingRepository->updateStatusByTransactionId($transactionId, "CONFIRMED", $paymentType);
         } else if (in_array($newStatus, ['DENIED', "EXPIRED", "CANCELLED"])) {
             $this->transactionRepository->updateStatus($transactionId, $newStatus);
-            $this->serviceBookingRepository->updateStatusByTransactionId($transactionId, "CANCELLED");
+            $this->serviceBookingRepository->updateStatusByTransactionId($transactionId, "CANCELLED", $paymentType);
         } else {
             $this->transactionRepository->updateStatus($transactionId, $newStatus);
-            $this->serviceBookingRepository->updateStatusByTransactionId($transactionId, "PENDING");
+            $this->serviceBookingRepository->updateStatusByTransactionId($transactionId, "PENDING", $paymentType);
         }
     }
 }

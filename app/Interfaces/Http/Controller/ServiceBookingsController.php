@@ -17,6 +17,7 @@ use App\UseCase\ServiceBooking\GetAllServiceBookingsByVeterinarianIdUseCase;
 use App\UseCase\ServiceBooking\GetAllServiceBookingsUseCase;
 use App\UseCase\ServiceBooking\GetServiceBookingByIdForAdminUseCase;
 use App\UseCase\ServiceBooking\GetServiceBookingByIdUseCase;
+use App\UseCase\ServiceBooking\RescheduleBookingUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -30,6 +31,7 @@ class ServiceBookingsController extends Controller
     private $cancelServiceBookingUseCase;
     private $getServiceBookingByIdUseCase;
     private $getServiceBookingForAdminByIdUseCase;
+    private $rescheduleServiceBookingUseCase;
 
     public function __construct(
         ServiceBookingRepository $serviceBookingRepository,
@@ -52,6 +54,7 @@ class ServiceBookingsController extends Controller
         $this->cancelServiceBookingUseCase = new CancelServiceBookingUseCase($serviceBookingRepository, $transactionRepository, $midtransPaymentGateway);
         $this->getServiceBookingByIdUseCase = new GetServiceBookingByIdUseCase($serviceBookingRepository);
         $this->getServiceBookingForAdminByIdUseCase = new GetServiceBookingByIdForAdminUseCase($serviceBookingRepository);
+        $this->rescheduleServiceBookingUseCase = new RescheduleBookingUseCase($serviceBookingRepository, $veterinarianScheduleRepository);
     }
 
     public function add(Request $request, $veterinarianId, $serviceId)
@@ -126,5 +129,14 @@ class ServiceBookingsController extends Controller
             "data" => $this->getServiceBookingByIdUseCase->execute($bookingId, $request->user()->id)->toArray()
         ];
         return response()->json($responseArray);
+    }
+
+    public function reschedule(Request $request, $bookingId)
+    {
+        $this->rescheduleServiceBookingUseCase->execute($bookingId, $request->startTime, $request->user()->id);
+        return response()->json([
+            "status" => "success",
+            "message" => "Booking successfully rescheduled"
+        ]);
     }
 }

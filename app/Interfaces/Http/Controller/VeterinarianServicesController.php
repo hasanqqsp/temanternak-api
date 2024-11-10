@@ -51,6 +51,8 @@ class VeterinarianServicesController extends Controller
         if (request()->bearerToken() && $user = Auth::guard('sanctum')->user()) {
             if ($user->role === 'superadmin' || $user->role === 'admin') {
                 $data = $this->getAllVeterinarianServiceUseCase->execute();
+            } else {
+                $data = $this->getAllPublicVeterinarianServiceUseCase->execute();
             }
         } else {
             $data = $this->getAllPublicVeterinarianServiceUseCase->execute();

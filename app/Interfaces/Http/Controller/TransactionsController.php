@@ -68,6 +68,7 @@ class TransactionsController extends Controller
         $type = $request->payment_type;
         $gross_amount = $request->gross_amount;
         $status_code = $request->status_code;
+        $paymentType = $request->payment_type;
 
         $expectedSignature = hash('sha512', $order_id . $status_code . $gross_amount . env('MIDTRANS_SERVER_KEY'));
 
@@ -81,19 +82,21 @@ class TransactionsController extends Controller
         if ($transaction == 'capture') {
             if ($type == 'credit_card') {
                 if ($fraud == 'accept') {
-                    $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
+                    $this->changeTransactionStatusUseCase->execute($order_id, 'PAID', $paymentType);
                 }
             }
         } else if ($transaction == 'settlement') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'PAID');
+            $this->changeTransactionStatusUseCase->execute($order_id, 'PAID', $paymentType);
         } else if ($transaction == 'pending') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'PENDING');
+            $this->changeTransactionStatusUseCase->execute($order_id, 'PENDING', $paymentType);
         } else if ($transaction == 'deny') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'DENIED');
+            $this->changeTransactionStatusUseCase->execute($order_id, 'DENIED', $paymentType);
         } else if ($transaction == 'expire') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'EXPIRED');
+            $this->changeTransactionStatusUseCase->execute($order_id, 'EXPIRED', $paymentType);
         } else if ($transaction == 'cancel') {
-            $this->changeTransactionStatusUseCase->execute($order_id, 'CANCELLED');
+            $this->changeTransactionStatusUseCase->execute($order_id, 'CANCELLED', $paymentType);
+        } else if ($transaction == 'refund') {
+            $this->changeTransactionStatusUseCase->execute($order_id, 'REFUNDED', $paymentType);
         }
         return response()->json([
             "status" => "success",

@@ -17,9 +17,10 @@ interface ServiceBookingRepository
     public function getByServiceIdAndStatus(string $id, string $status);
     public function getByStatus(string $status);
     public function setTransactionId(string $bookingId, string $transactionId);
-    public function updateStatusByTransactionId(string $transactionId, string $status);
+    public function updateStatusByTransactionId(string $transactionId, string $status, string $paymentType);
     public function checkIfAuthorized(string $bookingId, string $userId);
     public function cancel(string $bookingId, string $userId);
     public function checkIfExists(string $bookingId);
     public function checkStatus(string $bookingId);
+    public function reschedule(string $bookingId, string $newStartTime);
 }

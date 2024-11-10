@@ -26,6 +26,7 @@ class CancelServiceBookingUseCase
         $this->bookingRepository->checkIfAuthorized($bookingId, $credentialId);
         $booking = $this->bookingRepository->getById($bookingId);
         $status = $booking->getStatus();
+        $transaction = $booking->getTransaction();
 
         if ($booking->getStartTime() < now()->addHours(1)) {
             throw new ClientException("You can only cancel booking 1 hours before the schedule");
@@ -34,7 +35,14 @@ class CancelServiceBookingUseCase
             throw new ClientException("Booking already cancelled");
         }
         if ($status === 'CONFIRMED') {
-            throw new ClientException("Booking already confirmed. Please request refund");
+            try {
+                $this->midtransPaymentGateway->refundTransaction($transaction->getId(), [
+                    'amount' => $transaction->getPrice(),
+                    'reason' => 'Booking cancellation'
+                ]);
+            } catch (\Exception $e) {
+                throw new ClientException("Payment gateway reject to refund transaction : " . $e->getMessage());
+            }
         }
         if ($status === 'ONPROGRESS') {
             throw new ClientException("Booking already confirmed");
@@ -43,7 +51,6 @@ class CancelServiceBookingUseCase
             throw new ClientException("Booking already completed");
         }
 
-        $transaction = $booking->getTransaction();
         try {
             $this->midtransPaymentGateway->cancelTransaction($transaction->getId());
         } catch (\Exception $e) {

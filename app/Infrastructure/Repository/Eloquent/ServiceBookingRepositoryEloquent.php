@@ -16,6 +16,19 @@ use Carbon\Carbon;
 
 class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
 {
+    public function reschedule($bookingId, $newStartTime)
+    {
+        $booking = ServiceBooking::find($bookingId);
+        $newStartTime = new Carbon($newStartTime);
+        if ($booking) {
+            $booking->rescheduled_from = $booking->start_time;
+            $booking->start_time = $newStartTime->toDateTime();
+            $booking->end_time = $newStartTime->addMinutes($booking->service->duration)->subSecond()->toDateTime();
+            $booking->rescheduled_at = now();
+            $booking->save();
+        }
+    }
+
     public function checkIfExists($bookingId)
     {
         $booking = ServiceBooking::find($bookingId);
@@ -124,12 +137,13 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         return $serviceBooking;
     }
 
-    public function updateStatusByTransactionId($transactionId, $status)
+    public function updateStatusByTransactionId($transactionId, $status, $paymentType)
     {
         $booking = ServiceBooking::where('transaction_id', $transactionId)->first();
 
         if ($booking) {
             $booking->status = $status;
+            $booking->payment_type = $paymentType;
             $booking->save();
         }
     }

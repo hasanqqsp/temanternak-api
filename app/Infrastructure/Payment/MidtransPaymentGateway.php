@@ -24,6 +24,11 @@ class MidtransPaymentGateway
         return Transaction::cancel($transactionId);
     }
 
+    public function refundTransaction($transactionId, $params)
+    {
+        return Transaction::refund($transactionId, $params);
+    }
+
     public static function createPayload($transactionId, $paymentAmount, $products, $name, $email, $orderTime, $expiry)
     {
         return [

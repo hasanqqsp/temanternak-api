@@ -2,21 +2,24 @@
 
 namespace App\UseCase\VeterinarianSchedules;
 
+use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 
 class GetAllAvailableStartTimeForRescheduleUseCase
 {
     protected $veterinarianScheduleRepository;
+    protected $serviceBookingRepository;
 
-    public function __construct(VeterinarianScheduleRepository $veterinarianScheduleRepository)
+    public function __construct(VeterinarianScheduleRepository $veterinarianScheduleRepository, ServiceBookingRepository $serviceBookingRepository)
     {
         $this->veterinarianScheduleRepository = $veterinarianScheduleRepository;
+        $this->serviceBookingRepository = $serviceBookingRepository;
     }
 
-    public function execute($veterinarianId, $bookingId)
+    public function execute($bookingId)
     {
-        // Fetch all available start times for rescheduling
-        $availableStartTimes = $this->veterinarianScheduleRepository->getAvailableStartTimesForReschedule($veterinarianId, 5, 5, $bookingId);
+        $this->serviceBookingRepository->checkIfExists($bookingId);
+        $availableStartTimes = $this->veterinarianScheduleRepository->getAvailableStartTimesForReschedule($bookingId, 5, 5);
 
         return $availableStartTimes;
     }

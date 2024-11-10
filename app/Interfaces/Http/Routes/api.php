@@ -71,6 +71,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('ability:role-basic')->group(function () {
         Route::get('/veterinarians/services/{id}/startTimes', [VeterinarianSchedulesController::class, 'getAvailableStartTimes']);
         Route::post('/veterinarians/{veterinarianId}/services/{serviceId}/bookings', [ServiceBookingsController::class, 'add']);
+        Route::get('/bookings/{bookingId}/reschedule/startTimes', [VeterinarianSchedulesController::class, 'startTimesForReschedule']);
+        Route::post('/bookings/{bookingId}/reschedule', [ServiceBookingsController::class, 'reschedule']);
     });
 });
 
