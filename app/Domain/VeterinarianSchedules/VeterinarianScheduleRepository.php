@@ -9,7 +9,8 @@ use DateTime;
 interface VeterinarianScheduleRepository
 {
     public function add(NewVeterinarianSchedule $data): VeterinarianSchedule;
-    public function getByVeterinarianId(string $veterinarianId): array;
+    public function getAllByVeterinarianId(string $veterinarianId): array;
+    public function getFutureByVeterinarianId(string $veterinarianId): array;
     public function remove(string $id);
     public function verifyOwnership(string $scheduleId, string $veterinarianId);
     public function checkIfExist(string $id);

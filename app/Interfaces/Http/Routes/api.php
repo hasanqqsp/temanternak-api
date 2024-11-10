@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions/{id}', [TransactionsController::class, 'getById']);
     Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
     Route::get('/bookings', [ServiceBookingsController::class, 'getAll']);
+    Route::post('/bookings/{bookingId}/cancellation', [ServiceBookingsController::class, 'cancel']);
+    Route::get('/bookings/{bookingId}', [ServiceBookingsController::class, 'getById']);
 
     Route::middleware('ability:role-invited-user')->group(function () {
         Route::put('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'revise']);

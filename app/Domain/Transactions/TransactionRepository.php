@@ -12,4 +12,5 @@ interface TransactionRepository
     public function getByCustomerId(string $customerId);
     public function updateStatus(string $transactionId, string $status);
     public function checkIfExist(string $transactionId);
+    public function manualCancel(string $transactionId);
 }

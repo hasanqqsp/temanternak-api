@@ -16,7 +16,7 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
 {
     public function checkIfTimeIsAvailable($veterinarianId, $startTime, $endTime)
     {
-        $overlappingBookings = ServiceBooking::where('veterinarian_id', $veterinarianId)
+        $overlappingBookings = ServiceBooking::where('veterinarian_id', $veterinarianId)->where('status', '!=', 'CANCELLED')
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->whereBetween('start_time', [$startTime, $endTime])
                     ->orWhereBetween('end_time', [$startTime, $endTime])
@@ -56,7 +56,7 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
 
         $currentTime = now();
         $schedules = ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)
-            ->where('start_time', '>=', $currentTime)
+            ->where('end_time', '>=', $currentTime)
             ->orderBy('start_time')
             ->get()
             ->map(function ($schedule) {
@@ -67,9 +67,7 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
             })
             ->toArray();
 
-
-
-        $bookedSchedules = ServiceBooking::where('veterinarian_id', $veterinarianId)
+        $bookedSchedules = ServiceBooking::where('veterinarian_id', $veterinarianId)->where('status', '!=', 'CANCELLED')
             ->where('start_time', '>=', $currentTime)
             ->orderBy('start_time')
             ->get()
@@ -96,6 +94,10 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
                     }
                 }
 
+                if ($currentSlotStart < $currentTime->getTimestamp()) {
+                    $isAvailable = false;
+                }
+
                 if ($isAvailable) {
                     $availableSlots[] = date('Y-m-d\TH:i:s.up', $currentSlotStart);
                 }
@@ -109,7 +111,9 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
 
     public function getNormalizeScheduleByVeterinarianId($veterinarianId): array
     {
+        $currentTime = now();
         $schedules = ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)
+            ->where('end_time', '>=', $currentTime)
             ->orderBy('start_time')
             ->get()
             ->map(function ($schedule) {
@@ -184,9 +188,20 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
         }
     }
 
-    public function getByVeterinarianId($veterinarianId): array
+    public function getAllByVeterinarianId($veterinarianId): array
     {
-        return ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)->get()->map(function ($schedule) {
+        return ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)->orderBy('end_time', 'desc')->get()->map(function ($schedule) {
+            return (new VeterinarianSchedule(
+                $schedule->id,
+                $schedule->start_time,
+                $schedule->end_time
+            ))->toArray();
+        })->toArray();
+    }
+
+    public function getFutureByVeterinarianId($veterinarianId): array
+    {
+        return ModelVeterinarianSchedule::where('veterinarian_id', $veterinarianId)->orderBy('end_time', 'desc')->where('endTime', ">", now())->get()->map(function ($schedule) {
             return (new VeterinarianSchedule(
                 $schedule->id,
                 $schedule->start_time,

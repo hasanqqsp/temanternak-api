@@ -4,7 +4,7 @@ namespace App\UseCase\ServiceBooking;
 
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 
-class GetAllConfirmedServiceBookingsByVeterinarianIdUseCase
+class GetServiceBookingByIdUseCase
 {
     private $serviceBookingRepository;
 
@@ -13,8 +13,10 @@ class GetAllConfirmedServiceBookingsByVeterinarianIdUseCase
         $this->serviceBookingRepository = $serviceBookingRepository;
     }
 
-    public function execute(string $veterinarianId)
+    public function execute(string $id, string $credentialId)
     {
-        return $this->serviceBookingRepository->getByVeterinarianIdAndStatus($veterinarianId, "CONFIRMED");
+        $this->serviceBookingRepository->checkIfExists($id);
+        $this->serviceBookingRepository->checkIfAuthorized($id, $credentialId);
+        return $this->serviceBookingRepository->getById($id);
     }
 }

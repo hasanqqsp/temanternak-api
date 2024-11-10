@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Payment;
 
 use Midtrans\Snap;
+use Midtrans\Transaction;
 
 class MidtransPaymentGateway
 {
@@ -18,7 +19,12 @@ class MidtransPaymentGateway
         return Snap::getSnapToken($data);
     }
 
-    public static function createPayload($transactionId, $paymentAmount, $products, $name, $email)
+    public function cancelTransaction($transactionId)
+    {
+        return Transaction::cancel($transactionId);
+    }
+
+    public static function createPayload($transactionId, $paymentAmount, $products, $name, $email, $orderTime, $expiry)
     {
         return [
             "transaction_details" => [
@@ -32,6 +38,11 @@ class MidtransPaymentGateway
             "customer_details" => [
                 "first_name" => $name,
                 "email" => $email,
+            ],
+            "expiry" => [
+                "start_time" => $orderTime,
+                "duration" => $expiry,
+                "unit" => "minutes"
             ]
         ];
     }

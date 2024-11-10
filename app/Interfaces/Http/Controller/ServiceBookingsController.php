@@ -10,10 +10,13 @@ use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\Infrastructure\Payment\MidtransPaymentGateway;
 use App\UseCase\ServiceBooking\AddServiceBookingUseCase;
+use App\UseCase\ServiceBooking\CancelServiceBookingUseCase;
 use App\UseCase\ServiceBooking\GetAllConfirmedServiceBookingsByVeterinarianIdUseCase;
 use App\UseCase\ServiceBooking\GetAllServiceBookingsByCustomerIdUseCase;
 use App\UseCase\ServiceBooking\GetAllServiceBookingsByVeterinarianIdUseCase;
 use App\UseCase\ServiceBooking\GetAllServiceBookingsUseCase;
+use App\UseCase\ServiceBooking\GetServiceBookingByIdForAdminUseCase;
+use App\UseCase\ServiceBooking\GetServiceBookingByIdUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -24,6 +27,9 @@ class ServiceBookingsController extends Controller
     private $getAllServiceBookingsByCustomerIdUseCase;
     private $getAllServiceBookingsByVeterinarianIdUseCase;
     private $getAllServiceBookingsUseCase;
+    private $cancelServiceBookingUseCase;
+    private $getServiceBookingByIdUseCase;
+    private $getServiceBookingForAdminByIdUseCase;
 
     public function __construct(
         ServiceBookingRepository $serviceBookingRepository,
@@ -31,17 +37,21 @@ class ServiceBookingsController extends Controller
         VeterinarianServiceRepository $veterinarianServiceRepository,
         VeterinarianScheduleRepository $veterinarianScheduleRepository
     ) {
+        $midtransPaymentGateway = new MidtransPaymentGateway();
         $this->addServiceBookingUseCase = new AddServiceBookingUseCase(
             $serviceBookingRepository,
             $transactionRepository,
             $veterinarianServiceRepository,
             $veterinarianScheduleRepository,
-            new MidtransPaymentGateway()
+            $midtransPaymentGateway
         );
         $this->getAllServiceBookingsUseCase = new GetAllServiceBookingsUseCase($serviceBookingRepository);
         $this->getAllServiceBookingsByCustomerIdUseCase = new GetAllServiceBookingsByCustomerIdUseCase($serviceBookingRepository);
         $this->getAllServiceBookingsByVeterinarianIdUseCase = new GetAllServiceBookingsByVeterinarianIdUseCase($serviceBookingRepository);
         $this->getAllConfirmedServiceBookingsByVeterinarianIdUseCase = new GetAllConfirmedServiceBookingsByVeterinarianIdUseCase($serviceBookingRepository);
+        $this->cancelServiceBookingUseCase = new CancelServiceBookingUseCase($serviceBookingRepository, $transactionRepository, $midtransPaymentGateway);
+        $this->getServiceBookingByIdUseCase = new GetServiceBookingByIdUseCase($serviceBookingRepository);
+        $this->getServiceBookingForAdminByIdUseCase = new GetServiceBookingByIdForAdminUseCase($serviceBookingRepository);
     }
 
     public function add(Request $request, $veterinarianId, $serviceId)
@@ -87,6 +97,33 @@ class ServiceBookingsController extends Controller
         $responseArray = [
             "status" => "success",
             "data" => $this->getAllServiceBookingsByCustomerIdUseCase->execute($request->user()->id)
+        ];
+        return response()->json($responseArray);
+    }
+
+    public function cancel(Request $request, $bookingId)
+    {
+        $this->cancelServiceBookingUseCase->execute($bookingId, $request->user()->id);
+        $responseArray = [
+            "status" => "success",
+            "message" => "Booking successfully cancelled"
+        ];
+        return response()->json($responseArray);
+    }
+
+    public function getById(Request $request, $bookingId)
+    {
+        $role = $request->user()->role;
+        if ($role == "admin" || $role == "superadmin") {
+            $responseArray = [
+                "status" => "success",
+                "data" => $this->getServiceBookingForAdminByIdUseCase->execute($bookingId)->toArray()
+            ];
+            return response()->json($responseArray);
+        }
+        $responseArray = [
+            "status" => "success",
+            "data" => $this->getServiceBookingByIdUseCase->execute($bookingId, $request->user()->id)->toArray()
         ];
         return response()->json($responseArray);
     }

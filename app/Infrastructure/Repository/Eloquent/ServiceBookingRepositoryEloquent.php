@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository\Eloquent;
 
+use App\Commons\Exceptions\NotFoundException;
 use App\Domain\ServiceBookings\Entities\NewBooking;
 use App\Domain\ServiceBookings\Entities\ServiceBooking as EntitiesServiceBooking;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
@@ -15,6 +16,15 @@ use Carbon\Carbon;
 
 class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
 {
+    public function checkIfExists($bookingId)
+    {
+        $booking = ServiceBooking::find($bookingId);
+        if (!$booking) {
+            throw new NotFoundException("Booking not found");
+        }
+        return true;
+    }
+
     public function getAll()
     {
         return ServiceBooking::all()->map(function ($booking) {
@@ -22,46 +32,45 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         });
     }
 
+    public function cancel($bookingId, $userId)
+    {
+        $booking = ServiceBooking::find($bookingId);
+        if ($booking) {
+            $booking->canceller_id = $userId;
+            $booking->status = 'CANCELLED';
+            $booking->save();
+        }
+    }
+    public function checkIfAuthorized($userId, $bookingId)
+    {
+        $booking = ServiceBooking::find($bookingId);
+        return $booking && (($booking->booker_id == $userId) || ($booking->veterinarian_id == $userId));
+    }
     public function getById($id)
     {
         $booking = ServiceBooking::find($id);
+        $this->updateStatusToCancelledIfNeeded($booking);
         return $booking ? $this->createBookingService($booking) : null;
     }
 
-    public function getAllByStatus($status)
-    {
-        return ServiceBooking::where('status', $status)->get()->map(function ($booking) {
-            return $this->createBookingService($booking)->toArray();
-        });
-    }
-
-    public function getAllByVeterinarianId($veterinarianId)
+    public function getByVeterinarianId($veterinarianId)
     {
         return ServiceBooking::where('veterinarian_id', $veterinarianId)->get()->map(function ($booking) {
+            $this->updateStatusToCancelledIfNeeded($booking);
+
             return $this->createBookingService($booking)->toArray();
         });
     }
 
-    public function getAllByStatusAndVeterinarianId($status, $veterinarianId)
-    {
-        return ServiceBooking::where('status', $status)->where('veterinarian_id', $veterinarianId)->get()->map(function ($booking) {
-            return $this->createBookingService($booking)->toArray();
-        });
-    }
 
-    public function getAllByBookerId($bookerId)
+    public function getByBookerId($bookerId)
     {
         return ServiceBooking::where('booker_id', $bookerId)->get()->map(function ($booking) {
+            $this->updateStatusToCancelledIfNeeded($booking);
             return $this->createBookingService($booking)->toArray();
         });
     }
 
-    public function getAllByStatusAndBookerId($status, $bookerId)
-    {
-        return ServiceBooking::where('status', $status)->where('booker_id', $bookerId)->get()->map(function ($booking) {
-            return $this->createBookingService($booking)->toArray();
-        });
-    }
     private function createBookingService($booking)
     {
         $serviceBooking =
@@ -105,12 +114,20 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
                 )
             );
         }
+        if ($booking->status === 'CANCELLED') {
+            $serviceBooking->setCancelledBy(
+                $booking->canceller_id == $booking->booker_id
+                    ? 'BOOKER' : ($booking->veterinarian_id === $booking->canceller_id
+                        ? 'VETERINARIAN' : "SYSTEM")
+            );
+        }
         return $serviceBooking;
     }
 
     public function updateStatusByTransactionId($transactionId, $status)
     {
         $booking = ServiceBooking::where('transaction_id', $transactionId)->first();
+
         if ($booking) {
             $booking->status = $status;
             $booking->save();
@@ -135,37 +152,81 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         $newBooking->veterinarian_id = $booking->getVeterinarianId();
         $newBooking->status = 'PENDING'; // 'CONFIRMED', 'CANCELLED', 'RESCHEDULED'
         $newBooking->save();
-        $newBooking->end_time = (new Carbon($booking->getStartTime()))->addMinutes($newBooking->service->duration)->toDateTime();
+        $newBooking->end_time = (new Carbon($booking->getStartTime()))->addMinutes($newBooking->service->duration)->subSecond()->toDateTime();
         $newBooking->save();
         return $this->createBookingService($newBooking);
-    }
-
-
-    public function getByVeterinarianId($veterinarianId)
-    {
-        return ServiceBooking::where('veterinarian_id', $veterinarianId)->get()->map(function ($booking) {
-            return $this->createBookingService($booking)->toArray();
-        });
-    }
-
-    public function getByBookerId($bookerId)
-    {
-        return ServiceBooking::where('booker_id', $bookerId)->get()->map(function ($booking) {
-            return $this->createBookingService($booking)->toArray();
-        });
     }
 
     public function getByServiceId($serviceId)
     {
         return ServiceBooking::where('service_id', $serviceId)->get()->map(function ($booking) {
+            $this->updateStatusToCancelledIfNeeded($booking);
             return $this->createBookingService($booking)->toArray();
         });
     }
 
-    public function getByTimeRange($startTime, $endTime)
+    public function updateStatusToCancelledIfNeeded($booking)
     {
-        return ServiceBooking::whereBetween('booking_time', [$startTime, $endTime])->get()->map(function ($booking) {
-            return $this->createBookingService($booking)->toArray();
-        });
+        if ($booking->transaction == null) {
+            $booking->status = 'CANCELLED';
+            $booking->save();
+        }
+        if ($booking->transaction && $booking->transaction->status === 'CANCELLED') {
+            $booking->status = 'CANCELLED';
+            $booking->save();
+        }
+        if ($booking->status === 'PENDING' && $booking->start_time < now()) {
+            $booking->status = 'CANCELLED';
+            $booking->save();
+        }
+    }
+
+    public function getByVeterinarianIdAndStatus(string $veterinarianId, string $status)
+    {
+        return ServiceBooking::where('veterinarian_id', $veterinarianId)
+            ->where('status', $status)
+            ->get()
+            ->map(function ($booking) {
+                $this->updateStatusToCancelledIfNeeded($booking);
+                return $this->createBookingService($booking)->toArray();
+            });
+    }
+
+    public function getByBookerIdAndStatus($bookerId, $status)
+    {
+        return ServiceBooking::where('booker_id', $bookerId)
+            ->where('status', $status)
+            ->get()
+            ->map(function ($booking) {
+                $this->updateStatusToCancelledIfNeeded($booking);
+                return $this->createBookingService($booking)->toArray();
+            });
+    }
+
+    public function getByServiceIdAndStatus($serviceId, $status)
+    {
+        return ServiceBooking::where('service_id', $serviceId)
+            ->where('status', $status)
+            ->get()
+            ->map(function ($booking) {
+                $this->updateStatusToCancelledIfNeeded($booking);
+                return $this->createBookingService($booking)->toArray();
+            });
+    }
+
+    public function checkStatus($bookingId)
+    {
+        $booking = ServiceBooking::find($bookingId);
+        return $booking ? $booking->status : null;
+    }
+
+    public function getByStatus($status)
+    {
+        return ServiceBooking::where('status', $status)
+            ->get()
+            ->map(function ($booking) {
+                $this->updateStatusToCancelledIfNeeded($booking);
+                return $this->createBookingService($booking)->toArray();
+            });
     }
 }

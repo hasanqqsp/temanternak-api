@@ -7,6 +7,7 @@ use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\UseCase\VeterinarianSchedules\AddVeterinarianScheduleUseCase;
 use App\UseCase\VeterinarianSchedules\GetAllAvailableStartTimesByServiceId;
+use App\UseCase\VeterinarianSchedules\GetFutureSchedulesUseCaseByVeterinarianIdUseCase;
 use App\UseCase\VeterinarianSchedules\GetScheduleByVeterinarianIdUseCase;
 use App\UseCase\VeterinarianSchedules\RemoveVeterinarianScheduleUseCase;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class VeterinarianSchedulesController extends Controller
     private $removeVeterinarianScheduleUseCase;
     private $getScheduleByVeterinarianIdUseCase;
     private $getAllAvailableStartTimesByServiceId;
+    private $getAllFutureScheduleByVeterinarianId;
 
 
     public function __construct(VeterinarianScheduleRepository $repository, VeterinarianServiceRepository $veterinarianServiceRepository)
@@ -26,6 +28,7 @@ class VeterinarianSchedulesController extends Controller
         $this->removeVeterinarianScheduleUseCase = new RemoveVeterinarianScheduleUseCase($repository);
         $this->getScheduleByVeterinarianIdUseCase = new GetScheduleByVeterinarianIdUseCase($repository);
         $this->getAllAvailableStartTimesByServiceId = new GetAllAvailableStartTimesByServiceId($repository, $veterinarianServiceRepository);
+        $this->getAllFutureScheduleByVeterinarianId = new GetFutureSchedulesUseCaseByVeterinarianIdUseCase($repository);
     }
 
     public function add(Request $request)
@@ -52,6 +55,13 @@ class VeterinarianSchedulesController extends Controller
     }
     public function getMy(Request $request)
     {
+        if ($request->query('only_future') == 'true') {
+            $responseArray = [
+                "status" => "success",
+                "data" => $this->getAllFutureScheduleByVeterinarianId->execute($request->user()->id)
+            ];
+            return response()->json($responseArray);
+        }
         $responseArray = [
             "status" => "success",
             "data" => $this->getScheduleByVeterinarianIdUseCase->execute($request->user()->id)

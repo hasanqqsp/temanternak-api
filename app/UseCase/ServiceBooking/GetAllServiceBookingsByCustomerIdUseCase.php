@@ -15,6 +15,6 @@ class GetAllServiceBookingsByCustomerIdUseCase
 
     public function execute(string $customerId)
     {
-        return $this->serviceBookingRepository->getAllByBookerId($customerId);
+        return $this->serviceBookingRepository->getByBookerId($customerId);
     }
 }

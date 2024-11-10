@@ -16,8 +16,9 @@ class ServiceBooking
     private VetServiceOnly $service;
     private ?Transaction $transaction;
     private string $status;
+    private ?string $cancelledBy;
 
-    public function __construct(string $id, DateTime $startTime, DateTime $endTime, User $booker, VetServiceOnly $service, string $status, ?Transaction $transaction = null)
+    public function __construct(string $id, DateTime $startTime, DateTime $endTime, User $booker, VetServiceOnly $service, string $status, ?Transaction $transaction = null, ?string $cancelledBy = null)
     {
         $this->id = $id;
         $this->startTime = $startTime;
@@ -26,6 +27,7 @@ class ServiceBooking
         $this->service = $service;
         $this->transaction = $transaction;
         $this->status = $status;
+        $this->cancelledBy = $cancelledBy;
     }
 
     public function getId(): string
@@ -63,6 +65,11 @@ class ServiceBooking
         return $this->status;
     }
 
+    public function getCancelledBy(): ?string
+    {
+        return $this->cancelledBy;
+    }
+
     public function setId(string $id): void
     {
         $this->id = $id;
@@ -98,9 +105,14 @@ class ServiceBooking
         $this->status = $status;
     }
 
+    public function setCancelledBy(?string $cancelledBy): void
+    {
+        $this->cancelledBy = $cancelledBy;
+    }
+
     public function toArray(): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'startTime' => $this->startTime->format('Y-m-d\TH:i:s.up'),
             'endTime' => $this->endTime->format('Y-m-d\TH:i:s.up'),
@@ -109,5 +121,11 @@ class ServiceBooking
             'transaction' => $this->transaction ? $this->transaction->toArray() : null,
             'status' => $this->status,
         ];
+
+        if ($this->cancelledBy !== null) {
+            $data['cancelledBy'] = $this->cancelledBy;
+        }
+
+        return $data;
     }
 }

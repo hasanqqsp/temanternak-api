@@ -2,6 +2,7 @@
 
 namespace App\UseCase\ServiceBooking;
 
+use App\Commons\Exceptions\ClientException;
 use App\Domain\ServiceBookings\Entities\NewBooking;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Transactions\Entities\NewTransaction;
@@ -37,6 +38,10 @@ class AddServiceBookingUseCase
     {
         $service = $this->veterinarianServiceRepository->getById($data->getServiceId());
         $endTime = (new Carbon($data->getStartTime()))->addMinutes($service->getDuration())->toDateTime();
+        if ((new Carbon($data->getStartTime()))->diffInMinutes(now()) * -1 < 10) {
+            throw new ClientException('Cannot book a service less than 10 minutes before the schedule');
+        }
+
         $this->veterinarianScheduleRepository->checkIfTimeIsAvailable($data->getVeterinarianId(), $data->getStartTime(), $endTime);
         $booking = $this->serviceBookingRepository->add($data);
         $service = $this->veterinarianServiceRepository->getById($data->getServiceId());
@@ -53,14 +58,16 @@ class AddServiceBookingUseCase
             $data->getBookerId(),
             $products,
         );
-        $this->serviceBookingRepository->setTransactionId($booking->getId(), $newTransaction->getId());
         $payment = $this->midtransPaymentGateway->getSnapToken(MidtransPaymentGateway::createPayload(
             $newTransaction->getId(),
             $newTransaction->getPrice(),
             $products,
             $booking->getBooker()->getName(),
             $booking->getBooker()->getEmail(),
+            now()->format("Y-m-d H:i:s +Z"),
+            min([(new Carbon($data->getStartTime()))->subMinute()->diffInMinutes(now()) * -1, 60])
         ));
+        $this->serviceBookingRepository->setTransactionId($booking->getId(), $newTransaction->getId());
         $newTransaction->setPaymentToken($payment);
 
 

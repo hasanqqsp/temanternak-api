@@ -6,7 +6,10 @@ use App\Commons\Exceptions\NotFoundException;
 use App\Domain\Transactions\Entities\NewTransaction;
 use App\Domain\Transactions\Entities\Transaction as EntitiesTransaction;
 use App\Domain\Transactions\TransactionRepository;
+use App\Domain\Users\Entities\ShortUser;
+use App\Infrastructure\Repository\Models\ServiceBooking;
 use App\Infrastructure\Repository\Models\Transaction;
+use Aws\Api\Service;
 
 class TransactionRepositoryEloquent implements TransactionRepository
 {
@@ -25,6 +28,7 @@ class TransactionRepositoryEloquent implements TransactionRepository
             return $this->createTransactionEntity($transaction)->toArray();
         });
     }
+
     public function add(NewTransaction $newTransaction)
     {
         $transaction = new Transaction();
@@ -43,7 +47,6 @@ class TransactionRepositoryEloquent implements TransactionRepository
     public function getByTransactionId(string $id)
     {
         $transaction = Transaction::where('id', $id)->first();
-
         return $this->createTransactionEntity($transaction);
     }
 
@@ -64,13 +67,28 @@ class TransactionRepositoryEloquent implements TransactionRepository
         }
     }
 
+    public function manualCancel(string $transactionId)
+    {
+        $transaction = Transaction::where('id', $transactionId)->first();
+        if ($transaction) {
+            $transaction->status = 'CANCELLED';
+            $transaction->save();
+        } else {
+            throw new NotFoundException("Transaction not found");
+        }
+    }
+
     private function createTransactionEntity(Transaction $transaction): EntitiesTransaction
     {
         return new EntitiesTransaction(
             $transaction->id,
             $transaction->price,
             $transaction->platform_fee,
-            $transaction->customer_id,
+            new ShortUser(
+                $transaction->customer->id,
+                $transaction->customer->name,
+                $transaction->customer->role
+            ),
             $transaction->products,
             $transaction->payment_token,
             $transaction->status
