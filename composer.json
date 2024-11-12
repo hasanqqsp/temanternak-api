@@ -16,7 +16,8 @@
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.29",
         "midtrans/midtrans-php": "^2.6",
-        "mongodb/laravel-mongodb": "^5.0"
+        "mongodb/laravel-mongodb": "^5.0",
+        "spatie/laravel-package-tools": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.2",
@@ -31,7 +32,9 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Bavix\\Wallet\\": "app/Infrastructure/vendor/laravel-wallet/src",
+            "HPWebdeveloper\\LaravelPayPocket\\": "app/Infrastructure/vendor/laravel-pay-pocket/src"
         }
     },
     "autoload-dev": {

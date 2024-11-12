@@ -36,8 +36,8 @@ class NewVeterinarianSchedule
     {
         return [
             'veterinarianId' => $this->veterinarianId,
-            'startTime' => $this->startTime->format('Y-m-d H:i:s'),
-            'endTime' => $this->endTime->format('Y-m-d H:i:s'),
+            'startTime' => $this->startTime->format('Y-m-d\TH:i:s.up'),
+            'endTime' => $this->endTime->format('Y-m-d\TH:i:s.up'),
         ];
     }
 

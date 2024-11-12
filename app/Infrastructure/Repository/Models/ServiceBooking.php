@@ -26,4 +26,14 @@ class ServiceBooking extends Model
     {
         return $this->belongsTo(User::class, 'booker_id', 'id');
     }
+
+    public function consultation()
+    {
+        return $this->hasOne(Consultation::class, 'booking_id', 'id');
+    }
+
+    public function settlement()
+    {
+        return $this->hasOne(Settlement::class, 'booking_id', 'id');
+    }
 }

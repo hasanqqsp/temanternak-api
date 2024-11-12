@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Providers;
 
+use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\Invitations\InvitationRepository;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Transactions\TransactionRepository;
@@ -12,6 +13,8 @@ use App\Domain\Veterinarians\VeterinarianRepository;
 use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\Domain\VeterinarianVerifications\VeterinarianVerificationRepository;
+use App\Domain\Wallets\WalletLogRepository;
+use App\Infrastructure\Repository\Eloquent\ConsultationRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\InvitationRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\ServiceBookingRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\TransactionRepositoryEloquent;
@@ -22,6 +25,7 @@ use App\Infrastructure\Repository\Eloquent\VeterinarianRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\VeterinarianScheduleRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\VeterinarianServiceRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\VeterinarianVerificationRepositoryEloquent;
+use App\Infrastructure\Repository\Eloquent\WalletLogRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
 
 
@@ -45,6 +49,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(VeterinarianScheduleRepository::class, VeterinarianScheduleRepositoryEloquent::class);
         $this->app->singleton(ServiceBookingRepository::class, ServiceBookingRepositoryEloquent::class);
         $this->app->singleton(TransactionRepository::class, TransactionRepositoryEloquent::class);
+        $this->app->singleton(ConsultationRepository::class, ConsultationRepositoryEloquent::class);
+        $this->app->singleton(WalletLogRepository::class, WalletLogRepositoryEloquent::class);
     }
 
     /**

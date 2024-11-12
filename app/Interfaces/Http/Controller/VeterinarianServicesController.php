@@ -11,6 +11,7 @@ use App\UseCase\VeterinarianServices\ApproveVeterinarianServiceUseCase;
 use App\UseCase\VeterinarianServices\DeleteVeterinarianServiceUseCase;
 use App\UseCase\VeterinarianServices\EditVeterinarianServiceUseCase;
 use App\UseCase\VeterinarianServices\GetAllPublicVeterinarianServiceUseCase;
+use App\UseCase\VeterinarianServices\GetAllServiceByVeterinarianIdUseCase;
 use App\UseCase\VeterinarianServices\GetAllVeterinarianServiceUseCase;
 use App\UseCase\VeterinarianServices\GetVeterinarianServiceByIdUseCase;
 use App\UseCase\VeterinarianServices\SuspendVeterinarianServiceUseCase;
@@ -31,6 +32,7 @@ class VeterinarianServicesController extends Controller
     protected GetVeterinarianServiceByIdUseCase $getVeterinarianServiceByIdUseCase;
     protected EditVeterinarianServiceUseCase $editVeterinarianServiceUseCase;
     protected DeleteVeterinarianServiceUseCase $deleteVeterinarianServiceUseCase;
+    protected GetAllServiceByVeterinarianIdUseCase $getAllServiceByVeterinarianIdUseCase;
 
     public function __construct(VeterinarianServiceRepository $repository)
     {
@@ -43,6 +45,7 @@ class VeterinarianServicesController extends Controller
         $this->getVeterinarianServiceByIdUseCase = new GetVeterinarianServiceByIdUseCase($repository);
         $this->editVeterinarianServiceUseCase = new EditVeterinarianServiceUseCase($repository);
         $this->deleteVeterinarianServiceUseCase = new DeleteVeterinarianServiceUseCase($repository);
+        $this->getAllServiceByVeterinarianIdUseCase = new GetAllServiceByVeterinarianIdUseCase($repository);
     }
 
     public function getAll()
@@ -143,6 +146,15 @@ class VeterinarianServicesController extends Controller
         return response()->json([
             'status' => "success",
             'message' => "Service is deleted successfully"
+        ]);
+    }
+
+    public function getByVeterinarianId($veterinarianId)
+    {
+        $data = $this->getAllServiceByVeterinarianIdUseCase->execute($veterinarianId);
+        return response()->json([
+            'status' => "success",
+            'data' => $data
         ]);
     }
 }

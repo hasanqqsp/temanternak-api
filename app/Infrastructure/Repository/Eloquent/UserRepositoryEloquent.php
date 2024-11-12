@@ -9,6 +9,7 @@ use App\Domain\Users\Entities\NewUser;
 use App\Domain\Users\Entities\UpdateUser;
 use App\Domain\Users\Entities\User as UserEntity;
 use App\Domain\Users\UserRepository;
+use App\Infrastructure\Repository\Models\Settlement;
 use App\Infrastructure\Repository\Models\User;
 
 
@@ -20,6 +21,22 @@ class UserRepositoryEloquent implements UserRepository
         if ($user) {
             $user->tokens()->delete();
         }
+    }
+    public function getWalletByUserId(string $userId): float
+    {
+        $user = User::find($userId);
+
+        Settlement::where('veterinarian_id', $userId)
+            ->where('status', 'PENDING')
+            ->get()->map(function ($settlement) use ($user) {
+                $oldBalance = $user->balance;
+                $user->deposit("veterinarian_wallet", $settlement->accepted_amount, $settlement->id);
+                if (($user->balance - $settlement->amount_accepted) != $oldBalance) {
+                    $settlement->status = 'COMPLETED';
+                    $settlement->save();
+                }
+            });
+        return $user->walletBalance;
     }
     public function deleteById(string $id): bool
     {

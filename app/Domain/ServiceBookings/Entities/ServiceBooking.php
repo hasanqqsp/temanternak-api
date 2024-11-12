@@ -4,6 +4,7 @@ namespace App\Domain\ServiceBookings\Entities;
 
 use App\Domain\Transactions\Entities\Transaction;
 use App\Domain\Users\Entities\User;
+use App\Domain\VeterinarianServices\Entities\VetService;
 use App\Domain\VeterinarianServices\Entities\VetServiceOnly;
 use DateTime;
 
@@ -13,12 +14,12 @@ class ServiceBooking
     private DateTime $startTime;
     private DateTime $endTime;
     private User $booker;
-    private VetServiceOnly $service;
+    private VetService $service;
     private ?Transaction $transaction;
     private string $status;
     private ?string $cancelledBy;
 
-    public function __construct(string $id, DateTime $startTime, DateTime $endTime, User $booker, VetServiceOnly $service, string $status, ?Transaction $transaction = null, ?string $cancelledBy = null)
+    public function __construct(string $id, DateTime $startTime, DateTime $endTime, User $booker, VetService $service, string $status, ?Transaction $transaction = null, ?string $cancelledBy = null)
     {
         $this->id = $id;
         $this->startTime = $startTime;
@@ -50,7 +51,7 @@ class ServiceBooking
         return $this->booker;
     }
 
-    public function getService(): VetServiceOnly
+    public function getService(): VetService
     {
         return $this->service;
     }
@@ -90,7 +91,7 @@ class ServiceBooking
         $this->booker = $booker;
     }
 
-    public function setService(VetServiceOnly $service): void
+    public function setService(VetService $service): void
     {
         $this->service = $service;
     }
