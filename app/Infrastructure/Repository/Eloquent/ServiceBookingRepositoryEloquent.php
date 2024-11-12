@@ -9,6 +9,8 @@ use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Transactions\Entities\Transaction;
 use App\Domain\Users\Entities\ShortUser;
 use App\Domain\Users\Entities\User;
+use App\Domain\Veterinarians\Entities\VeterinarianShort;
+use App\Domain\VeterinarianServices\Entities\VetService;
 use App\Domain\VeterinarianServices\Entities\VetServiceOnly;
 use App\Infrastructure\Repository\Models\ServiceBooking;
 use Carbon\Carbon;
@@ -51,6 +53,10 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         if ($booking) {
             $booking->canceller_id = $userId;
             $booking->status = 'CANCELLED';
+            if ($booking->consultation) {
+                $booking->consultation->status = 'CANCELLED';
+                $booking->consultation->save();
+            }
             $booking->save();
         }
     }
@@ -63,6 +69,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
     {
         $booking = ServiceBooking::find($id);
         $this->updateStatusToCancelledIfNeeded($booking);
+        $this->updateStatusToFailedIfNeeded($booking);
         return $booking ? $this->createBookingService($booking) : null;
     }
 
@@ -70,6 +77,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
     {
         return ServiceBooking::where('veterinarian_id', $veterinarianId)->get()->map(function ($booking) {
             $this->updateStatusToCancelledIfNeeded($booking);
+            $this->updateStatusToFailedIfNeeded($booking);
 
             return $this->createBookingService($booking)->toArray();
         });
@@ -80,12 +88,14 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
     {
         return ServiceBooking::where('booker_id', $bookerId)->get()->map(function ($booking) {
             $this->updateStatusToCancelledIfNeeded($booking);
+            $this->updateStatusToFailedIfNeeded($booking);
             return $this->createBookingService($booking)->toArray();
         });
     }
 
     private function createBookingService($booking)
     {
+        $veterinarian = (new VeterinarianRepositoryEloquent())->getById($booking->veterinarian_id);
         $serviceBooking =
             new EntitiesServiceBooking(
                 $booking->id,
@@ -101,8 +111,15 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
                     $booking->booker->phone,
                     $booking->booker->username
                 ),
-                new VetServiceOnly(
+                new VetService(
                     $booking->service->id,
+                    new VeterinarianShort(
+                        $veterinarian->getId(),
+                        $veterinarian->getNameAndTitle(),
+                        $veterinarian->getUsername(),
+                        $veterinarian->getFormalPicturePath(),
+                        $veterinarian->getSpecializations(),
+                    ),
                     $booking->service->price,
                     $booking->service->duration,
                     $booking->service->description,
@@ -175,6 +192,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
     {
         return ServiceBooking::where('service_id', $serviceId)->get()->map(function ($booking) {
             $this->updateStatusToCancelledIfNeeded($booking);
+            $this->updateStatusToFailedIfNeeded($booking);
             return $this->createBookingService($booking)->toArray();
         });
     }
@@ -195,6 +213,35 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         }
     }
 
+    public function updateStatusToFailedIfNeeded($booking)
+    {
+        if (!$booking->consultation) {
+            (new ConsultationRepositoryEloquent())->populate($booking->id);
+        }
+        if (
+            $booking->consultation &&
+            $booking->consultation->status == 'WAITING'
+            && $booking->status === 'CONFIRMED'
+            && $booking->end_time < now()
+            && !($booking->consultation->veterinarian_attend_at && $booking->consultation->customer_attend_at)
+        ) {
+            dd('here');
+            $booking->status = 'FAILED';
+
+            if ($booking->consultation->veterinarian_attend && !$booking->consultation->customer_attend) {
+                $booking->is_refundable = false;
+            }
+            if (!$booking->consultation->veterinarian_attend && $booking->consultation->customer_attend) {
+                $booking->is_refundable = true;
+            }
+            if (!$booking->consultation->customer_attend && !$booking->consultation->veterinarian_attend) {
+                $booking->is_refundable = false;
+            }
+
+            $booking->save();
+        }
+    }
+
     public function getByVeterinarianIdAndStatus(string $veterinarianId, string $status)
     {
         return ServiceBooking::where('veterinarian_id', $veterinarianId)
@@ -202,6 +249,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
             ->get()
             ->map(function ($booking) {
                 $this->updateStatusToCancelledIfNeeded($booking);
+                $this->updateStatusToFailedIfNeeded($booking);
                 return $this->createBookingService($booking)->toArray();
             });
     }
@@ -213,6 +261,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
             ->get()
             ->map(function ($booking) {
                 $this->updateStatusToCancelledIfNeeded($booking);
+                $this->updateStatusToFailedIfNeeded($booking);
                 return $this->createBookingService($booking)->toArray();
             });
     }
@@ -224,6 +273,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
             ->get()
             ->map(function ($booking) {
                 $this->updateStatusToCancelledIfNeeded($booking);
+                $this->updateStatusToFailedIfNeeded($booking);
                 return $this->createBookingService($booking)->toArray();
             });
     }
@@ -240,6 +290,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
             ->get()
             ->map(function ($booking) {
                 $this->updateStatusToCancelledIfNeeded($booking);
+                $this->updateStatusToFailedIfNeeded($booking);
                 return $this->createBookingService($booking)->toArray();
             });
     }

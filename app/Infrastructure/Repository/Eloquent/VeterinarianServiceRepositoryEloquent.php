@@ -16,6 +16,17 @@ use Illuminate\Auth\Access\AuthorizationException;
 
 class VeterinarianServiceRepositoryEloquent implements VeterinarianServiceRepository
 {
+    public function getPublicByVeterinarianId($veterinarianId)
+    {
+        return VeterinarianService::where('veterinarian_id', $veterinarianId)
+            ->whereNotNull('approved_at')
+            ->whereNull('suspended_at')
+            ->get()
+            ->map(function ($service) {
+                return $this->createVetService($service)->toArray();
+            });
+    }
+
 
     public function checkIfExist($id): bool
     {

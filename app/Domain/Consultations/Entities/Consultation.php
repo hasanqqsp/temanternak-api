@@ -2,7 +2,6 @@
 
 namespace App\Domain\Consultations\Entities;
 
-use App\Domain\Consultations\SIPCredential;
 use DateTime;
 
 class Consultation
@@ -14,7 +13,6 @@ class Consultation
     private DateTime $endTime;
     private int $duration;
     private string $bookerName;
-    private SIPCredential $sipCredential;
     private string $status;
 
     public function getId(): string
@@ -87,16 +85,6 @@ class Consultation
         $this->bookerName = $bookerName;
     }
 
-    public function getSipCredential(): SIPCredential
-    {
-        return $this->sipCredential;
-    }
-
-    public function setSipCredential(SIPCredential $sipCredential): void
-    {
-        $this->sipCredential = $sipCredential;
-    }
-
     public function getStatus(): string
     {
         return $this->status;
@@ -133,11 +121,10 @@ class Consultation
             'id' => $this->id,
             'serviceName' => $this->serviceName,
             'veterinarianNameAndTitle' => $this->veterinarianNameAndTitle,
-            'startTime' => $this->startTime->format('Y-m-d H:i:s'),
-            'endTime' => $this->endTime->format('Y-m-d H:i:s'),
+            'startTime' => $this->startTime->format('Y-m-d\TH:i:s.up'),
+            'endTime' => $this->endTime->format('Y-m-d\TH:i:s.up'),
             'duration' => $this->duration,
             'bookerName' => $this->bookerName,
-            'sipCredential' => $this->sipCredential->toArray(),
             'status' => $this->status,
         ];
     }

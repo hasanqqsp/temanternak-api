@@ -65,15 +65,15 @@ class AddServiceBookingUseCase
             $booking->getBooker()->getName(),
             $booking->getBooker()->getEmail(),
             now()->format("Y-m-d H:i:s +Z"),
-            min([(new Carbon($data->getStartTime()))->subMinute()->diffInMinutes(now()) * -1, 60])
+            floor(min([(new Carbon($data->getStartTime()))->subMinute()->diffInMinutes(now()) * -1, 60]))
         ));
         $this->serviceBookingRepository->setTransactionId($booking->getId(), $newTransaction->getId());
         $newTransaction->setPaymentToken($payment);
 
-
         $transaction = $this->transactionRepository->add($newTransaction);
 
         $booking->setTransaction($transaction);
-        return $booking;
+
+        return $this->serviceBookingRepository->getById($booking->getId());;
     }
 }

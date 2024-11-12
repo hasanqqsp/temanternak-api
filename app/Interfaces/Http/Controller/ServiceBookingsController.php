@@ -139,4 +139,5 @@ class ServiceBookingsController extends Controller
             "message" => "Booking successfully rescheduled"
         ]);
     }
+    public function getMy() {}
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Consultations;
+namespace App\Domain\Consultations\Entities;
 
 class SIPCredential
 {

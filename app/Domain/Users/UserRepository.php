@@ -17,7 +17,7 @@ interface UserRepository
     public function verifyUsernameAvailable(string $username): void;
     public function verifyUserExist(string $id): void;
     public function verifyUsernameExist(string $username): void;
-    public function getById(string $id);
+    public function getById(string $id): User;
     public function getByEmail(string $email): User;
     public function getByUsername(string $username): User;
     public function getByRole(string $role): array;
@@ -29,4 +29,5 @@ interface UserRepository
     public function createTokenByEmail(string $email): string;
     public function changeRole(string $id, string $role): void;
     public function removeAllToken(string $id): void;
+    public function getWalletByUserId(string $id): float;
 }

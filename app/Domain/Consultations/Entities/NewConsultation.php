@@ -8,7 +8,6 @@ use DateTime;
 class NewConsultation
 {
     private string $serviceId;
-    private string $veterinarianId;
     private DateTime $startTime;
     private DateTime $endTime;
     private int $duration;
@@ -24,16 +23,6 @@ class NewConsultation
     public function setServiceId(string $serviceId): void
     {
         $this->serviceId = $serviceId;
-    }
-
-    public function getVeterinarianId(): string
-    {
-        return $this->veterinarianId;
-    }
-
-    public function setVeterinarianId(string $veterinarianId): void
-    {
-        $this->veterinarianId = $veterinarianId;
     }
 
     public function getStartTime(): DateTime

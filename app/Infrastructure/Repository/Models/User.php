@@ -2,16 +2,18 @@
 
 namespace App\Infrastructure\Repository\Models;
 
+use Bavix\Wallet\Interfaces\Confirmable;
+use HPWebdeveloper\LaravelPayPocket\Interfaces\WalletOperations;
+use HPWebdeveloper\LaravelPayPocket\Traits\ManagesWallet;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
-use MongoDB\Laravel\Auth\User as AuthUser;
+
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
-class User extends AuthUser
+class User extends AuthUser implements WalletOperations
 {
-
-    use HasFactory, CanResetPassword, HasApiTokens, SoftDeletes;
+    use HasFactory, CanResetPassword, HasApiTokens, SoftDeletes, ManagesWallet;
 
     protected $connection = 'mongodb';
 

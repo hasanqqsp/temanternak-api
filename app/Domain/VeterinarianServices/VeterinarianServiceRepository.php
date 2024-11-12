@@ -20,6 +20,7 @@ interface VeterinarianServiceRepository
     public function editWithoutApproval(EditService $data);
     public function editWithApproval(EditService $data);
     public function verifyOwnership(string $serviceId, string $veterinarianId);
+    public function getPublicByVeterinarianId(string $veterinarianId);
     public function getAllPublic();
     public function getAll();
     public function deleteById(string $id);
