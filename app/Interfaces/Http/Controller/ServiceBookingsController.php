@@ -74,32 +74,27 @@ class ServiceBookingsController extends Controller
     public function getAll(Request $request)
     {
         $role = $request->user()->role;
+        $page = $request->query('page') ?? 1;
+
+        $results = [];
         if ($role == "veterinarian") {
             if ($request->query('only_confirmed') == 'true') {
-                $responseArray = [
-                    "status" => "success",
-                    "data" => $this->getAllConfirmedServiceBookingsByVeterinarianIdUseCase->execute($request->user()->id)
-                ];
-                return response()->json($responseArray);
+                $results = $this->getAllConfirmedServiceBookingsByVeterinarianIdUseCase->execute($request->user()->id, $page);
             }
-            $responseArray = [
-                "status" => "success",
-                "data" => $this->getAllServiceBookingsByVeterinarianIdUseCase->execute($request->user()->id)
-            ];
-            return response()->json($responseArray);
+            $results = $this->getAllServiceBookingsByVeterinarianIdUseCase->execute($request->user()->id, $page);
+        } else if ($role == "admin" || $role == "superadmin") {
+            $results = $this->getAllServiceBookingsUseCase->execute($page);
+        } else {
+            $results = $this->getAllServiceBookingsByCustomerIdUseCase->execute($request->user()->id, $page);
         }
 
-        if ($role == "admin" || $role == "superadmin") {
-            $responseArray = [
-                "status" => "success",
-                "data" => $this->getAllServiceBookingsUseCase->execute()
-            ];
-            return response()->json($responseArray);
-        }
+
+
 
         $responseArray = [
             "status" => "success",
-            "data" => $this->getAllServiceBookingsByCustomerIdUseCase->execute($request->user()->id)
+            "pagination" => $results["pagination"],
+            "data" => $results["data"]
         ];
         return response()->json($responseArray);
     }

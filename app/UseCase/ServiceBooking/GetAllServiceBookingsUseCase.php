@@ -13,8 +13,8 @@ class GetAllServiceBookingsUseCase
         $this->serviceBookingRepository = $serviceBookingRepository;
     }
 
-    public function execute()
+    public function execute(int $page = 1)
     {
-        return $this->serviceBookingRepository->getAll();
+        return $this->serviceBookingRepository->getAll($page);
     }
 }

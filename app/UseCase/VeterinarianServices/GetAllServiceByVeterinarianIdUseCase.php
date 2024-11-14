@@ -15,6 +15,7 @@ class GetAllServiceByVeterinarianIdUseCase
 
     public function execute(string $veterinarianId)
     {
-        return $this->veterinarianServiceRepository->getPublicByVeterinarianId($veterinarianId);
+        // dd($this->veterinarianServiceRepository->getAllByVeterinarianId($veterinarianId));
+        return $this->veterinarianServiceRepository->getAllByVeterinarianId($veterinarianId);
     }
 }

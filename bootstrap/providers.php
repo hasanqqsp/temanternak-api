@@ -9,5 +9,5 @@ return [
     AppServiceProvider::class,
     RepositoryServiceProvider::class,
     HashServiceProvider::class,
-    LaravelPayPocketServiceProvider::class
+    LaravelPayPocketServiceProvider::class,
 ];

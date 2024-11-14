@@ -13,8 +13,8 @@ class GetAllServiceBookingsByCustomerIdUseCase
         $this->serviceBookingRepository = $serviceBookingRepository;
     }
 
-    public function execute(string $customerId)
+    public function execute(string $customerId, int $page = 1)
     {
-        return $this->serviceBookingRepository->getByBookerId($customerId);
+        return $this->serviceBookingRepository->getByBookerId($customerId, $page);
     }
 }

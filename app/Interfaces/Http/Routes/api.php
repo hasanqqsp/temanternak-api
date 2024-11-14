@@ -57,6 +57,29 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/veterinarians/schedules', [VeterinarianSchedulesController::class, 'add']);
         Route::get('/users/my/schedules', [VeterinarianSchedulesController::class, 'getMy']);
         Route::get('/users/my/wallet', [VeterinariansController::class, 'getMyWallet']);
+        Route::get('/users/my/profile', [VeterinariansController::class, 'getMyProfile']);
+        Route::put('/users/my/profile/generalIdentity', [VeterinariansController::class, 'updateMyGeneralIdentity']);
+        Route::put('/users/my/profile/specializations', [VeterinariansController::class, 'updateMySpecializations']);
+        Route::put('/users/my/profile/license', [VeterinariansController::class, 'updateMyLicense']);
+        Route::put('/users/my/profile/educations', [VeterinariansController::class, 'updateMyEducations']);
+        Route::put('/users/my/profile/workingExperiences', [VeterinariansController::class, 'updateMyWorkingExperiences']);
+        Route::put('/users/my/profile/organizationExperiences', [VeterinariansController::class, 'updateMyOrganizationExperiences']);
+        Route::put('/users/my/profile/bankAndTax', [VeterinariansController::class, 'updateMybankAndTax']);
+        Route::get('/users/my/profile/generalIdentity', [VeterinariansController::class, 'getMyGeneralIdentity']);
+        Route::get('/users/my/profile/specializations', [VeterinariansController::class, 'getMySpecializations']);
+        Route::get('/users/my/profile/license', [VeterinariansController::class, 'getMyLicense']);
+        Route::get('/users/my/profile/educations', [VeterinariansController::class, 'getMyEducations']);
+        Route::get('/users/my/profile/workingExperiences', [VeterinariansController::class, 'getMyWorkingExperiences']);
+        Route::get('/users/my/profile/organizationExperiences', [VeterinariansController::class, 'getMyOrganizationExperiences']);
+        Route::get('/users/my/profile/bankAndTax', [VeterinariansController::class, 'getMybankAndTax']);
+        Route::get('/users/my/services', [VeterinarianServicesController::class, 'getMyServices']);
+    });
+    Route::middleware('ability:role-basic')->group(function () {
+        Route::get('/veterinarians/services/{id}/startTimes', [VeterinarianSchedulesController::class, 'getAvailableStartTimes']);
+        Route::post('/veterinarians/{veterinarianId}/services/{serviceId}/bookings', [ServiceBookingsController::class, 'add']);
+        Route::get('/bookings/{bookingId}/reschedule/startTimes', [VeterinarianSchedulesController::class, 'startTimesForReschedule']);
+        Route::post('/bookings/{bookingId}/reschedule', [ServiceBookingsController::class, 'reschedule']);
+        Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
     });
     Route::middleware('ability:role-superadmin,role-admin')->group(function () {
         Route::get('/users/{id}', [UsersController::class, 'getUserById']);
@@ -79,13 +102,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/veterinarians/{veterinarianId}/suspension', [VeterinariansController::class, "suspend"]);
         Route::delete('/veterinarians/{veterinarianId}/suspension', [VeterinariansController::class, "unsuspend"]);
         Route::get('/users/{customerId}/transactions', [TransactionsController::class, 'getAllByCustomerId']);
-    });
-    Route::middleware('ability:role-basic')->group(function () {
-        Route::get('/veterinarians/services/{id}/startTimes', [VeterinarianSchedulesController::class, 'getAvailableStartTimes']);
-        Route::post('/veterinarians/{veterinarianId}/services/{serviceId}/bookings', [ServiceBookingsController::class, 'add']);
-        Route::get('/bookings/{bookingId}/reschedule/startTimes', [VeterinarianSchedulesController::class, 'startTimesForReschedule']);
-        Route::post('/bookings/{bookingId}/reschedule', [ServiceBookingsController::class, 'reschedule']);
-        Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
     });
 });
 

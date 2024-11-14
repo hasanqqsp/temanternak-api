@@ -13,8 +13,8 @@ class GetAllServiceBookingsByVeterinarianIdUseCase
         $this->serviceBookingRepository = $serviceBookingRepository;
     }
 
-    public function execute(string $veterinarianId)
+    public function execute(string $veterinarianId, int $page = 1)
     {
-        return $this->serviceBookingRepository->getByVeterinarianId($veterinarianId);
+        return $this->serviceBookingRepository->getByVeterinarianId($veterinarianId, $page);
     }
 }

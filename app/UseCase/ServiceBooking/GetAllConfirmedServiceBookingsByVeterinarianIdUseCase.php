@@ -13,8 +13,8 @@ class GetAllConfirmedServiceBookingsByVeterinarianIdUseCase
         $this->serviceBookingRepository = $serviceBookingRepository;
     }
 
-    public function execute(string $veterinarianId)
+    public function execute(string $veterinarianId, int  $page = 1)
     {
-        return $this->serviceBookingRepository->getByVeterinarianIdAndStatus($veterinarianId, "CONFIRMED");
+        return $this->serviceBookingRepository->getByVeterinarianIdAndStatus($veterinarianId, "CONFIRMED", $page);
     }
 }

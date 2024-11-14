@@ -157,4 +157,14 @@ class VeterinarianServicesController extends Controller
             'data' => $data
         ]);
     }
+
+    public function getMyServices(Request $request)
+    {
+        return response()->json(
+            [
+                'status' => "success",
+                "data" => $this->getAllServiceByVeterinarianIdUseCase->execute($request->user()->id)
+            ]
+        );
+    }
 }

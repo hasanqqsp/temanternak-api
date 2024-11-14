@@ -123,7 +123,7 @@ class VetServiceForAdmin
     {
         return [
             'id' => $this->id,
-            'veterinarian' => $this->veterinarian,
+            'veterinarian' => $this->veterinarian->toArray(),
             'price' => $this->price,
             'duration' => $this->duration,
             'description' => $this->description,

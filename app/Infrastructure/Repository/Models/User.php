@@ -52,7 +52,15 @@ class User extends AuthUser implements WalletOperations
     public function veterinarianRegistration()
     {
         if ($this->role === 'invited-user' || $this->role === 'veterinarian') {
-            return $this->hasMany(VeterinarianRegistration::class, 'user_id', '_id');
+            return $this->hasMany(VeterinarianRegistration::class, 'user_id', 'id');
+        }
+        return null;
+    }
+
+    public function data()
+    {
+        if ($this->role === 'veterinarian') {
+            return $this->hasOne(Veterinarian::class, 'user_id', 'id');
         }
         return null;
     }

@@ -12,6 +12,7 @@ use App\Domain\Users\Entities\User;
 use App\Domain\Veterinarians\Entities\VeterinarianShort;
 use App\Domain\VeterinarianServices\Entities\VetService;
 use App\Domain\VeterinarianServices\Entities\VetServiceOnly;
+use App\Infrastructure\Repository\Models\Consultation;
 use App\Infrastructure\Repository\Models\ServiceBooking;
 use Carbon\Carbon;
 
@@ -31,6 +32,15 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         }
     }
 
+    public function checkIsRefundable($bookingId)
+    {
+        $booking = ServiceBooking::find($bookingId);
+        if ($booking && $booking->status === 'FAILED' && $booking->is_refundable) {
+            return true;
+        }
+        return false;
+    }
+
     public function checkIfExists($bookingId)
     {
         $booking = ServiceBooking::find($bookingId);
@@ -40,16 +50,30 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         return true;
     }
 
-    public function getAll()
+    public function getAll($page)
     {
-        return ServiceBooking::all()->map(function ($booking) {
-            return $this->createBookingService($booking);
-        });
+        // dd(ServiceBooking::with(["consultation", "transaction", "booker", "service"])->simplePaginate(10, ["*"], 'page', $page)->items());
+        $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
+            ->orderBy("created_at", "desc")->paginate(10, ["*"], 'page', $page);
+
+        return [
+            'pagination' => [
+                'total' => $results->total(),
+                'perPage' => $results->perPage(),
+                'currentPage' => $results->currentPage(),
+                'lastPage' => $results->lastPage(),
+            ],
+            'data' => array_map(function ($booking) {
+                $this->updateStatusToCancelledIfNeeded($booking);
+                $this->updateStatusToFailedIfNeeded($booking);
+                return $this->createBookingService($booking)->toArray();
+            }, $results->items())
+        ];
     }
 
     public function cancel($bookingId, $userId)
     {
-        $booking = ServiceBooking::find($bookingId);
+        $booking = ServiceBooking::with(["consultation"])->find($bookingId);
         if ($booking) {
             $booking->canceller_id = $userId;
             $booking->status = 'CANCELLED';
@@ -67,34 +91,59 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
     }
     public function getById($id)
     {
-        $booking = ServiceBooking::find($id);
+        $booking = ServiceBooking::with(["consultation", "transaction", "booker", "service"])->find($id);
         $this->updateStatusToCancelledIfNeeded($booking);
         $this->updateStatusToFailedIfNeeded($booking);
         return $booking ? $this->createBookingService($booking) : null;
     }
 
-    public function getByVeterinarianId($veterinarianId)
+    public function getByVeterinarianId($veterinarianId, $page = 1)
     {
-        return ServiceBooking::where('veterinarian_id', $veterinarianId)->get()->map(function ($booking) {
-            $this->updateStatusToCancelledIfNeeded($booking);
-            $this->updateStatusToFailedIfNeeded($booking);
+        $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
+            ->where('veterinarian_id', $veterinarianId)
+            ->orderBy("created_at", "desc")->paginate(10);
 
-            return $this->createBookingService($booking)->toArray();
-        });
+        return [
+            'pagination' => [
+                'total' => $results->total(),
+                'perPage' => $results->perPage(),
+                'currentPage' => $results->currentPage(),
+                'lastPage' => $results->lastPage(),
+            ],
+            'data' => array_map(function ($booking) {
+                $this->updateStatusToCancelledIfNeeded($booking);
+                $this->updateStatusToFailedIfNeeded($booking);
+                return $this->createBookingService($booking)->toArray();
+            }, $results->items())
+        ];
     }
 
 
-    public function getByBookerId($bookerId)
+    public function getByBookerId($bookerId, $page = 1)
     {
-        return ServiceBooking::where('booker_id', $bookerId)->get()->map(function ($booking) {
-            $this->updateStatusToCancelledIfNeeded($booking);
-            $this->updateStatusToFailedIfNeeded($booking);
-            return $this->createBookingService($booking)->toArray();
-        });
+
+        $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
+            ->where('booker_id', $bookerId)
+            ->orderBy("created_at", "desc")->paginate(10);
+
+        return [
+            'pagination' => [
+                'total' => $results->total(),
+                'perPage' => $results->perPage(),
+                'currentPage' => $results->currentPage(),
+                'lastPage' => $results->lastPage(),
+            ],
+            'data' => array_map(function ($booking) {
+                $this->updateStatusToCancelledIfNeeded($booking);
+                $this->updateStatusToFailedIfNeeded($booking);
+                return $this->createBookingService($booking)->toArray();
+            }, $results->items())
+        ];
     }
 
     private function createBookingService($booking)
     {
+
         $veterinarian = (new VeterinarianRepositoryEloquent())->getById($booking->veterinarian_id);
         $serviceBooking =
             new EntitiesServiceBooking(
@@ -188,17 +237,31 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         return $this->createBookingService($newBooking);
     }
 
-    public function getByServiceId($serviceId)
+    public function getByServiceId($serviceId, $page = 1)
     {
-        return ServiceBooking::where('service_id', $serviceId)->get()->map(function ($booking) {
-            $this->updateStatusToCancelledIfNeeded($booking);
-            $this->updateStatusToFailedIfNeeded($booking);
-            return $this->createBookingService($booking)->toArray();
-        });
+
+        $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
+            ->where('service_id', $serviceId)
+            ->orderBy("created_at", "desc")->paginate(10)->items();
+
+        return [
+            'pagination' => [
+                'total' => $results->total(),
+                'perPage' => $results->perPage(),
+                'currentPage' => $results->currentPage(),
+                'lastPage' => $results->lastPage(),
+            ],
+            'data' => array_map(function ($booking) {
+                return $this->createBookingService($booking)->toArray();
+                $this->updateStatusToCancelledIfNeeded($booking);
+                $this->updateStatusToFailedIfNeeded($booking);
+            }, $results->items())
+        ];
     }
 
     public function updateStatusToCancelledIfNeeded($booking)
     {
+        if ($booking->status === 'CANCELLED') return;
         if ($booking->transaction == null) {
             $booking->status = 'CANCELLED';
             $booking->save();
@@ -215,26 +278,32 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
 
     public function updateStatusToFailedIfNeeded($booking)
     {
+        if ($booking->status === 'FAILED') return;
         if (!$booking->consultation) {
             (new ConsultationRepositoryEloquent())->populate($booking->id);
         }
         if (
             $booking->consultation &&
-            $booking->consultation->status == 'WAITING'
+            ($booking->consultation->status == 'WAITING' || str_ends_with($booking->consultation->status, "ATTENDED") || $booking->consultation->status == 'FAILED')
             && $booking->status === 'CONFIRMED'
             && $booking->end_time < now()
             && !($booking->consultation->veterinarian_attend_at && $booking->consultation->customer_attend_at)
         ) {
-            dd('here');
-            $booking->status = 'FAILED';
 
-            if ($booking->consultation->veterinarian_attend && !$booking->consultation->customer_attend) {
+            $booking->status = 'FAILED';
+            if ($booking->consultation) {
+                $consultation = Consultation::find($booking->consultation->id);
+                $consultation->status = 'FAILED';
+                $booking->consultation->save();
+            }
+
+            if ($booking->consultation->veterinarian_attend_at && !$booking->consultation->customer_attend_at) {
                 $booking->is_refundable = false;
             }
-            if (!$booking->consultation->veterinarian_attend && $booking->consultation->customer_attend) {
+            if (!$booking->consultation->veterinarian_attend_at && $booking->consultation->customer_attend_at) {
                 $booking->is_refundable = true;
             }
-            if (!$booking->consultation->customer_attend && !$booking->consultation->veterinarian_attend) {
+            if (!$booking->consultation->customer_attend_at && !$booking->consultation->veterinarian_attend_at) {
                 $booking->is_refundable = false;
             }
 
@@ -242,40 +311,71 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         }
     }
 
-    public function getByVeterinarianIdAndStatus(string $veterinarianId, string $status)
+    public function getByVeterinarianIdAndStatus(string $veterinarianId, string $status, $page = 1)
     {
-        return ServiceBooking::where('veterinarian_id', $veterinarianId)
+
+        $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
             ->where('status', $status)
-            ->get()
-            ->map(function ($booking) {
+            ->orderBy("created_at", "desc")->paginate(10)->items();
+
+        return [
+            'pagination' => [
+                'total' => $results->total(),
+                'perPage' => $results->perPage(),
+                'currentPage' => $results->currentPage(),
+                'lastPage' => $results->lastPage(),
+            ],
+            'data' => array_map(function ($booking) {
                 $this->updateStatusToCancelledIfNeeded($booking);
                 $this->updateStatusToFailedIfNeeded($booking);
                 return $this->createBookingService($booking)->toArray();
-            });
+            }, $results->items())
+        ];
     }
 
-    public function getByBookerIdAndStatus($bookerId, $status)
+    public function getByBookerIdAndStatus($bookerId, $status, $page = 1)
     {
-        return ServiceBooking::where('booker_id', $bookerId)
+
+        $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
+            ->where('booker_id', $bookerId)
             ->where('status', $status)
-            ->get()
-            ->map(function ($booking) {
+            ->orderBy("created_at", "desc")->paginate(10)->items();
+
+        return [
+            'pagination' => [
+                'total' => $results->total(),
+                'perPage' => $results->perPage(),
+                'currentPage' => $results->currentPage(),
+                'lastPage' => $results->lastPage(),
+            ],
+            'data' => array_map(function ($booking) {
+                return $this->createBookingService($booking)->toArray();
                 $this->updateStatusToCancelledIfNeeded($booking);
                 $this->updateStatusToFailedIfNeeded($booking);
-                return $this->createBookingService($booking)->toArray();
-            });
+            }, $results->items())
+        ];
     }
 
-    public function getByServiceIdAndStatus($serviceId, $status)
+    public function getByServiceIdAndStatus($serviceId, $status, $page = 1)
     {
-        return ServiceBooking::where('service_id', $serviceId)
+        $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
+            ->where('service_id', $serviceId)
             ->where('status', $status)
-            ->get()
-            ->map(function ($booking) {
+            ->orderBy("created_at", "desc")->paginate(10)->items();
+
+        return [
+            'pagination' => [
+                'total' => $results->total(),
+                'perPage' => $results->perPage(),
+                'currentPage' => $results->currentPage(),
+                'lastPage' => $results->lastPage(),
+            ],
+            'data' => array_map(function ($booking) {
+                return $this->createBookingService($booking)->toArray();
                 $this->updateStatusToCancelledIfNeeded($booking);
                 $this->updateStatusToFailedIfNeeded($booking);
-                return $this->createBookingService($booking)->toArray();
-            });
+            }, $results->items())
+        ];
     }
 
     public function checkStatus($bookingId)
@@ -284,9 +384,9 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         return $booking ? $booking->status : null;
     }
 
-    public function getByStatus($status)
+    public function getByStatus($status, $page = 1)
     {
-        return ServiceBooking::where('status', $status)
+        return ServiceBooking::with(["consultation", "transaction", "booker", "service"])->where('status', $status)
             ->get()
             ->map(function ($booking) {
                 $this->updateStatusToCancelledIfNeeded($booking);

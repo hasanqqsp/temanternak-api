@@ -41,6 +41,9 @@ class CancelServiceBookingUseCase
                     'reason' => 'Booking cancellation'
                 ]);
             } catch (\Exception $e) {
+                // $this->transactionRepository->manualCancel($transaction->getId());
+                $this->bookingRepository->cancel($booking->getId(), $credentialId);
+
                 throw new ClientException("Payment gateway reject to refund transaction : " . $e->getMessage());
             }
         }

@@ -17,6 +17,7 @@
         "league/flysystem-aws-s3-v3": "^3.29",
         "midtrans/midtrans-php": "^2.6",
         "mongodb/laravel-mongodb": "^5.0",
+        "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-package-tools": "*"
     },
     "require-dev": {

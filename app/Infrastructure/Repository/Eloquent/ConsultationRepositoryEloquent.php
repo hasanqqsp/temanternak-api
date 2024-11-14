@@ -122,21 +122,22 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
             if (!Consultation::where('booking_id', $booking->id)->exists())
                 $this->populate($booking->id);
         });
-        return Consultation::where('veterinarian_id', $veterinarianId)->get()->map(function ($consultation) {
-            $veterinarian = (new VeterinarianRepositoryEloquent())->getById($consultation->veterinarian_id);
-            $this->updateStatusIfNeeded($consultation);
+        return Consultation::where('veterinarian_id', $veterinarianId)->orderBy('end_time', 'desc')
+            ->get()->map(function ($consultation) {
+                $veterinarian = (new VeterinarianRepositoryEloquent())->getById($consultation->veterinarian_id);
+                $this->updateStatusIfNeeded($consultation);
 
-            return (new EntitiesConsultation(
-                $consultation->id,
-                $consultation->service->name,
-                $veterinarian->getNameAndTitle(),
-                $consultation->start_time,
-                $consultation->end_time,
-                $consultation->duration,
-                $consultation->customer->name,
-                $consultation->status,
-            ))->toArray();
-        })->toArray();
+                return (new EntitiesConsultation(
+                    $consultation->id,
+                    $consultation->service->name,
+                    $veterinarian->getNameAndTitle(),
+                    $consultation->start_time,
+                    $consultation->end_time,
+                    $consultation->duration,
+                    $consultation->customer->name,
+                    $consultation->status,
+                ))->toArray();
+            })->toArray();
     }
 
     public function getAllByStatusAndVeterinarianId($status, $veterinarianId): array
@@ -149,6 +150,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
         }
         return Consultation::where('status', $status)
             ->where('veterinarian_id', $veterinarianId)
+            ->orderBy('end_time', 'desc')
             ->get()->map(function ($consultation) {
                 $this->updateStatusIfNeeded($consultation);
 
@@ -172,7 +174,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
                 $this->populate($booking->id);
         });
 
-        return Consultation::where('customer_id', $customerId)->get()->map(function ($consultation) {
+        return Consultation::where('customer_id', $customerId)->orderBy('end_time', 'desc')->get()->map(function ($consultation) {
             $this->updateStatusIfNeeded($consultation);
             return (new EntitiesConsultation(
                 $consultation->id,
@@ -190,7 +192,11 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
     public function updateStatusIfNeeded($consultation)
     {
         $booking = ServiceBooking::find($consultation->booking_id);
-
+        if (($consultation->status == 'WAITING' || str_ends_with($consultation->status, "ATTENDED")) && $consultation->end_time < now()) {
+            $consultation->status = 'FAILED';
+            $consultation->save();
+            return;
+        }
         // dd($consultation->settlement);
         if ($consultation->status == 'WAITING' && $consultation->veterinarian_attend_at && $consultation->customer_attend_at) {
             $consultation->status = 'ONPROGRESS';
@@ -229,12 +235,9 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
         $settlement->save();
 
         $user =  ModelsUser::find($consultation->veterinarian_id);
-        $oldBalance = $user->walletBalancee;
         $user->deposit("veterinarian_wallet", $settlement->accepted_amount, $settlement->id);
 
-        if ($user->walletBalance == ($oldBalance + $settlement->accepted_amount)) {
-            $settlement->status = 'COMPLETED';
-            $settlement->save();
-        }
+        $settlement->status = 'COMPLETED';
+        $settlement->save();
     }
 }

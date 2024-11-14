@@ -16,6 +16,13 @@ use Illuminate\Auth\Access\AuthorizationException;
 
 class VeterinarianServiceRepositoryEloquent implements VeterinarianServiceRepository
 {
+    public function getAllByVeterinarianId($veterinarianId)
+    {
+        return VeterinarianService::where('veterinarian_id', $veterinarianId)->get()->map(function ($service) {
+            return $this->createVetServiceForAdmin($service)->toArray();
+        });
+    }
+
     public function getPublicByVeterinarianId($veterinarianId)
     {
         return VeterinarianService::where('veterinarian_id', $veterinarianId)
@@ -201,8 +208,8 @@ class VeterinarianServiceRepositoryEloquent implements VeterinarianServiceReposi
             $service->duration,
             $service->description,
             $service->name,
-            boolval($service->accepted_at),
-            boolval($service->suspended_at)
+            $service->approved_at == null ? false : true,
+            $service->suspended_at == null ? false : true
         );
     }
 }

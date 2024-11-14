@@ -25,7 +25,7 @@ class ChangeTransactionStatusById
         if ($newStatus == "PAID") {
             $this->transactionRepository->updateStatus($transactionId, $newStatus);
             $this->serviceBookingRepository->updateStatusByTransactionId($transactionId, "CONFIRMED", $paymentType);
-        } else if (in_array($newStatus, ['DENIED', "EXPIRED", "CANCELLED"])) {
+        } else if (in_array($newStatus, ['DENIED', "EXPIRED", "CANCELLED", "REFUNDED"])) {
             $this->transactionRepository->updateStatus($transactionId, $newStatus);
             $this->serviceBookingRepository->updateStatusByTransactionId($transactionId, "CANCELLED", $paymentType);
         } else {
