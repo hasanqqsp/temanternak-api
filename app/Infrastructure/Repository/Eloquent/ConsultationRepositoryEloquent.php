@@ -223,7 +223,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
         }
     }
 
-    private function settleTransaction($booking, $consultation)
+    private function settleTransaction($booking, $consultation, $rebooking = null)
     {
         $settlement = new Settlement();
         $settlement->transaction_id = $booking->transaction_id;

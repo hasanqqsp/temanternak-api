@@ -32,13 +32,22 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         }
     }
 
+    public function setRebookingId($bookingId, $rebookingId)
+    {
+        $booking = ServiceBooking::find($bookingId);
+        if ($booking) {
+            $booking->rebooking_id = $rebookingId;
+            $booking->save();
+        }
+    }
+
     public function checkIsRefundable($bookingId)
     {
         $booking = ServiceBooking::find($bookingId);
         if ($booking && $booking->status === 'FAILED' && $booking->is_refundable) {
             return true;
         }
-        return false;
+        throw new NotFoundException("Booking is not refundable");
     }
 
     public function checkIfExists($bookingId)
@@ -316,7 +325,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
 
         $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
             ->where('status', $status)
-            ->orderBy("created_at", "desc")->paginate(10)->items();
+            ->orderBy("created_at", "desc")->paginate(10);
 
         return [
             'pagination' => [

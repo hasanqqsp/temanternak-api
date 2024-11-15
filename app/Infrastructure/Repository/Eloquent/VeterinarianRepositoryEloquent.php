@@ -24,6 +24,7 @@ use App\Infrastructure\Repository\Models\User;
 use App\Infrastructure\Repository\Models\Veterinarian as ModelsVeterinarian;
 use App\Infrastructure\Repository\Models\VeterinarianRegistration;
 use App\Infrastructure\Repository\Models\WorkingExperience;
+use Tymon\JWTAuth\JWT;
 
 class VeterinarianRepositoryEloquent implements VeterinarianRepository
 {
@@ -285,12 +286,13 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
 
     private function mapUserToVeterinarianShort(?User $user): VeterinarianShort
     {
-        // if (!$user->data) {
-        //     $this->populate($user->veterinarianRegistration->where("status", "ACCEPTED")->first());
-        // }
+        if (!$user->data) {
+            $this->populate($user->veterinarianRegistration->where("status", "ACCEPTED")->first());
+        }
 
-        $data = $user->load('data');
-        dd($data);
+        $user = User::find($user->id);
+        $data = $user->data;
+
         $frontTitle = $data->generalIdentity->front_title;
         $backTitle = $data->generalIdentity->back_title;
         $nameAndTitle = StringUtils::nameAndTitle($frontTitle, $user->name, $backTitle);

@@ -5,6 +5,7 @@ namespace App\Interfaces\Http\Controller;
 use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Users\UserRepository;
+use App\Infrastructure\Tokenizer\JWTService;
 use App\UseCase\Consultations\CustomerJoinConsultationRoomUseCase;
 use App\UseCase\Consultations\GetConsultationByBookingIdUseCase;
 use App\UseCase\Consultations\GetConsultationByCustomerIdUseCase;
@@ -22,6 +23,7 @@ class ConsultationsController extends Controller
     protected $getConsultationByVeterinarianIdUseCase;
     protected $getConsultationByCustomerIdUseCase;
     protected $veterinarianJoinConsultationRoomUseCase;
+    protected $jwtService;
 
     public function __construct(UserRepository $userRepository, ConsultationRepository $consultationRepository, ServiceBookingRepository $bookingRepository)
     {
@@ -31,6 +33,7 @@ class ConsultationsController extends Controller
         $this->getConsultationByVeterinarianIdUseCase = new GetConsultationByVeterinarianIdUseCase($consultationRepository);
         $this->getConsultationByCustomerIdUseCase = new GetConsultationByCustomerIdUseCase($consultationRepository);
         $this->veterinarianJoinConsultationRoomUseCase = new VeterinarianJoinConsultationRoomUseCase($userRepository, $bookingRepository, $consultationRepository);
+        $this->jwtService = new JWTService();
     }
 
     public function getByBookingId(Request $request)
@@ -39,6 +42,12 @@ class ConsultationsController extends Controller
             "status" => "success",
             "data" => $this->getConsultationByBookingIdUseCase->execute($request->bookingId, $request->user()->id)->toArray()
         ];
+        $responseArray['data']["token"] = $this->jwtService->generate((array) [
+            'userId' => $request->user()->id,
+            'role' => $request->user()->role,
+            'roomId' => $responseArray['data']['id']
+        ], now()->addDay());
+
         return response()->json($responseArray);
     }
 
@@ -53,6 +62,7 @@ class ConsultationsController extends Controller
                         $request->query('status')
                     )
                 ];
+
                 return response()->json($responseArray);
             }
             $responseArray = [

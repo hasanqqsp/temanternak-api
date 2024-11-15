@@ -2,6 +2,9 @@
 
 namespace App\Interfaces\Http\Controller;
 
+use App\Domain\Refunds\Entities\NewRefundRequest;
+use App\Domain\Refunds\Entities\RefundRequest;
+use App\Domain\Refunds\RefundRepository;
 use App\Domain\ServiceBookings\Entities\NewBooking;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Transactions\TransactionRepository;
@@ -17,6 +20,8 @@ use App\UseCase\ServiceBooking\GetAllServiceBookingsByVeterinarianIdUseCase;
 use App\UseCase\ServiceBooking\GetAllServiceBookingsUseCase;
 use App\UseCase\ServiceBooking\GetServiceBookingByIdForAdminUseCase;
 use App\UseCase\ServiceBooking\GetServiceBookingByIdUseCase;
+use App\UseCase\ServiceBooking\RebookServiceBookingUseCase;
+use App\UseCase\ServiceBooking\RefundServiceBookingUseCase;
 use App\UseCase\ServiceBooking\RescheduleBookingUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -32,12 +37,15 @@ class ServiceBookingsController extends Controller
     private $getServiceBookingByIdUseCase;
     private $getServiceBookingForAdminByIdUseCase;
     private $rescheduleServiceBookingUseCase;
+    private $refundServiceBookingUseCase;
+    private $rebookServiceBookingUseCase;
 
     public function __construct(
         ServiceBookingRepository $serviceBookingRepository,
         TransactionRepository $transactionRepository,
         VeterinarianServiceRepository $veterinarianServiceRepository,
-        VeterinarianScheduleRepository $veterinarianScheduleRepository
+        VeterinarianScheduleRepository $veterinarianScheduleRepository,
+        RefundRepository   $refundRepository
     ) {
         $midtransPaymentGateway = new MidtransPaymentGateway();
         $this->addServiceBookingUseCase = new AddServiceBookingUseCase(
@@ -55,6 +63,8 @@ class ServiceBookingsController extends Controller
         $this->getServiceBookingByIdUseCase = new GetServiceBookingByIdUseCase($serviceBookingRepository);
         $this->getServiceBookingForAdminByIdUseCase = new GetServiceBookingByIdForAdminUseCase($serviceBookingRepository);
         $this->rescheduleServiceBookingUseCase = new RescheduleBookingUseCase($serviceBookingRepository, $veterinarianScheduleRepository);
+        $this->refundServiceBookingUseCase = new RefundServiceBookingUseCase($serviceBookingRepository, $transactionRepository, $midtransPaymentGateway);
+        $this->rebookServiceBookingUseCase = new RebookServiceBookingUseCase($serviceBookingRepository, $midtransPaymentGateway, $refundRepository,  $transactionRepository);
     }
 
     public function add(Request $request, $veterinarianId, $serviceId)
@@ -80,16 +90,14 @@ class ServiceBookingsController extends Controller
         if ($role == "veterinarian") {
             if ($request->query('only_confirmed') == 'true') {
                 $results = $this->getAllConfirmedServiceBookingsByVeterinarianIdUseCase->execute($request->user()->id, $page);
+            } else {
+                $results = $this->getAllServiceBookingsByVeterinarianIdUseCase->execute($request->user()->id, $page);
             }
-            $results = $this->getAllServiceBookingsByVeterinarianIdUseCase->execute($request->user()->id, $page);
         } else if ($role == "admin" || $role == "superadmin") {
             $results = $this->getAllServiceBookingsUseCase->execute($page);
         } else {
             $results = $this->getAllServiceBookingsByCustomerIdUseCase->execute($request->user()->id, $page);
         }
-
-
-
 
         $responseArray = [
             "status" => "success",
@@ -134,5 +142,27 @@ class ServiceBookingsController extends Controller
             "message" => "Booking successfully rescheduled"
         ]);
     }
-    public function getMy() {}
+
+    public function rebook(Request $request, $bookingId)
+    {
+        $data = $this->rebookServiceBookingUseCase->execute(new NewRefundRequest(
+            $request->oldBookingId,
+            $request->newServiceId,
+
+        ), $request->user()->id);
+        return response()->json([
+            "status" => "success",
+            "message" => "Booking successfully rebooked",
+            "data" => $data
+        ]);
+    }
+    public function refund(Request $request, $bookingId)
+    {
+        $data = $this->refundServiceBookingUseCase->execute($bookingId, $request->startTime, $request->user()->id);
+        return response()->json([
+            "status" => "success",
+            "message" => "Booking successfully refunded",
+            "data" => $data
+        ]);
+    }
 }

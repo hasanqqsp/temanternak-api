@@ -24,4 +24,5 @@ interface ServiceBookingRepository
     public function checkStatus(string $bookingId);
     public function reschedule(string $bookingId, string $newStartTime);
     public function checkIsRefundable(string $bookingId);
+    public function setRebookingId(string $bookingId, string $rebookingId);
 }

@@ -79,6 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/veterinarians/{veterinarianId}/services/{serviceId}/bookings', [ServiceBookingsController::class, 'add']);
         Route::get('/bookings/{bookingId}/reschedule/startTimes', [VeterinarianSchedulesController::class, 'startTimesForReschedule']);
         Route::post('/bookings/{bookingId}/reschedule', [ServiceBookingsController::class, 'reschedule']);
+        Route::post('/bookings/{bookingId}/rebook', [ServiceBookingsController::class, 'rebook']);
+        Route::post('/bookings/{bookingId}/refund', [ServiceBookingsController::class, 'refund']);
         Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
     });
     Route::middleware('ability:role-superadmin,role-admin')->group(function () {

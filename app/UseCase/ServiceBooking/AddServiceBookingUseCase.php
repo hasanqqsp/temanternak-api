@@ -70,9 +70,7 @@ class AddServiceBookingUseCase
         $this->serviceBookingRepository->setTransactionId($booking->getId(), $newTransaction->getId());
         $newTransaction->setPaymentToken($payment);
 
-        $transaction = $this->transactionRepository->add($newTransaction);
-
-        $booking->setTransaction($transaction);
+        $this->transactionRepository->add($newTransaction);
 
         return $this->serviceBookingRepository->getById($booking->getId());;
     }
