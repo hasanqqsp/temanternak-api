@@ -48,7 +48,7 @@ class ConsultationsController extends Controller
             'userId' => $request->user()->id,
             'roomId' => $consultation->getId(),
             'actualStartTime' => $consultation->getStartTime(),
-        ], (new Carbon($consultation->getEndTime()))->addSeconds(10), (new Carbon($consultation->getStartTime()))->subSecond(10));
+        ], (new Carbon($consultation->getEndTime()))->addSeconds(10), (new Carbon($consultation->getStartTime()))->subMinutes(5));
 
         return response()->json($responseArray);
     }
