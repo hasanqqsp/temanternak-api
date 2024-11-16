@@ -44,6 +44,11 @@ class ConsultationsController extends Controller
             "status" => "success",
             "data" => $this->getConsultationByBookingIdUseCase->execute($request->bookingId, $request->user()->id)->toArray()
         ];
+
+        if (new Carbon($consultation->getStartTime()) > Carbon::now()->addMinutes(10)) {
+            $responseArray['data']["token"] = null;
+            return response()->json($responseArray);
+        }
         $responseArray['data']["token"] = $this->jwtService->generate((array) [
             'userId' => $request->user()->id,
             'roomId' => $consultation->getId(),

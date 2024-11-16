@@ -12,6 +12,7 @@ use App\Infrastructure\Repository\Models\User;
 use App\Infrastructure\Repository\Models\VeterinarianSchedule as ModelVeterinarianSchedule;
 use App\Infrastructure\Repository\Models\VeterinarianService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepository
 {
@@ -174,15 +175,23 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
             ->toArray();
 
         $bookedSchedules = ServiceBooking::where('veterinarian_id', $veterinarianId)->where('status', '!=', 'CANCELLED')
-            ->where('start_time', '>=', $currentTime)
-            ->orderBy('start_time')
-            ->get()
+            ->where(function ($query) use ($currentTime) {
+                $query
+                    ->where(function ($query) use ($currentTime) {
+                        $query->where('start_time', '<=', $currentTime)
+                            ->where('end_time', '>=', $currentTime)
+                        ;
+                    })->orWhere('start_time', '>=', $currentTime);
+            })
+            ->orderBy('start_time', 'desc')->get()
             ->map(function ($schedule) {
                 return [
                     'start_time' => $schedule->start_time->getTimestamp(),
                     'end_time' => $schedule->end_time->getTimestamp()
                 ];
-            })->toArray();
+            })
+            ->toArray();
+        // dd($bookedSchedules);
 
         $availableSlots = [];
         foreach ($schedules as $schedule) {
@@ -194,6 +203,7 @@ class VeterinarianScheduleRepositoryEloquent implements VeterinarianScheduleRepo
                 $currentSlotEnd = $currentSlotStart + $sessionDuration;
 
                 foreach ($bookedSchedules as $booked) {
+
                     if (($currentSlotStart <= $booked['end_time'] + $minGap) && ($currentSlotEnd >= $booked['start_time'] - $minGap)) {
                         $isAvailable = false;
                         break;
