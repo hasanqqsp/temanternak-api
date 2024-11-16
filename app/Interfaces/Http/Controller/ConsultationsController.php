@@ -46,8 +46,9 @@ class ConsultationsController extends Controller
         ];
         $responseArray['data']["token"] = $this->jwtService->generate((array) [
             'userId' => $request->user()->id,
-            'roomId' => $consultation->getId()
-        ], new Carbon($consultation->getEndTime()), new Carbon($consultation->getStartTime()));
+            'roomId' => $consultation->getId(),
+            'actualStartTime' => $consultation->getStartTime(),
+        ], (new Carbon($consultation->getEndTime()))->subMinutes(5), (new Carbon($consultation->getStartTime()))->addSeconds(10));
 
         return response()->json($responseArray);
     }
