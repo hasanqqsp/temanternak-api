@@ -12,6 +12,7 @@ use App\UseCase\Consultations\GetConsultationByCustomerIdUseCase;
 use App\UseCase\Consultations\GetConsultationByVeterinarianIdAndStatusUseCase;
 use App\UseCase\Consultations\GetConsultationByVeterinarianIdUseCase;
 use App\UseCase\Consultations\VeterinarianJoinConsultationRoomUseCase;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -38,15 +39,21 @@ class ConsultationsController extends Controller
 
     public function getByBookingId(Request $request)
     {
+        $consultation = $this->getConsultationByBookingIdUseCase->execute($request->bookingId, $request->user()->id);
         $responseArray = [
             "status" => "success",
             "data" => $this->getConsultationByBookingIdUseCase->execute($request->bookingId, $request->user()->id)->toArray()
         ];
+
+        if (new Carbon($consultation->getStartTime()) > Carbon::now()->addMinutes(10)) {
+            $responseArray['data']["token"] = null;
+            return response()->json($responseArray);
+        }
         $responseArray['data']["token"] = $this->jwtService->generate((array) [
             'userId' => $request->user()->id,
-            'role' => $request->user()->role,
-            'roomId' => $responseArray['data']['id']
-        ], now()->addDay());
+            'roomId' => $consultation->getId(),
+            'actualStartTime' => $consultation->getStartTime(),
+        ], (new Carbon($consultation->getEndTime()))->addSeconds(10), (new Carbon($consultation->getStartTime()))->subMinutes(5));
 
         return response()->json($responseArray);
     }

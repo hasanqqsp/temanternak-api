@@ -16,11 +16,10 @@ class JWTService
         $this->secretKey = env("JWT_SECRET");
     }
 
-    public function generate(array $payload, Carbon $expirationTime)
+    public function generate(array $payload, Carbon $expirationTime, Carbon $issuedAt = null)
     {
-        $issuedAt = now()->getTimestamp();
         $expirationTime = $expirationTime->getTimestamp();
-        $payload['iat'] = $issuedAt;
+        $payload['iat'] = $issuedAt->getTimestamp() ?? now()->getTimestamp();
         $payload['exp'] = $expirationTime;
 
         return JWT::encode($payload, $this->secretKey, 'HS256');
