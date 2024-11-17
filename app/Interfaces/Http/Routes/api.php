@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Interfaces\Http\Controller\AuthenticationsController;
 use App\Interfaces\Http\Controller\ConsultationsController;
 use App\Interfaces\Http\Controller\InvitationsController;
+use App\Interfaces\Http\Controller\PayoutsController;
 use App\Interfaces\Http\Controller\ServiceBookingsController;
 use App\Interfaces\Http\Controller\TransactionsController;
 use App\Interfaces\Http\Controller\UserFilesController;
@@ -73,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users/my/profile/organizationExperiences', [VeterinariansController::class, 'getMyOrganizationExperiences']);
         Route::get('/users/my/profile/bankAndTax', [VeterinariansController::class, 'getMybankAndTax']);
         Route::get('/users/my/services', [VeterinarianServicesController::class, 'getMyServices']);
+        Route::get('/payouts/banks', [PayoutsController::class, 'getBanks']);
     });
     Route::middleware('ability:role-basic')->group(function () {
         Route::get('/veterinarians/services/{id}/startTimes', [VeterinarianSchedulesController::class, 'getAvailableStartTimes']);
