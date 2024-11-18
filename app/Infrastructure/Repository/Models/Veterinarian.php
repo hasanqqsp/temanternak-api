@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository\Models;
 
+use App\Commons\Utils\StringUtils;
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
@@ -35,5 +36,9 @@ class Veterinarian extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id');
+    }
+    public function nameAndTitle()
+    {
+        return StringUtils::nameAndTitle($this->generalIdentity->front_title, $this->user->name, $this->generalIdentity->back_title);
     }
 }

@@ -17,6 +17,8 @@ use App\Interfaces\Http\Controller\VeterinarianServicesController;
 use App\Interfaces\Http\Controller\VeterinarianVerificationController;
 
 Route::post('/transactions/hooks', [TransactionsController::class, 'midtransHooks']);
+Route::post('/payouts/hooks', [PayoutsController::class, 'updateStatus']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/my', [AuthenticationsController::class, 'getMyAccount']);
     Route::patch('/users/my/password', [UsersController::class, 'changeUserPassword']);
@@ -44,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('ability:role-veterinarian,role-admin,role-superadmin')->group(function () {
         Route::delete('/veterinarians/services/{serviceId}', [VeterinarianServicesController::class, 'delete']);
         Route::delete('/veterinarians/schedules/{scheduleId}', [VeterinarianSchedulesController::class, 'remove']);
+        Route::get('payouts/disbursements/{disbursementId}', [PayoutsController::class, 'getById']);
     });
     Route::middleware('ability:role-veterinarian,role-invited-user')->group(function () {
         Route::get('/users/my/registrations', [VeterinarianRegistrationsController::class, 'getMy']);
@@ -75,6 +78,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users/my/profile/bankAndTax', [VeterinariansController::class, 'getMybankAndTax']);
         Route::get('/users/my/services', [VeterinarianServicesController::class, 'getMyServices']);
         Route::get('/payouts/banks', [PayoutsController::class, 'getBanks']);
+        Route::get('/payouts/idempotencyKey', [PayoutsController::class, 'getIdempotencyKey']);
+        Route::post('/payouts/disbursement', [PayoutsController::class, 'createDisbursementRequest']);
+        Route::get('/users/my/disbursements', [PayoutsController::class, 'getMy']);
     });
     Route::middleware('ability:role-basic')->group(function () {
         Route::get('/veterinarians/services/{id}/startTimes', [VeterinarianSchedulesController::class, 'getAvailableStartTimes']);
@@ -106,6 +112,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/veterinarians/{veterinarianId}/suspension', [VeterinariansController::class, "suspend"]);
         Route::delete('/veterinarians/{veterinarianId}/suspension', [VeterinariansController::class, "unsuspend"]);
         Route::get('/users/{customerId}/transactions', [TransactionsController::class, 'getAllByCustomerId']);
+        Route::get('/payouts/disbursements', [PayoutsController::class, 'getAll']);
     });
 });
 

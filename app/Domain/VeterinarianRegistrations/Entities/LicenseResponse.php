@@ -10,8 +10,10 @@ class LicenseResponse
     private string $sipFilePath;
     private string $sipValidUntil;
     private string $sipNumber;
+    private string $strvFileId;
+    private string $sipFileId;
 
-    public function __construct(string $strvFilePath, string $strvValidUntil, string $strvNumber, string $sipFilePath, string $sipValidUntil, string $sipNumber)
+    public function __construct(string $strvFilePath, string $strvValidUntil, string $strvNumber, string $sipFilePath, string $sipValidUntil, string $sipNumber, string $strvFileId, string $sipFileId)
     {
         $this->strvFilePath = $strvFilePath;
         $this->strvValidUntil = $strvValidUntil;
@@ -19,6 +21,8 @@ class LicenseResponse
         $this->sipFilePath = $sipFilePath;
         $this->sipValidUntil = $sipValidUntil;
         $this->sipNumber = $sipNumber;
+        $this->strvFileId = $strvFileId;
+        $this->sipFileId = $sipFileId;
     }
 
     public function getStrvFilePath(): string
@@ -51,6 +55,16 @@ class LicenseResponse
         return $this->sipNumber;
     }
 
+    public function getStrvFileId(): string
+    {
+        return $this->strvFileId;
+    }
+
+    public function getSipFileId(): string
+    {
+        return $this->sipFileId;
+    }
+
     public function setStrvFilePath(string $strvFilePath): void
     {
         $this->strvFilePath = $strvFilePath;
@@ -81,6 +95,16 @@ class LicenseResponse
         $this->sipNumber = $sipNumber;
     }
 
+    public function setStrvFileId(string $strvFileId): void
+    {
+        $this->strvFileId = $strvFileId;
+    }
+
+    public function setSipFileId(string $sipFileId): void
+    {
+        $this->sipFileId = $sipFileId;
+    }
+
     public function toArray(): array
     {
         return [
@@ -90,6 +114,8 @@ class LicenseResponse
             'sipFilePath' => $this->sipFilePath,
             'sipValidUntil' => $this->sipValidUntil,
             'sipNumber' => $this->sipNumber,
+            'strvFileId' => $this->strvFileId,
+            'sipFileId' => $this->sipFileId,
         ];
     }
 }

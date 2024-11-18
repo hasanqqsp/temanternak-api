@@ -15,6 +15,6 @@ class GetScheduleByVeterinarianIdUseCase
 
     public function execute(string $veterinarianId)
     {
-        return $this->veterinarianScheduleRepository->getByVeterinarianId($veterinarianId);
+        return $this->veterinarianScheduleRepository->getAllByVeterinarianId($veterinarianId);
     }
 }

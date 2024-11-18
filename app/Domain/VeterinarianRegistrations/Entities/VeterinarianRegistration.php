@@ -16,8 +16,10 @@ class VeterinarianRegistration
     private string $dateOfBirth;
     private string $whatsappNumber;
     private string $formalPictureFilePath;
+    private string $formalPictureFileId;
     private string $nik;
     private string $ktpFilePath;
+    private string $ktpFileId;
     private string $createdAt;
     private string $updatedAt;
     private array $specializations;
@@ -39,8 +41,10 @@ class VeterinarianRegistration
         string $dateOfBirth,
         string $whatsappNumber,
         string $formalPictureFilePath,
+        string $formalPictureFileId,
         string $nik,
         string $ktpFilePath,
+        string $ktpFileId,
         string $createdAt,
         string $updatedAt,
         array $specializations,
@@ -60,8 +64,10 @@ class VeterinarianRegistration
         $this->dateOfBirth = $dateOfBirth;
         $this->whatsappNumber = $whatsappNumber;
         $this->formalPictureFilePath = $formalPictureFilePath;
+        $this->formalPictureFileId = $formalPictureFileId;
         $this->nik = $nik;
         $this->ktpFilePath = $ktpFilePath;
+        $this->ktpFileId = $ktpFileId;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->specializations = $specializations;
@@ -154,6 +160,16 @@ class VeterinarianRegistration
         $this->formalPictureFilePath = $formalPictureFilePath;
     }
 
+    public function getFormalPictureFileId(): string
+    {
+        return $this->formalPictureFileId;
+    }
+
+    public function setFormalPictureFileId(string $formalPictureFileId): void
+    {
+        $this->formalPictureFileId = $formalPictureFileId;
+    }
+
     public function getNik(): string
     {
         return $this->nik;
@@ -172,6 +188,16 @@ class VeterinarianRegistration
     public function setKtpFilePath(string $ktpFilePath): void
     {
         $this->ktpFilePath = $ktpFilePath;
+    }
+
+    public function getKtpFileId(): string
+    {
+        return $this->ktpFileId;
+    }
+
+    public function setKtpFileId(string $ktpFileId): void
+    {
+        $this->ktpFileId = $ktpFileId;
     }
 
     public function getCreatedAt(): string
@@ -209,7 +235,7 @@ class VeterinarianRegistration
         return $this->license;
     }
 
-    public function setLicense(License $license): void
+    public function setLicense(LicenseResponse $license): void
     {
         $this->license = $license;
     }
@@ -249,7 +275,7 @@ class VeterinarianRegistration
         return $this->bankAndTax;
     }
 
-    public function setBankAndTax(BankAndTax $bankAndTax): void
+    public function setBankAndTax(BankAndTaxResponse $bankAndTax): void
     {
         $this->bankAndTax = $bankAndTax;
     }
@@ -295,8 +321,10 @@ class VeterinarianRegistration
             'dateOfBirth' => $this->dateOfBirth,
             'whatsappNumber' => $this->whatsappNumber,
             'formalPictureFilePath' => $this->formalPictureFilePath,
+            'formalPictureFileId' => $this->formalPictureFileId,
             'nik' => $this->nik,
             'ktpFilePath' => $this->ktpFilePath,
+            'ktpFileId' => $this->ktpFileId,
             'createdAt' => $this->createdAt,
             'updatedAt' => $this->updatedAt,
             'specializations' => $this->specializations,

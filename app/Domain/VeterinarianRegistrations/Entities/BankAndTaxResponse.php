@@ -6,24 +6,30 @@ class BankAndTaxResponse
 {
     private string $npwp;
     private string $npwpFilePath;
+    private string $npwpFileId;
     private string $bankName;
     private string $bankAccountNumber;
     private string $bankAccountFilePath;
+    private string $bankAccountFileId;
     private string $bankAccountName;
 
     public function __construct(
         string $npwp,
         string $npwpFilePath,
+        string $npwpFileId,
         string $bankName,
         string $bankAccountNumber,
         string $bankAccountFilePath,
+        string $bankAccountFileId,
         string $bankAccountName
     ) {
         $this->npwp = $npwp;
         $this->npwpFilePath = $npwpFilePath;
+        $this->npwpFileId = $npwpFileId;
         $this->bankName = $bankName;
         $this->bankAccountNumber = $bankAccountNumber;
         $this->bankAccountFilePath = $bankAccountFilePath;
+        $this->bankAccountFileId = $bankAccountFileId;
         $this->bankAccountName = $bankAccountName;
     }
 
@@ -45,6 +51,16 @@ class BankAndTaxResponse
     public function setNpwpFilePath(string $npwpFilePath): void
     {
         $this->npwpFilePath = $npwpFilePath;
+    }
+
+    public function getNpwpFileId(): string
+    {
+        return $this->npwpFileId;
+    }
+
+    public function setNpwpFileId(string $npwpFileId): void
+    {
+        $this->npwpFileId = $npwpFileId;
     }
 
     public function getBankName(): string
@@ -77,6 +93,16 @@ class BankAndTaxResponse
         $this->bankAccountFilePath = $bankAccountFilePath;
     }
 
+    public function getBankAccountFileId(): string
+    {
+        return $this->bankAccountFileId;
+    }
+
+    public function setBankAccountFileId(string $bankAccountFileId): void
+    {
+        $this->bankAccountFileId = $bankAccountFileId;
+    }
+
     public function getBankAccountName(): string
     {
         return $this->bankAccountName;
@@ -92,9 +118,11 @@ class BankAndTaxResponse
         return [
             'npwp' => $this->npwp,
             'npwpFilePath' => $this->npwpFilePath,
+            'npwpFileId' => $this->npwpFileId,
             'bankName' => $this->bankName,
             'bankAccountNumber' => $this->bankAccountNumber,
             'bankAccountFilePath' => $this->bankAccountFilePath,
+            'bankAccountFileId' => $this->bankAccountFileId,
             'bankAccountName' => $this->bankAccountName,
         ];
     }

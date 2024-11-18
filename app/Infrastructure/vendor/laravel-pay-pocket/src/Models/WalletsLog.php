@@ -2,6 +2,7 @@
 
 namespace HPWebdeveloper\LaravelPayPocket\Models;
 
+use App\Infrastructure\Repository\Models\Disbursement;
 use App\Infrastructure\Repository\Models\Settlement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use MongoDB\Laravel\Eloquent\Model;
@@ -49,6 +50,13 @@ class WalletsLog extends Model
 
     public function settlement()
     {
-        return $this->hasOne(Settlement::class, "id", "notes");;
+        if ($this->type == "inc")
+            return $this->hasOne(Settlement::class, "id", "notes");
+    }
+
+    public function disbursement()
+    {
+        if ($this->type == "dec")
+            return $this->hasOne(Disbursement::class, "transfer_id", "notes");
     }
 }

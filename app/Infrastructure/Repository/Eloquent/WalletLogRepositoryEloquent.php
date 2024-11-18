@@ -13,11 +13,25 @@ class WalletLogRepositoryEloquent implements WalletLogRepository
     public function getWalletHistory($userId)
     {
         $wallet = User::find($userId)->wallets->first();
-        $logs = WalletsLog::with("settlement")->where('loggable_id', $wallet->id)->get()->map(
-            function ($log) {
+
+        $logs = WalletsLog::where('loggable_id', $wallet->id)->orderBy('updated_at', 'desc')->get()->map(
+            function ($log) use ($userId) {
+                if (($log->settlement() == null)) {
+                    $transfer_fee = $log->disbursement->transfer_fee;
+                    return (new WalletLogItem(
+                        $log->id,
+                        $log->from,
+                        $log->to,
+                        $log->value,
+                        $transfer_fee,
+                        $log->value - $transfer_fee,
+                        null,
+                        $log->updated_at,
+                    ))->toArray();
+                }
                 $settlement = $log->settlement;
-                $booking = $settlement->booking;
-                $veterinarian = (new VeterinarianRepositoryEloquent())->getById($settlement->veterinarian_id);
+                $booking = $settlement !== null ? $settlement->booking : null;
+                $veterinarian = (new VeterinarianRepositoryEloquent())->getById($userId);
                 return (new WalletLogItem(
                     $log->id,
                     $log->from,

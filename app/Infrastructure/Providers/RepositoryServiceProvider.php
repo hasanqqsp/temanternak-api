@@ -4,6 +4,7 @@ namespace App\Infrastructure\Providers;
 
 use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\Invitations\InvitationRepository;
+use App\Domain\Payouts\DisbursementRepository;
 use App\Domain\Refunds\RefundRepository;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Transactions\TransactionRepository;
@@ -16,6 +17,7 @@ use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\Domain\VeterinarianVerifications\VeterinarianVerificationRepository;
 use App\Domain\Wallets\WalletLogRepository;
 use App\Infrastructure\Repository\Eloquent\ConsultationRepositoryEloquent;
+use App\Infrastructure\Repository\Eloquent\DisbursementRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\InvitationRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\RefundRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\ServiceBookingRepositoryEloquent;
@@ -54,6 +56,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ConsultationRepository::class, ConsultationRepositoryEloquent::class);
         $this->app->singleton(WalletLogRepository::class, WalletLogRepositoryEloquent::class);
         $this->app->singleton(RefundRepository::class, RefundRepositoryEloquent::class);
+        $this->app->singleton(DisbursementRepository::class, DisbursementRepositoryEloquent::class);
     }
 
     /**

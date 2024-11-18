@@ -157,18 +157,22 @@ class VeterinarianRegistrationRepositoryEloquent implements VeterinarianRegistra
             $registrationData->generalIdentity->date_of_birth,
             $registrationData->generalIdentity->whatsapp_number,
             $registrationData->generalIdentity->formalPhoto->file_path,
+            $registrationData->generalIdentity->formalPhoto->id,
             $registrationData->generalIdentity->nik,
             $registrationData->generalIdentity->ktpFile->file_path,
+            $registrationData->generalIdentity->ktpFile->id,
             $registrationData->created_at,
             $registrationData->updated_at,
             $registrationData->specializations,
             new LicenseResponse(
-                $registrationData->license->strv_number,
                 $registrationData->license->strvFile->file_path,
                 $registrationData->license->strv_valid_until,
-                $registrationData->license->sip_number,
+                $registrationData->license->strv_number,
                 $registrationData->license->sipFile->file_path,
-                $registrationData->license->sip_valid_until
+                $registrationData->license->sip_valid_until,
+                $registrationData->license->sip_number,
+                $registrationData->license->sipFile->id,
+                $registrationData->license->strvFile->id
             ),
             $educations->toArray(),
             $workingExperiences->toArray(),
@@ -176,10 +180,13 @@ class VeterinarianRegistrationRepositoryEloquent implements VeterinarianRegistra
             new BankAndTaxResponse(
                 $registrationData->bankAndTax->npwp,
                 $registrationData->bankAndTax->npwpFile->file_path,
-                $registrationData->bankAndTax->bank_account_name,
+                $registrationData->bankAndTax->npwpFile->id,
                 $registrationData->bankAndTax->bank_name,
                 $registrationData->bankAndTax->bank_account_number,
-                $registrationData->bankAndTax->bankAccountFile->file_path
+                $registrationData->bankAndTax->bankAccountFile->file_path,
+                $registrationData->bankAndTax->bankAccountFile->id,
+                $registrationData->bankAndTax->bank_account_name
+
             ),
             new Invitation(
                 $registrationData->invitation->id,
