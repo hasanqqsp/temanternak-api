@@ -14,6 +14,7 @@ class VetServiceForAdmin
     private string $name;
     private bool $isAccepted;
     private bool $isSuspended;
+    private bool $isDeleted; // Added attribute
 
     // Constructor
     public function __construct(
@@ -24,7 +25,8 @@ class VetServiceForAdmin
         string $description,
         string $name,
         bool $isAccepted,
-        bool $isSuspended
+        bool $isSuspended,
+        bool $isDeleted // Added parameter
     ) {
         $this->id = $id;
         $this->veterinarian = $veterinarian;
@@ -34,6 +36,7 @@ class VetServiceForAdmin
         $this->name = $name;
         $this->isAccepted = $isAccepted;
         $this->isSuspended = $isSuspended;
+        $this->isDeleted = $isDeleted; // Set attribute
     }
 
     // Getters
@@ -77,6 +80,11 @@ class VetServiceForAdmin
         return $this->isSuspended;
     }
 
+    public function getIsDeleted(): bool // Added getter
+    {
+        return $this->isDeleted;
+    }
+
     // Setters
     public function setId(string $id): void
     {
@@ -118,6 +126,11 @@ class VetServiceForAdmin
         $this->isSuspended = $isSuspended;
     }
 
+    public function setIsDeleted(bool $isDeleted): void // Added setter
+    {
+        $this->isDeleted = $isDeleted;
+    }
+
     // Convert object to array
     public function toArray(): array
     {
@@ -130,6 +143,7 @@ class VetServiceForAdmin
             'name' => $this->name,
             'isAccepted' => $this->isAccepted,
             'isSuspended' => $this->isSuspended,
+            'isDeleted' => $this->isDeleted, // Added to array
         ];
     }
 }

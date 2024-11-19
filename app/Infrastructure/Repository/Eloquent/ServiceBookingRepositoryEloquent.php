@@ -154,6 +154,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
     {
 
         $veterinarian = (new VeterinarianRepositoryEloquent())->getById($booking->veterinarian_id);
+
         $serviceBooking =
             new EntitiesServiceBooking(
                 $booking->id,

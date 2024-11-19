@@ -19,7 +19,6 @@ class InvitationRepositoryEloquent implements InvitationRepository
             $invitation->is_accepted = true;
             $invitation->save();
         }
-
         return $invitation;
     }
 
@@ -67,7 +66,7 @@ class InvitationRepositoryEloquent implements InvitationRepository
 
     public function getAll()
     {
-        $invitations = EloquentInvitation::all();
+        $invitations = EloquentInvitation::where("is_revoked", false)->orderBy("created_at", "desc")->get();
 
         return $invitations->map(function ($invitation) {
             return (new Invitation(

@@ -3,6 +3,7 @@
 namespace App\Domain\Invitations\Entities;
 
 use App\Domain\Users\Entities\ShortUser;
+use DateTime;
 
 class Invitation
 {
@@ -12,8 +13,8 @@ class Invitation
     private ShortUser $inviter;
     private ?string $message;
     private ?string $phone;
-    private string $createdAt;
-    private string $updatedAt;
+    private DateTime $createdAt;
+    private DateTime $updatedAt;
     private ?bool $isRevoked;
 
     public function __construct(
@@ -23,8 +24,8 @@ class Invitation
         ShortUser $inviter,
         ?string $message = null,
         ?string $phone = null,
-        string $createdAt,
-        string $updatedAt,
+        DateTime $createdAt,
+        DateTime $updatedAt,
         ?bool $isRevoked = null
     ) {
         $this->id = $id;
@@ -70,12 +71,12 @@ class Invitation
 
     public function getCreatedAt(): string
     {
-        return $this->createdAt;
+        return $this->createdAt->format("Y-m-d\TH:i:s.up");
     }
 
     public function getUpdatedAt(): string
     {
-        return $this->updatedAt;
+        return $this->updatedAt->format("Y-m-d\TH:i:s.up");
     }
 
     public function getIsRevoked(): ?bool
@@ -137,8 +138,8 @@ class Invitation
             'inviter' => $this->inviter->toArray(),
             'message' => $this->message,
             'phone' => $this->phone,
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
+            'createdAt' => $this->createdAt->format('Y-m-d\TH:i:s.up'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d\TH:i:s.up'),
             'isRevoked' => $this->isRevoked,
         ];
     }

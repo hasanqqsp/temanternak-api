@@ -23,6 +23,6 @@ interface VeterinarianServiceRepository
     public function getPublicByVeterinarianId(string $veterinarianId);
     public function getAllByVeterinarianId(string $veterinarianId);
     public function getAllPublic();
-    public function getAll();
+    public function getAll(int $page);
     public function deleteById(string $id);
 }

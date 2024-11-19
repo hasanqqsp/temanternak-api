@@ -17,6 +17,7 @@ class InvitationsController extends Controller
     private $getAllInvitationsUseCase;
     private $getInvitationUseCase;
     private $revokeInvitationUseCase;
+
     public function __construct(InvitationRepository $invitationRepository)
     {
         $this->createInvitationUseCase = new CreateInvitationUseCase($invitationRepository);

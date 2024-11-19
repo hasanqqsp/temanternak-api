@@ -156,11 +156,21 @@ class VeterinarianServiceRepositoryEloquent implements VeterinarianServiceReposi
             });
     }
 
-    public function getAll()
+    public function getAll($page)
     {
-        return VeterinarianService::withTrashed()->get()->map(function ($service) {
-            return $this->createVetServiceForAdmin($service)->toArray();
-        });
+        $results =  VeterinarianService::withTrashed()->paginate(10, ["*"], 'page', $page);
+
+        return [
+            'pagination' => [
+                'total' => $results->total(),
+                'perPage' => $results->perPage(),
+                'currentPage' => $results->currentPage(),
+                'lastPage' => $results->lastPage(),
+            ],
+            'data' => array_map(function ($service) {
+                return $this->createVetServiceForAdmin($service)->toArray();
+            }, $results->items())
+        ];
     }
 
     public function verifyOwnership($serviceId, $veterinarianId): bool
@@ -195,11 +205,12 @@ class VeterinarianServiceRepositoryEloquent implements VeterinarianServiceReposi
     {
         $veterinarian = $service->veterinarian;
         $generalIdentity = $veterinarian->veterinarianRegistration->where("status", "ACCEPTED")->first()->generalIdentity;
+
         return new VetServiceForAdmin(
             $service->id,
             new VeterinarianShort(
                 $veterinarian->id,
-                StringUtils::nameAndTitle($generalIdentity->frontTitle, $veterinarian->name, $generalIdentity->backTitle),
+                StringUtils::nameAndTitle($generalIdentity->front_title, $veterinarian->name, $generalIdentity->back_title),
                 $veterinarian->username,
                 $generalIdentity->formalPhoto->file_path,
                 $veterinarian->specializations,
@@ -209,7 +220,8 @@ class VeterinarianServiceRepositoryEloquent implements VeterinarianServiceReposi
             $service->description,
             $service->name,
             $service->approved_at == null ? false : true,
-            $service->suspended_at == null ? false : true
+            $service->suspended_at == null ? false : true,
+            $service->deleted_at == null ? false : true
         );
     }
 }

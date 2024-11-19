@@ -48,12 +48,17 @@ class VeterinarianServicesController extends Controller
         $this->getAllServiceByVeterinarianIdUseCase = new GetAllServiceByVeterinarianIdUseCase($repository);
     }
 
-    public function getAll()
+    public function getAll(Request $request)
     {
         $data = [];
         if (request()->bearerToken() && $user = Auth::guard('sanctum')->user()) {
             if ($user->role === 'superadmin' || $user->role === 'admin') {
-                $data = $this->getAllVeterinarianServiceUseCase->execute();
+                $result = $this->getAllVeterinarianServiceUseCase->execute($request->query('page', 1));
+                return response()->json([
+                    'status' => "success",
+                    'pagination' => $result["pagination"],
+                    'data' => $result["data"]
+                ]);
             } else {
                 $data = $this->getAllPublicVeterinarianServiceUseCase->execute();
             }

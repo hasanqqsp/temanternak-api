@@ -12,6 +12,7 @@ use App\Domain\VeterinarianRegistrations\Entities\OrganizationExperience as Enti
 use App\Domain\VeterinarianRegistrations\Entities\WorkingExperience as EntitiesWorkingExperience;
 use App\Domain\Veterinarians\Entities\Veterinarian;
 use App\Domain\Veterinarians\Entities\VeterinarianShort;
+use App\Domain\Veterinarians\Entities\VeterinarianShortForList;
 use App\Domain\Veterinarians\VeterinarianRepository;
 use App\Domain\VeterinarianSchedules\Entities\VeterinarianSchedule;
 use App\Domain\VeterinarianServices\Entities\VetServiceOnly;
@@ -284,7 +285,7 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
         );
     }
 
-    private function mapUserToVeterinarianShort(?User $user): VeterinarianShort
+    private function mapUserToVeterinarianShort(?User $user): VeterinarianShortForList
     {
         if (!$user->data) {
             $this->populate($user->veterinarianRegistration->where("status", "ACCEPTED")->first());
@@ -296,13 +297,15 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
         $frontTitle = $data->generalIdentity->front_title;
         $backTitle = $data->generalIdentity->back_title;
         $nameAndTitle = StringUtils::nameAndTitle($frontTitle, $user->name, $backTitle);
-
-        return new VeterinarianShort(
+        return new VeterinarianShortForList(
             $user->id,
             $nameAndTitle,
             $user->username,
             $data->generalIdentity->formalPhoto->file_path,
             $data->specializations,
+            $data->generalIdentity->whatsapp_number,
+            $data->license->sip_number,
+            $data->license->strv_number
         );
     }
 

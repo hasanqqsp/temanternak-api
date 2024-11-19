@@ -13,8 +13,8 @@ class GetAllVeterinarianServiceUseCase
         $this->veterinarianServiceRepository = $veterinarianServiceRepository;
     }
 
-    public function execute()
+    public function execute($page = 1)
     {
-        return $this->veterinarianServiceRepository->getAll();
+        return $this->veterinarianServiceRepository->getAll($page);
     }
 }
