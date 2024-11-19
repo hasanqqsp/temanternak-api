@@ -18,6 +18,7 @@ use App\Domain\VeterinarianRegistrations\Entities\ShortVeterinarianRegistration;
 use App\Domain\VeterinarianRegistrations\Entities\VeterinarianRegistration as EntitiesVeterinarianRegistration;
 use App\Domain\VeterinarianRegistrations\Entities\WorkingExperience as EntitiesWorkingExperience;
 use App\Domain\VeterinarianRegistrations\VeterinarianRegistrationRepository;
+use App\Domain\Veterinarians\Entities\Veterinarian;
 use App\Infrastructure\Repository\Models\BankAndTax;
 use App\Infrastructure\Repository\Models\Education;
 use App\Infrastructure\Repository\Models\GeneralIdentity;
@@ -237,15 +238,20 @@ class VeterinarianRegistrationRepositoryEloquent implements VeterinarianRegistra
 
     public function getAll(): array
     {
-        return VeterinarianRegistration::all()->map(
+        return VeterinarianRegistration::orderBy('created_at', 'desc')->get()->map(
             function ($registrationData) {
                 return (new ShortVeterinarianRegistration(
                     $registrationData->id,
                     $registrationData->status,
-                    (new ShortUser(
+                    (new User(
                         $registrationData->user_id,
                         $registrationData->user->name,
+                        $registrationData->user->email,
+                        $registrationData->user->created_at,
+                        $registrationData->user->updated_at,
                         $registrationData->user->role,
+                        $registrationData->user->phone,
+                        $registrationData->user->username
                     )),
                     $registrationData->generalIdentity->whatsapp_number,
                     $registrationData->generalIdentity->formalPhoto->file_path,

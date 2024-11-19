@@ -15,6 +15,7 @@ class GetVeterinarianRegistrationByIdUseCase
 
     public function execute(string $id)
     {
+        $this->veterinarianRegistrationRepository->checkIfExists($id);
         return $this->veterinarianRegistrationRepository->getById($id);
     }
 }

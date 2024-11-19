@@ -2,7 +2,6 @@
 
 namespace App\Infrastructure\Repository\Models;
 
-use App\Domain\Veterinarians\Entities\Veterinarian;
 use MongoDB\Laravel\Eloquent\Model;
 
 class ServiceBooking extends Model
@@ -34,6 +33,6 @@ class ServiceBooking extends Model
 
     public function settlement()
     {
-        return $this->hasOne(Settlement::class, 'booking_id', 'id')->withTrashed();
+        return $this->hasOne(Settlement::class, 'booking_id', 'id');
     }
 }

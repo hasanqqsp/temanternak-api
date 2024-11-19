@@ -4,14 +4,14 @@ namespace App\Domain\VeterinarianRegistrations\Entities;
 
 use App\Domain\Invitations\Entities\Invitation;
 use App\Domain\Invitations\Entities\ShortInvitation;
-use App\Domain\Users\Entities\ShortUser;
 use App\Domain\Users\Entities\User;
+
 
 class ShortVeterinarianRegistration
 {
     private string $id;
     private string $status;
-    private ShortUser $user;
+    private User $user;
     private string $whatsappNumber;
     private string $formalPictureFilePath;
     private string $createdAt;
@@ -22,7 +22,7 @@ class ShortVeterinarianRegistration
     public function __construct(
         string $id,
         string $status,
-        ShortUser $user,
+        User $user,
         string $whatsappNumber,
         string $formalPictureFilePath,
         string $createdAt,
@@ -50,7 +50,7 @@ class ShortVeterinarianRegistration
         return $this->status;
     }
 
-    public function getUser(): ShortUser
+    public function getUser(): User
     {
         return $this->user;
     }
