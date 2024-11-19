@@ -34,11 +34,11 @@ class VeterinarianRegistration extends Model
     }
     public function invitation()
     {
-        return $this->hasOne(Invitation::class, 'id', 'invitation_id');
+        return $this->hasOne(Invitation::class, 'id', 'invitation_id')->withTrashed();
     }
     public function user()
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->hasOne(User::class, 'id', 'user_id')->withTrashed();
     }
     public function verificationResult()
     {

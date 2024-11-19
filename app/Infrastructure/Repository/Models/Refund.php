@@ -23,6 +23,6 @@ class Refund extends Model
     }
     public function newService()
     {
-        return $this->belongsTo(VeterinarianService::class, 'id', 'new_service_id');
+        return $this->belongsTo(VeterinarianService::class, 'id', 'new_service_id')->withTrashed();
     }
 }

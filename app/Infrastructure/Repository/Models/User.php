@@ -52,7 +52,7 @@ class User extends AuthUser implements WalletOperations
     public function veterinarianRegistration()
     {
         if ($this->role === 'invited-user' || $this->role === 'veterinarian') {
-            return $this->hasMany(VeterinarianRegistration::class, 'user_id', 'id');
+            return $this->hasMany(VeterinarianRegistration::class, 'user_id', 'id')->withTrashed();
         }
         return null;
     }
@@ -60,7 +60,7 @@ class User extends AuthUser implements WalletOperations
     public function data()
     {
         if ($this->role === 'veterinarian') {
-            return $this->hasOne(Veterinarian::class, 'user_id', 'id');
+            return $this->hasOne(Veterinarian::class, 'user_id', 'id')->withTrashed();
         }
         return null;
     }
@@ -68,7 +68,7 @@ class User extends AuthUser implements WalletOperations
     public function services()
     {
         if ($this->role === 'veterinarian') {
-            return $this->hasMany(VeterinarianService::class, 'veterinarian_id', 'id');
+            return $this->hasMany(VeterinarianService::class, 'veterinarian_id', 'id')->withTrashed();
         }
         return null;
     }

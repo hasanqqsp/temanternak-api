@@ -9,15 +9,15 @@ class Consultation extends Model
 
     public function service()
     {
-        return $this->hasOne(VeterinarianService::class, 'id', 'service_id');
+        return $this->hasOne(VeterinarianService::class, 'id', 'service_id')->withTrashed();
     }
     public  function veterinarian()
     {
-        return $this->hasOne(User::class, 'id', 'veterinarian_id');
+        return $this->hasOne(User::class, 'id', 'veterinarian_id')->withTrashed();
     }
     public  function customer()
     {
-        return $this->hasOne(User::class, 'id', 'customer_id');
+        return $this->hasOne(User::class, 'id', 'customer_id')->withTrashed();
     }
     public  function booking()
     {

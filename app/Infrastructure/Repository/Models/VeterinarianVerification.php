@@ -8,10 +8,10 @@ class VeterinarianVerification extends Model
 {
     public function registrationsData()
     {
-        return $this->belongsTo(VeterinarianRegistration::class);
+        return $this->belongsTo(VeterinarianRegistration::class)->withTrashed();
     }
     public function verificator()
     {
-        return $this->hasOne(User::class, 'id', 'verificator_id');
+        return $this->hasOne(User::class, 'id', 'verificator_id')->withTrashed();
     }
 }

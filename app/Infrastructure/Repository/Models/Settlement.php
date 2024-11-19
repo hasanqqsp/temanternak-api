@@ -12,11 +12,11 @@ class Settlement extends Model
     }
     public function veterinarian()
     {
-        return $this->hasOne(User::class, 'id', 'veterinarian_id');
+        return $this->hasOne(User::class, 'id', 'veterinarian_id')->withTrashed();
     }
     public function service()
     {
-        return $this->hasOne(VeterinarianService::class, 'id', 'service_id');
+        return $this->hasOne(VeterinarianService::class, 'id', 'service_id')->withTrashed();
     }
     public function booking()
     {

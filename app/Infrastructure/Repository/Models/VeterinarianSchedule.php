@@ -10,6 +10,6 @@ class VeterinarianSchedule extends Model
     use SoftDeletes;
     public function veterinarian()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 }

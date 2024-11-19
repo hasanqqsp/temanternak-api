@@ -9,6 +9,6 @@ class Disbursement extends Model
 {
     public function veterinarian()
     {
-        return $this->hasOne(User::class, 'id', 'veterinarian_id');
+        return $this->hasOne(User::class, 'id', 'veterinarian_id')->withTrashed();
     }
 }

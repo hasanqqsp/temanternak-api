@@ -11,6 +11,6 @@ class Invitation extends Model
 
     public function inviter()
     {
-        return $this->hasOne(User::class, 'id', 'inviter_id');
+        return $this->hasOne(User::class, 'id', 'inviter_id')->withTrashed();
     }
 }
