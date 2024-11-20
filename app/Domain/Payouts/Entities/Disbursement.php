@@ -17,8 +17,9 @@ class Disbursement
     private ?string $failReason = null;
     private ?string $transferId = null;
     private string $status;
+    private float $fee;
 
-    public function __construct(string $id, string $account_number, string $bank_code, float $amount, string $remark, string $idempotencyKey, VeterinarianShort $veterinarian, string $status, ?string $receiptUrl = null, ?string $failReason = null, ?string $transferId = null)
+    public function __construct(string $id, string $account_number, string $bank_code, float $amount, string $remark, string $idempotencyKey, VeterinarianShort $veterinarian, string $status, float $fee, ?string $receiptUrl = null, ?string $failReason = null, ?string $transferId = null)
     {
         $this->id = $id;
         $this->account_number = $account_number;
@@ -28,6 +29,7 @@ class Disbursement
         $this->idempotencyKey = $idempotencyKey;
         $this->veterinarian = $veterinarian;
         $this->status = $status;
+        $this->fee = $fee;
         $this->receiptUrl = $receiptUrl;
         $this->failReason = $failReason;
         $this->transferId = $transferId;
@@ -143,6 +145,16 @@ class Disbursement
         $this->status = $status;
     }
 
+    public function getFee(): float
+    {
+        return $this->fee;
+    }
+
+    public function setFee(float $fee): void
+    {
+        $this->fee = $fee;
+    }
+
     public function toArray(): array
     {
         $data = [
@@ -154,6 +166,7 @@ class Disbursement
             'idempotencyKey' => $this->idempotencyKey,
             'veterinarian' => $this->veterinarian->toArray(),
             'status' => $this->status,
+            'fee' => $this->fee,
         ];
 
         if ($this->receiptUrl !== null) {

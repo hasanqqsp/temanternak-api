@@ -117,6 +117,7 @@ class DisbursementRepositoryEloquent implements DisbursementRepository
                 $disbursement->veterinarian->data->specializations,
             ),
             $disbursement->status,
+            $disbursement->transfer_fee
         );
         if ($disbursement->receipt_url) {
             $entity->setReceiptUrl($disbursement->receipt_url);

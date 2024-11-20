@@ -204,7 +204,7 @@ class VeterinarianServiceRepositoryEloquent implements VeterinarianServiceReposi
     private function createVetServiceForAdmin($service): VetServiceForAdmin
     {
         $veterinarian = $service->veterinarian;
-        $generalIdentity = $veterinarian->veterinarianRegistration->where("status", "ACCEPTED")->first()->generalIdentity;
+        $generalIdentity = $veterinarian->data->first()->generalIdentity;
 
         return new VetServiceForAdmin(
             $service->id,

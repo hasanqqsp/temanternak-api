@@ -256,7 +256,7 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
             },)->toArray();
 
         $services = array_values($user->services->whereNotNull('approved_at')
-            ->whereNull('suspended_at')->map(function ($service) {
+            ->whereNull('suspended_at')->whereNull("deleted_at")->map(function ($service) {
                 return (new VetServiceOnly(
                     $service->id,
                     $service->price,

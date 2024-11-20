@@ -23,8 +23,8 @@ class WalletLogRepositoryEloquent implements WalletLogRepository
                         $log->from,
                         $log->to,
                         $log->value,
-                        $transfer_fee,
-                        $log->value - $transfer_fee,
+                        $log->value < 0 ? $transfer_fee * -1 : $transfer_fee,
+                        $log->value < 0 ? $log->value + $transfer_fee : $log->value - $transfer_fee,
                         null,
                         $log->updated_at,
                     ))->toArray();
