@@ -13,7 +13,7 @@ class UpdateDisbursementStatusByTransferIdUseCase
         $this->disbursementRepository = $disbursementRepository;
     }
 
-    public function execute(string $transferId, string $status, string $receiptUrl, string $failReason)
+    public function execute(string $transferId, string $status, ?string $receiptUrl, ?string $failReason)
     {
         $this->disbursementRepository->checkIfDisbursementValid($transferId);
         return $this->disbursementRepository->updateDisbursementStatusByTransferId($transferId, $status, $receiptUrl, $failReason);

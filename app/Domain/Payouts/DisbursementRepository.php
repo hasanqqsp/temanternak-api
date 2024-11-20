@@ -10,7 +10,7 @@ interface DisbursementRepository
     public function getDisbursementById($disbursementId);
     public function getDisbursements();
     public function getDisbursementsByVeterinarianId($veterinarianId);
-    public function updateDisbursementStatusByTransferId($disbursementId, $status, $receiptUrl);
+    public function updateDisbursementStatusByTransferId($disbursementId, $status, $receiptUrl, $failReason);
     public function getIdempotencyKey($veterinarianId);
     public function checkIdempotencyKeyExists($idempotencyKey);
     public function checkIdempotencyKeyIsUsed($idempotencyKey);

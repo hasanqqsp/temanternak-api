@@ -74,7 +74,8 @@ class PayoutsController extends Controller
 
     public function updateStatus(Request $request)
     {
-        $this->updateDisbursementStatusByTransferIdUseCase->execute($request->id, $request->status, $request->receipt, $request->reason);
+
+        $this->updateDisbursementStatusByTransferIdUseCase->execute(strval($request->id), $request->status, $request->receipt, $request->reason);
         return [
             "status" => "success",
         ];
