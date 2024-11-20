@@ -14,6 +14,7 @@ use App\Domain\VeterinarianServices\VeterinarianServiceRepository;
 use App\Infrastructure\Payment\MidtransPaymentGateway;
 use App\UseCase\ServiceBooking\AddServiceBookingUseCase;
 use App\UseCase\ServiceBooking\CancelServiceBookingUseCase;
+use App\UseCase\ServiceBooking\GetAllConfirmedServiceBookingsByUserIdUseCase;
 use App\UseCase\ServiceBooking\GetAllConfirmedServiceBookingsByVeterinarianIdUseCase;
 use App\UseCase\ServiceBooking\GetAllServiceBookingsByCustomerIdUseCase;
 use App\UseCase\ServiceBooking\GetAllServiceBookingsByVeterinarianIdUseCase;
@@ -39,6 +40,7 @@ class ServiceBookingsController extends Controller
     private $rescheduleServiceBookingUseCase;
     private $refundServiceBookingUseCase;
     private $rebookServiceBookingUseCase;
+    private $getAllConfirmedServiceBookingsByUserIdUseCase;
 
     public function __construct(
         ServiceBookingRepository $serviceBookingRepository,
@@ -65,6 +67,7 @@ class ServiceBookingsController extends Controller
         $this->rescheduleServiceBookingUseCase = new RescheduleBookingUseCase($serviceBookingRepository, $veterinarianScheduleRepository);
         $this->refundServiceBookingUseCase = new RefundServiceBookingUseCase($serviceBookingRepository, $transactionRepository, $midtransPaymentGateway);
         $this->rebookServiceBookingUseCase = new RebookServiceBookingUseCase($serviceBookingRepository, $midtransPaymentGateway, $refundRepository,  $transactionRepository);
+        $this->getAllConfirmedServiceBookingsByUserIdUseCase = new GetAllConfirmedServiceBookingsByUserIdUseCase($serviceBookingRepository);
     }
 
     public function add(Request $request, $veterinarianId, $serviceId)
@@ -96,7 +99,11 @@ class ServiceBookingsController extends Controller
         } else if ($role == "admin" || $role == "superadmin") {
             $results = $this->getAllServiceBookingsUseCase->execute($page);
         } else {
-            $results = $this->getAllServiceBookingsByCustomerIdUseCase->execute($request->user()->id, $page);
+            if ($request->query('only_confirmed') == 'true') {
+                $results = $this->getAllConfirmedServiceBookingsByUserIdUseCase->execute($request->user()->id, $page);
+            } else {
+                $results = $this->getAllServiceBookingsByCustomerIdUseCase->execute($request->user()->id, $page);
+            }
         }
 
         $responseArray = [

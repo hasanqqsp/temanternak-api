@@ -349,7 +349,7 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         $results = ServiceBooking::with(["consultation", "transaction", "booker", "service", "transaction.customer"])
             ->where('booker_id', $bookerId)
             ->where('status', $status)
-            ->orderBy("created_at", "desc")->paginate(10)->items();
+            ->orderBy("created_at", "desc")->paginate(10);
 
         return [
             'pagination' => [
