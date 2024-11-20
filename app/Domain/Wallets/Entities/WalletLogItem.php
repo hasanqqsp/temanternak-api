@@ -3,6 +3,7 @@
 namespace App\Domain\Wallets\Entities;
 
 use App\Domain\Consultations\Entities\Consultation;
+use App\Domain\Consultations\Entities\ConsultationShort;
 
 class WalletLogItem
 {
@@ -12,7 +13,7 @@ class WalletLogItem
     private float $price;
     private float $platformFee;
     private float $acceptedAmount;
-    private ?Consultation $consultation;
+    private ?ConsultationShort $consultation;
     private \DateTime $timestamp;
 
     public function __construct(
@@ -22,7 +23,7 @@ class WalletLogItem
         float $price,
         float $platformFee,
         float $acceptedAmount,
-        ?Consultation $consultation,
+        ?ConsultationShort $consultation,
         \DateTime $timestamp
     ) {
         $this->id = $id;
@@ -65,7 +66,7 @@ class WalletLogItem
         return $this->acceptedAmount;
     }
 
-    public function getConsultation(): ?Consultation
+    public function getConsultation(): ?ConsultationShort
     {
         return $this->consultation;
     }
@@ -105,7 +106,7 @@ class WalletLogItem
         $this->acceptedAmount = $acceptedAmount;
     }
 
-    public function setConsultation(?Consultation $consultation): void
+    public function setConsultation(?ConsultationShort $consultation): void
     {
         $this->consultation = $consultation;
     }
