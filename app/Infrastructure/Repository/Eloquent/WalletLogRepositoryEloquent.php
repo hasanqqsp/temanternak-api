@@ -17,6 +17,7 @@ class WalletLogRepositoryEloquent implements WalletLogRepository
         $logs = WalletsLog::where('loggable_id', $wallet->id)->orderBy('updated_at', 'desc')->get()->map(
             function ($log) use ($userId) {
                 if (($log->settlement() == null)) {
+                    dd($log);
                     $transfer_fee = $log->disbursement->transfer_fee;
                     return (new WalletLogItem(
                         $log->id,

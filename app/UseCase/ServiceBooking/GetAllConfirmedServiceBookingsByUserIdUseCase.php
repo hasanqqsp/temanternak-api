@@ -13,8 +13,8 @@ class GetAllConfirmedServiceBookingsByUserIdUseCase
         $this->serviceBookingRepository = $serviceBookingRepository;
     }
 
-    public function execute(string $userId, string $status, int $page = 1)
+    public function execute(string $userId, int $page = 1)
     {
-        return $this->serviceBookingRepository->getByBookerIdAndStatus($userId, $status, $page);
+        return $this->serviceBookingRepository->getByBookerIdAndStatus($userId, "CONFIRMED", $page);
     }
 }

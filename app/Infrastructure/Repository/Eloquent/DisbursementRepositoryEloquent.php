@@ -81,7 +81,6 @@ class DisbursementRepositoryEloquent implements DisbursementRepository
         if ($transfer == null) {
             throw new ClientException("Failed, please try again");
         }
-        User::find($data->getVeterinarianId())->pay($data->getAmount(), $transfer['id']);
         $disbursement = Disbursement::where('idempotency_key', $data->getIdempotencyKey())->first();
         $disbursement->account_number = $data->getAccountNumber();
         $disbursement->bank_code = $data->getBankCode();
@@ -91,6 +90,7 @@ class DisbursementRepositoryEloquent implements DisbursementRepository
         $disbursement->transfer_id = strval($transfer['id']);
         $disbursement->status = "PENDING";
         $disbursement->save();
+        User::find($data->getVeterinarianId())->pay($disbursement->amount, $disbursement->transfer_id);
         return $this->createDisbursementEntity(Disbursement::find($disbursement->id));
     }
 
