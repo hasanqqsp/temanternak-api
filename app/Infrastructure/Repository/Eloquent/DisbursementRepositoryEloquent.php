@@ -88,7 +88,7 @@ class DisbursementRepositoryEloquent implements DisbursementRepository
         $disbursement->amount = $data->getAmount();
         $disbursement->remark = $data->getRemark();
         $disbursement->transfer_fee = $transfer['fee'];
-        $disbursement->transfer_id = stringValue($transfer['id']);
+        $disbursement->transfer_id = strval($transfer['id']);
         $disbursement->status = "PENDING";
         $disbursement->save();
         return $this->createDisbursementEntity(Disbursement::find($disbursement->id));
