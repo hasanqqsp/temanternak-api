@@ -114,7 +114,7 @@ class DisbursementRepositoryEloquent implements DisbursementRepository
                 $disbursement->veterinarian->data->nameAndTitle(),
                 $disbursement->veterinarian->username,
                 $disbursement->veterinarian->data->generalIdentity->formalPhoto->file_path,
-                $disbursement->veterinarian->data->specializations
+                $disbursement->veterinarian->data->specializations,
             ),
             $disbursement->status,
         );
