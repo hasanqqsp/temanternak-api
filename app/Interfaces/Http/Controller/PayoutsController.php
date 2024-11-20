@@ -14,6 +14,8 @@ use App\UseCase\Payouts\GetIdempotencyKeyForDisbursement;
 use App\UseCase\Payouts\UpdateDisbursementStatusByTransferIdUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class PayoutsController extends Controller
 {
@@ -74,8 +76,9 @@ class PayoutsController extends Controller
 
     public function updateStatus(Request $request)
     {
+        $data  = json_decode($request->data);
 
-        $this->updateDisbursementStatusByTransferIdUseCase->execute(strval($request->id), $request->status, $request->receipt, $request->reason);
+        $this->updateDisbursementStatusByTransferIdUseCase->execute(strval($data->id), $data->status, $data->receipt, $data->reason);
         return [
             "status" => "success",
         ];
