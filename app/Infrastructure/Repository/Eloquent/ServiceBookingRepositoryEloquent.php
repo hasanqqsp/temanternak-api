@@ -292,6 +292,11 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
         if (!$booking->consultation) {
             (new ConsultationRepositoryEloquent())->populate($booking->id);
         }
+        if ($booking->consultation && $booking->consultation->status === 'COMPLETED') {
+            $booking->status = 'COMPLETED';
+            $booking->save();
+            return;
+        }
         if (
             $booking->consultation &&
             ($booking->consultation->status == 'WAITING' || str_ends_with($booking->consultation->status, "ATTENDED") || $booking->consultation->status == 'FAILED')
