@@ -10,4 +10,6 @@ return [
     RepositoryServiceProvider::class,
     HashServiceProvider::class,
     LaravelPayPocketServiceProvider::class,
+    \Barryvdh\DomPDF\ServiceProvider::class,
+    \Torann\GeoIP\GeoIPServiceProvider::class
 ];

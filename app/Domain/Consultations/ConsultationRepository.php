@@ -17,4 +17,6 @@ interface ConsultationRepository
     public function joinConsultation($role, $bookingId);
     public function addResult($bookingId, $result);
     public function getDetail($bookingId): Consultation;
+    public function addReport($bookingId, $reportFilePath);
+    public function getReport($bookingId);
 }

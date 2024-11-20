@@ -14,14 +14,34 @@ use App\Infrastructure\Repository\Models\Consultation;
 use App\Infrastructure\Repository\Models\ServiceBooking;
 use App\Infrastructure\Repository\Models\Settlement;
 use App\Infrastructure\Repository\Models\User as ModelsUser;
+use Exception;
 
 class ConsultationRepositoryEloquent implements ConsultationRepository
 {
+    public function getReport($bookingId)
+    {
+        $consultation = Consultation::where("booking_id", $bookingId)->first();
+
+        if (!$consultation || !$consultation->report) {
+            throw new Exception("Consultation report not found for booking ID: $bookingId");
+        }
+
+        return $consultation->report;
+    }
+
     public function addResult($bookingId, $result)
     {
         $consultation = Consultation::where("booking_id", $bookingId)->first();
         $consultation->result = $result;
         $consultation->status = "COMPLETED";
+        $consultation->save();
+    }
+
+    public function addReport($bookingId, $report)
+    {
+        $consultation = Consultation::where("booking_id", $bookingId)->first();
+
+        $consultation->report = $report;
         $consultation->save();
     }
 
@@ -76,10 +96,12 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
             $consultation->id,
             $consultation->service->name,
             $veterinarian->getNameAndTitle(),
+            $consultation->veterinarian_id,
             $consultation->start_time,
             $consultation->end_time,
             $consultation->duration,
             $consultation->customer->name,
+            $consultation->customer->id,
             $consultation->status,
         );
         if ($consultation->call_logs) {

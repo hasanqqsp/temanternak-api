@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('ability:role-veterinarian,role-basic')->group(function () {
         Route::post('/bookings/{bookingId}/consultation/attendee', [ConsultationsController::class, 'join']);
+        Route::get('/bookings/{bookingId}/consultations/report', [ConsultationsController::class, 'getReport']);
     });
     Route::middleware('ability:role-veterinarian')->group(function () {
         Route::post('/veterinarians/services', [VeterinarianServicesController::class, 'add']);

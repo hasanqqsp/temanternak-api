@@ -80,4 +80,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn() => true
         );
-    })->create();
+    })
+
+    ->create();

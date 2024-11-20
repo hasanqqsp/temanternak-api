@@ -24,6 +24,13 @@ class S3FileRepository
         return Storage::disk('s3')->temporaryUrl($path, now()->addMinutes($expiry));
     }
 
+    public function uploadPdf($file, $consultationId, $documentType)
+    {
+        $timestamp = now()->getTimestamp();
+        $path = "user_files/{$consultationId}/{$documentType}/{$timestamp}.pdf";
+        Storage::disk('s3')->put($path, $file);
+        return $path;
+    }
     public function download($fileId)
     {
         // $file = $this->findById($fileId);

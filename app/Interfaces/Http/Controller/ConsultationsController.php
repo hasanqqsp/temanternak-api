@@ -5,6 +5,7 @@ namespace App\Interfaces\Http\Controller;
 use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Users\UserRepository;
+use App\Infrastructure\Repository\Storage\S3Compatible\S3FileRepository;
 use App\Infrastructure\Tokenizer\JWTService;
 use App\UseCase\Consultations\AddConsultationResultByBookingIdUseCase;
 use App\UseCase\Consultations\CustomerJoinConsultationRoomUseCase;
@@ -13,8 +14,13 @@ use App\UseCase\Consultations\GetConsultationByCustomerIdUseCase;
 use App\UseCase\Consultations\GetConsultationByVeterinarianIdAndStatusUseCase;
 use App\UseCase\Consultations\GetConsultationByVeterinarianIdUseCase;
 use App\UseCase\Consultations\GetConsultationDetailByBookingIdUseCase;
+use App\UseCase\Consultations\GetConsultationReportByBookingIdUseCase;
 use App\UseCase\Consultations\VeterinarianJoinConsultationRoomUseCase;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -28,9 +34,10 @@ class ConsultationsController extends Controller
     protected $veterinarianJoinConsultationRoomUseCase;
     protected $addConsultationResultByBookingIdUseCase;
     protected $getConsultationDetailByBookingIdUseCase;
+    protected $getConsultationReportByBookingIdUseCase;
     protected $jwtService;
 
-    public function __construct(UserRepository $userRepository, ConsultationRepository $consultationRepository, ServiceBookingRepository $bookingRepository)
+    public function __construct(UserRepository $userRepository, ConsultationRepository $consultationRepository, ServiceBookingRepository $bookingRepository, S3FileRepository $s3FileRepository)
     {
         $this->customerJoinConsultationRoomUseCase = new CustomerJoinConsultationRoomUseCase($userRepository, $bookingRepository, $consultationRepository);
         $this->getConsultationByBookingIdUseCase = new GetConsultationByBookingIdUseCase($consultationRepository, $bookingRepository);
@@ -40,6 +47,7 @@ class ConsultationsController extends Controller
         $this->veterinarianJoinConsultationRoomUseCase = new VeterinarianJoinConsultationRoomUseCase($userRepository, $bookingRepository, $consultationRepository);
         $this->addConsultationResultByBookingIdUseCase = new AddConsultationResultByBookingIdUseCase($consultationRepository, $bookingRepository);
         $this->getConsultationDetailByBookingIdUseCase = new GetConsultationDetailByBookingIdUseCase($consultationRepository, $bookingRepository);
+        $this->getConsultationReportByBookingIdUseCase = new GetConsultationReportByBookingIdUseCase($consultationRepository, $bookingRepository, $s3FileRepository, FacadePdf::class);
         $this->jwtService = new JWTService();
     }
 
@@ -137,6 +145,23 @@ class ConsultationsController extends Controller
         $responseArray = [
             "status" => "success",
             "data" => $this->getConsultationDetailByBookingIdUseCase->execute($bookingId, $request->user()->id)->toArray()
+        ];
+        return response()->json($responseArray);
+    }
+
+    public function getReport(Request $request, $bookingId)
+
+    {
+        $responseArray = [
+            "status" => "success",
+            "data" => [
+                "filePath" => $this->getConsultationReportByBookingIdUseCase
+                    ->execute(
+                        $bookingId,
+                        $request->user()->id,
+                        new DateTimeZone(geoip($request->ip())->timezone ?? "Asia/Jakarta")
+                    )
+            ]
         ];
         return response()->json($responseArray);
     }

@@ -9,10 +9,12 @@ class Consultation
     private string $id;
     private string $serviceName;
     private string $veterinarianNameAndTitle;
+    private string $veterinarianId;
     private DateTime $startTime;
     private DateTime $endTime;
     private int $duration;
     private string $bookerName;
+    private string $bookerId;
     private string $status;
     private ?array $callLogs;
     private ?array $chatLogs;
@@ -48,6 +50,16 @@ class Consultation
     public function setVeterinarianNameAndTitle(string $veterinarianNameAndTitle): void
     {
         $this->veterinarianNameAndTitle = $veterinarianNameAndTitle;
+    }
+
+    public function getVeterinarianId(): string
+    {
+        return $this->veterinarianId;
+    }
+
+    public function setVeterinarianId(string $veterinarianId): void
+    {
+        $this->veterinarianId = $veterinarianId;
     }
 
     public function getStartTime(): DateTime
@@ -88,6 +100,16 @@ class Consultation
     public function setBookerName(string $bookerName): void
     {
         $this->bookerName = $bookerName;
+    }
+
+    public function getBookerId(): string
+    {
+        return $this->bookerId;
+    }
+
+    public function setBookerId(string $bookerId): void
+    {
+        $this->bookerId = $bookerId;
     }
 
     public function getStatus(): string
@@ -154,10 +176,12 @@ class Consultation
         string $id,
         string $serviceName,
         string $veterinarianNameAndTitle,
+        string $veterinarianId,
         DateTime $startTime,
         DateTime $endTime,
         int $duration,
         string $bookerName,
+        string $bookerId,
         string $status,
         ?array $callLogs = null,
         ?array $chatLogs = null,
@@ -168,10 +192,12 @@ class Consultation
         $this->id = $id;
         $this->serviceName = $serviceName;
         $this->veterinarianNameAndTitle = $veterinarianNameAndTitle;
+        $this->veterinarianId = $veterinarianId;
         $this->startTime = $startTime;
         $this->endTime = $endTime;
         $this->duration = $duration;
         $this->bookerName = $bookerName;
+        $this->bookerId = $bookerId;
         $this->status = $status;
         $this->callLogs = $callLogs;
         $this->chatLogs = $chatLogs;
@@ -186,10 +212,12 @@ class Consultation
             'id' => $this->id,
             'serviceName' => $this->serviceName,
             'veterinarianNameAndTitle' => $this->veterinarianNameAndTitle,
+            'veterinarianId' => $this->veterinarianId,
             'startTime' => $this->startTime->format('Y-m-d\TH:i:s.up'),
             'endTime' => $this->endTime->format('Y-m-d\TH:i:s.up'),
             'duration' => $this->duration,
             'bookerName' => $this->bookerName,
+            'bookerId' => $this->bookerId,
             'status' => $this->status,
         ];
 
