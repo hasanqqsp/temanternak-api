@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository\Eloquent;
 
 use App\Domain\Consultations\Entities\Consultation;
+use App\Domain\Consultations\Entities\ConsultationShort;
 use App\Domain\Wallets\Entities\WalletLogItem;
 use App\Domain\Wallets\WalletLogRepository;
 use App\Infrastructure\Repository\Models\User;
@@ -17,7 +18,6 @@ class WalletLogRepositoryEloquent implements WalletLogRepository
         $logs = WalletsLog::where('loggable_id', $wallet->id)->orderBy('updated_at', 'desc')->get()->map(
             function ($log) use ($userId) {
                 if (($log->settlement() == null)) {
-                    dd($log);
                     $transfer_fee = $log->disbursement->transfer_fee;
                     return (new WalletLogItem(
                         $log->id,
@@ -40,7 +40,7 @@ class WalletLogRepositoryEloquent implements WalletLogRepository
                     $log->settlement->service->price,
                     $log->settlement->transaction->platform_fee,
                     $log->settlement->accepted_amount,
-                    $booking->consultation ? new Consultation(
+                    $booking->consultation ? new ConsultationShort(
                         $booking->consultation->id,
                         $booking->consultation->service->name,
                         $veterinarian->getNameAndTitle(),
@@ -49,6 +49,7 @@ class WalletLogRepositoryEloquent implements WalletLogRepository
                         $booking->consultation->duration,
                         $booking->consultation->customer->name,
                         $booking->consultation->status,
+                        $booking->id
                     ) : null,
                     $log->updated_at,
                 ))->toArray();
