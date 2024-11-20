@@ -6,6 +6,7 @@ use App\Commons\Exceptions\ClientException;
 use App\Commons\Exceptions\NotFoundException;
 use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\Consultations\Entities\Consultation as EntitiesConsultation;
+use App\Domain\Consultations\Entities\ConsultationShort;
 use App\Domain\Consultations\Entities\NewConsultation;
 use App\Domain\Users\Entities\User;
 use App\Infrastructure\Repository\Eloquent\VeterinarianRepositoryEloquent;
@@ -16,6 +17,14 @@ use App\Infrastructure\Repository\Models\User as ModelsUser;
 
 class ConsultationRepositoryEloquent implements ConsultationRepository
 {
+    public function addResult($bookingId, $result)
+    {
+        $consultation = Consultation::where("booking_id", $bookingId)->first();
+        $consultation->result = $result;
+        $consultation->status = "COMPLETED";
+        $consultation->save();
+    }
+
     public function joinConsultation($role, $bookingId)
     {
         $consultation = Consultation::where('booking_id', $bookingId)->first();
@@ -54,11 +63,16 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
         $consultation->save();
     }
 
-    public function getByBookingId($bookingId): EntitiesConsultation
+    public function getByBookingId($bookingId): ConsultationShort
     {
         $consultation = Consultation::where('booking_id', $bookingId)->first();
+        return $this->createConsultationShortEntity($consultation);
+    }
+
+    private function createConsultationEntity($consultation)
+    {
         $veterinarian = (new VeterinarianRepositoryEloquent())->getById($consultation->veterinarian_id);
-        return new EntitiesConsultation(
+        $entity = new EntitiesConsultation(
             $consultation->id,
             $consultation->service->name,
             $veterinarian->getNameAndTitle(),
@@ -68,6 +82,39 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
             $consultation->customer->name,
             $consultation->status,
         );
+        if ($consultation->call_logs) {
+            $entity->setCallLogs($consultation->call_logs);
+        }
+        if ($consultation->result) {
+            $entity->setResult($consultation->result);
+        }
+        if ($consultation->chat_logs) {
+            $entity->setChatLogs($consultation->chat_logs);
+        }
+        if ($consultation->veterinarian_attend_at) {
+            $entity->setVeterinarianAttendAt($consultation->veterinarian_attend_at);
+        }
+        if ($consultation->customer_attend_at) {
+            $entity->setCustomerAttendAt($consultation->customer_attend_at);
+        }
+        return $entity;
+    }
+    private function createConsultationShortEntity($consultation)
+    {
+        $veterinarian = (new VeterinarianRepositoryEloquent())->getById($consultation->veterinarian_id);
+        $entity = new ConsultationShort(
+            $consultation->id,
+            $consultation->service->name,
+            $veterinarian->getNameAndTitle(),
+            $consultation->start_time,
+            $consultation->end_time,
+            $consultation->duration,
+            $consultation->customer->name,
+            $consultation->status,
+            $consultation->booking_id
+        );
+
+        return $entity;
     }
 
     public function populate($bookingId)
@@ -127,16 +174,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
                 $veterinarian = (new VeterinarianRepositoryEloquent())->getById($consultation->veterinarian_id);
                 $this->updateStatusIfNeeded($consultation);
 
-                return (new EntitiesConsultation(
-                    $consultation->id,
-                    $consultation->service->name,
-                    $veterinarian->getNameAndTitle(),
-                    $consultation->start_time,
-                    $consultation->end_time,
-                    $consultation->duration,
-                    $consultation->customer->name,
-                    $consultation->status,
-                ))->toArray();
+                return $this->createConsultationShortEntity($consultation)->toArray();
             })->toArray();
     }
 
@@ -154,16 +192,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
             ->get()->map(function ($consultation) {
                 $this->updateStatusIfNeeded($consultation);
 
-                return (new EntitiesConsultation(
-                    $consultation->id,
-                    $consultation->service->name,
-                    $consultation->veterinarian->getNameAndTitle(),
-                    $consultation->start_time,
-                    $consultation->end_time,
-                    $consultation->duration,
-                    $consultation->customer->name,
-                    $consultation->status,
-                ))->toArray();
+                return $this->createConsultationEntity($consultation)->toArray();
             })->toArray();
     }
 
@@ -176,16 +205,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
 
         return Consultation::where('customer_id', $customerId)->orderBy('end_time', 'desc')->get()->map(function ($consultation) {
             $this->updateStatusIfNeeded($consultation);
-            return (new EntitiesConsultation(
-                $consultation->id,
-                $consultation->service->name,
-                $consultation->veterinarian,
-                $consultation->start_time,
-                $consultation->end_time,
-                $consultation->duration,
-                $consultation->customer->name,
-                $consultation->status,
-            ))->toArray();
+            return $this->createConsultationEntity($consultation)->toArray();
         })->toArray();
     }
 
@@ -221,6 +241,12 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
             $this->settleTransaction($booking, $consultation);
             return;
         }
+    }
+    public function getDetail($bookingId): EntitiesConsultation
+    {
+        $consultation = Consultation::with(["service", "veterinarian", "customer", "booking"])->where("booking_id", $bookingId)->first();
+
+        return $this->createConsultationEntity($consultation);
     }
 
     private function settleTransaction($booking, $consultation, $rebooking = null)

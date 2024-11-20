@@ -6,11 +6,13 @@ use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Users\UserRepository;
 use App\Infrastructure\Tokenizer\JWTService;
+use App\UseCase\Consultations\AddConsultationResultByBookingIdUseCase;
 use App\UseCase\Consultations\CustomerJoinConsultationRoomUseCase;
 use App\UseCase\Consultations\GetConsultationByBookingIdUseCase;
 use App\UseCase\Consultations\GetConsultationByCustomerIdUseCase;
 use App\UseCase\Consultations\GetConsultationByVeterinarianIdAndStatusUseCase;
 use App\UseCase\Consultations\GetConsultationByVeterinarianIdUseCase;
+use App\UseCase\Consultations\GetConsultationDetailByBookingIdUseCase;
 use App\UseCase\Consultations\VeterinarianJoinConsultationRoomUseCase;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,6 +26,8 @@ class ConsultationsController extends Controller
     protected $getConsultationByVeterinarianIdUseCase;
     protected $getConsultationByCustomerIdUseCase;
     protected $veterinarianJoinConsultationRoomUseCase;
+    protected $addConsultationResultByBookingIdUseCase;
+    protected $getConsultationDetailByBookingIdUseCase;
     protected $jwtService;
 
     public function __construct(UserRepository $userRepository, ConsultationRepository $consultationRepository, ServiceBookingRepository $bookingRepository)
@@ -34,6 +38,8 @@ class ConsultationsController extends Controller
         $this->getConsultationByVeterinarianIdUseCase = new GetConsultationByVeterinarianIdUseCase($consultationRepository);
         $this->getConsultationByCustomerIdUseCase = new GetConsultationByCustomerIdUseCase($consultationRepository);
         $this->veterinarianJoinConsultationRoomUseCase = new VeterinarianJoinConsultationRoomUseCase($userRepository, $bookingRepository, $consultationRepository);
+        $this->addConsultationResultByBookingIdUseCase = new AddConsultationResultByBookingIdUseCase($consultationRepository, $bookingRepository);
+        $this->getConsultationDetailByBookingIdUseCase = new GetConsultationDetailByBookingIdUseCase($consultationRepository, $bookingRepository);
         $this->jwtService = new JWTService();
     }
 
@@ -115,5 +121,23 @@ class ConsultationsController extends Controller
             "status" => "success",
             "message" => "You have successfully joined the consultation room"
         ]);
+    }
+
+    public function addResult(Request $request, $bookingId)
+    {
+        $this->addConsultationResultByBookingIdUseCase->execute($bookingId, $request->result, $request->user()->id);
+        return response()->json([
+            "status" => "success",
+            "message" => "Consultation result successfully added"
+        ]);
+    }
+
+    public function getDetail(Request $request, $bookingId)
+    {
+        $responseArray = [
+            "status" => "success",
+            "data" => $this->getConsultationDetailByBookingIdUseCase->execute($bookingId, $request->user()->id)->toArray()
+        ];
+        return response()->json($responseArray);
     }
 }

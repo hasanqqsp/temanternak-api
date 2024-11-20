@@ -4,7 +4,7 @@ namespace App\Domain\Consultations\Entities;
 
 use DateTime;
 
-class Consultation
+class ConsultationShort
 {
     private string $id;
     private string $serviceName;
@@ -14,11 +14,7 @@ class Consultation
     private int $duration;
     private string $bookerName;
     private string $status;
-    private ?array $callLogs;
-    private ?array $chatLogs;
-    private ?string $result;
-    private ?DateTime $veterinarianAttendAt;
-    private ?DateTime $customerAttendAt;
+    private string $bookingId;
 
     public function getId(): string
     {
@@ -100,54 +96,14 @@ class Consultation
         $this->status = $status;
     }
 
-    public function getCallLogs(): ?array
+    public function getBookingId(): string
     {
-        return $this->callLogs;
+        return $this->bookingId;
     }
 
-    public function setCallLogs(?array $callLogs): void
+    public function setBookingId(string $bookingId): void
     {
-        $this->callLogs = $callLogs;
-    }
-
-    public function getChatLogs(): ?array
-    {
-        return $this->chatLogs;
-    }
-
-    public function setChatLogs(?array $chatLogs): void
-    {
-        $this->chatLogs = $chatLogs;
-    }
-
-    public function getResult(): ?string
-    {
-        return $this->result;
-    }
-
-    public function setResult(?string $result): void
-    {
-        $this->result = $result;
-    }
-
-    public function getVeterinarianAttendAt(): ?DateTime
-    {
-        return $this->veterinarianAttendAt;
-    }
-
-    public function setVeterinarianAttendAt(?DateTime $veterinarianAttendAt): void
-    {
-        $this->veterinarianAttendAt = $veterinarianAttendAt;
-    }
-
-    public function getCustomerAttendAt(): ?DateTime
-    {
-        return $this->customerAttendAt;
-    }
-
-    public function setCustomerAttendAt(?DateTime $customerAttendAt): void
-    {
-        $this->customerAttendAt = $customerAttendAt;
+        $this->bookingId = $bookingId;
     }
 
     public function __construct(
@@ -159,11 +115,7 @@ class Consultation
         int $duration,
         string $bookerName,
         string $status,
-        ?array $callLogs = null,
-        ?array $chatLogs = null,
-        ?string $result = null,
-        ?DateTime $veterinarianAttendAt = null,
-        ?DateTime $customerAttendAt = null
+        string $bookingId
     ) {
         $this->id = $id;
         $this->serviceName = $serviceName;
@@ -173,16 +125,12 @@ class Consultation
         $this->duration = $duration;
         $this->bookerName = $bookerName;
         $this->status = $status;
-        $this->callLogs = $callLogs;
-        $this->chatLogs = $chatLogs;
-        $this->result = $result;
-        $this->veterinarianAttendAt = $veterinarianAttendAt;
-        $this->customerAttendAt = $customerAttendAt;
+        $this->bookingId = $bookingId;
     }
 
     public function toArray(): array
     {
-        $array = [
+        return [
             'id' => $this->id,
             'serviceName' => $this->serviceName,
             'veterinarianNameAndTitle' => $this->veterinarianNameAndTitle,
@@ -191,28 +139,7 @@ class Consultation
             'duration' => $this->duration,
             'bookerName' => $this->bookerName,
             'status' => $this->status,
+            'bookingId' => $this->bookingId,
         ];
-
-        if ($this->callLogs !== null) {
-            $array['callLogs'] = $this->callLogs;
-        }
-
-        if ($this->chatLogs !== null) {
-            $array['chatLogs'] = $this->chatLogs;
-        }
-
-        if ($this->result !== null) {
-            $array['result'] = $this->result;
-        }
-
-        if ($this->veterinarianAttendAt !== null) {
-            $array['veterinarianAttendAt'] = $this->veterinarianAttendAt->format('Y-m-d\TH:i:s.up');
-        }
-
-        if ($this->customerAttendAt !== null) {
-            $array['customerAttendAt'] = $this->customerAttendAt->format('Y-m-d\TH:i:s.up');
-        }
-
-        return $array;
     }
 }

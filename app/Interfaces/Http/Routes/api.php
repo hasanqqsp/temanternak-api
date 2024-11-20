@@ -81,6 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/payouts/idempotencyKey', [PayoutsController::class, 'getIdempotencyKey']);
         Route::post('/payouts/disbursement', [PayoutsController::class, 'createDisbursementRequest']);
         Route::get('/users/my/disbursements', [PayoutsController::class, 'getMy']);
+        Route::post('/bookings/{bookingId}/consultations/result', [ConsultationsController::class, 'addResult']);
+        Route::get('/bookings/{bookingId}/consultations/detail', [ConsultationsController::class, 'getDetail']);
     });
     Route::middleware('ability:role-basic')->group(function () {
         Route::get('/veterinarians/services/{id}/startTimes', [VeterinarianSchedulesController::class, 'getAvailableStartTimes']);
