@@ -132,7 +132,7 @@ class DisbursementRepositoryEloquent implements DisbursementRepository
     }
     public function getDisbursements()
     {
-        return Disbursement::get()->whereNotNull('account_number')->map(function ($disbursement) {
+        return Disbursement::whereNotNull('account_number')->get()->map(function ($disbursement) {
             return $this->createDisbursementEntity($disbursement)->toArray();
         });
     }
