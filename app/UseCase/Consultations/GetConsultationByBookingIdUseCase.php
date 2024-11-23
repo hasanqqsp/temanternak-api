@@ -21,7 +21,7 @@ class GetConsultationByBookingIdUseCase
     {
         $this->bookingRepository->checkIfAuthorized($bookingId, $credentialId);
         $booking =  $this->bookingRepository->getById($bookingId);
-        if ($booking->getStatus() !== 'CONFIRMED' || $booking->getStatus() === 'COMPLETED') {
+        if ($booking->getStatus() !== 'CONFIRMED') {
             throw new NotFoundException('Consultation not found');
         }
         try {
