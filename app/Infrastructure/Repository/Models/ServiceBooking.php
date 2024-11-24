@@ -35,4 +35,9 @@ class ServiceBooking extends Model
     {
         return $this->hasOne(Settlement::class, 'booking_id', 'id');
     }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class, "booking_id", "id");
+    }
 }

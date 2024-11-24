@@ -6,6 +6,7 @@ use App\Interfaces\Http\Controller\AuthenticationsController;
 use App\Interfaces\Http\Controller\ConsultationsController;
 use App\Interfaces\Http\Controller\InvitationsController;
 use App\Interfaces\Http\Controller\PayoutsController;
+use App\Interfaces\Http\Controller\ReviewsController;
 use App\Interfaces\Http\Controller\ServiceBookingsController;
 use App\Interfaces\Http\Controller\TransactionsController;
 use App\Interfaces\Http\Controller\UserFilesController;
@@ -38,6 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/consultations', [ConsultationsController::class, 'getAll']);
     Route::get('/bookings/{bookingId}/consultations', [ConsultationsController::class, 'getByBookingId']);
     Route::get('/users/my/consultations', [ConsultationsController::class, 'getMy']);
+    Route::get('/veterinarians/{veterinarianId}/reviews', [ReviewsController::class, "getByVeterinarianId"]);
+    Route::get('/veterinarians/services/{serviceId}/reviews', [ReviewsController::class, "getByServiceId"]);
+    Route::get('/bookings/{bookingId}/review', [ReviewsController::class, 'getByBookingId']);
+
 
     Route::middleware('ability:role-invited-user')->group(function () {
         Route::put('/registrations/veterinarians', [VeterinarianRegistrationsController::class, 'revise']);
@@ -93,6 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/bookings/{bookingId}/rebook', [ServiceBookingsController::class, 'rebook']);
         Route::post('/bookings/{bookingId}/refund', [ServiceBookingsController::class, 'refund']);
         Route::get('/users/my/transactions', [TransactionsController::class, 'getMy']);
+        Route::post('/bookings/{bookingId}/review', [ReviewsController::class, 'add']);
     });
     Route::middleware('ability:role-superadmin,role-admin')->group(function () {
         Route::get('/users/{id}', [UsersController::class, 'getUserById']);

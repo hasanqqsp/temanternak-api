@@ -7,6 +7,7 @@ use App\Domain\Users\UserRepository;
 use App\Infrastructure\Repository\Models\User;
 use App\Services\Hash\HashingServiceInterface;
 use App\UseCase\Authentications\LoginUseCase;
+use App\UseCase\Users\GetLoyaltyPointByUserIdUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +15,11 @@ use Illuminate\Support\Facades\Auth;
 class AuthenticationsController extends Controller
 {
     protected $loginUseCase;
+    protected $getLoyaltyPointsByUserIdUseCase;
     public function __construct(UserRepository $userRepository, HashingServiceInterface $hashingService)
     {
         $this->loginUseCase = new LoginUseCase($userRepository, $hashingService);
+        $this->getLoyaltyPointsByUserIdUseCase =  new GetLoyaltyPointByUserIdUseCase($userRepository);
     }
     /**
      * Handle user login.
@@ -60,11 +63,15 @@ class AuthenticationsController extends Controller
             $user->role,
             $user->phone,
             $user->username
-        ))->toArray();
+        ));
+
+        $userData->setPoint($this->getLoyaltyPointsByUserIdUseCase->execute($user->id));
+
+
         return response()->json([
             "status" => "success",
             "message" => "You're login as " . $user->name,
-            "data" => $userData
+            "data" => $userData->toArray()
         ]);
     }
 }

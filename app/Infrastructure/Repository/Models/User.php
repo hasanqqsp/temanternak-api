@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
 
 use MongoDB\Laravel\Eloquent\SoftDeletes;
+use PDO;
 
 class User extends AuthUser implements WalletOperations
 {
@@ -71,5 +72,21 @@ class User extends AuthUser implements WalletOperations
             return $this->hasMany(VeterinarianService::class, 'veterinarian_id', 'id')->withTrashed();
         }
         return null;
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, "customer_id", "id");
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(ServiceBooking::class, "veterinarian_id", "id");
+    }
+
+
+    public function reviews()
+    {
+        return $this->hasManyThrough(Review::class, ServiceBooking::class, 'veterinarian_id', 'booking_id', 'id', 'id');
     }
 }

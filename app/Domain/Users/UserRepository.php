@@ -30,4 +30,5 @@ interface UserRepository
     public function changeRole(string $id, string $role): void;
     public function removeAllToken(string $id): void;
     public function getWalletByUserId(string $id): float;
+    public function getLoyaltyPointByUserId(string $id): int;
 }

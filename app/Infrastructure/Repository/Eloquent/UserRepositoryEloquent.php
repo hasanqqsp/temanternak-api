@@ -10,8 +10,9 @@ use App\Domain\Users\Entities\UpdateUser;
 use App\Domain\Users\Entities\User as UserEntity;
 use App\Domain\Users\UserRepository;
 use App\Infrastructure\Repository\Models\Settlement;
+use App\Infrastructure\Repository\Models\Transaction;
 use App\Infrastructure\Repository\Models\User;
-
+use MongoDB\Laravel\Helpers\EloquentBuilder;
 
 class UserRepositoryEloquent implements UserRepository
 {
@@ -22,6 +23,25 @@ class UserRepositoryEloquent implements UserRepository
             $user->tokens()->delete();
         }
     }
+
+    public function getLoyaltyPointByUserId(string $userId): int
+    {
+        $points = $this->calculateLoyaltyPoints($userId);
+        $user = User::find($userId);
+        $user->loyalty_points = $points;
+        $user->save();
+        return $user ? $user->loyalty_points : 0;
+    }
+
+    private function calculateLoyaltyPoints($userId)
+    {
+        $transactions = Transaction::where("customer_id", $userId)
+            ->whereNot("status", "CANCELLED")
+            ->orWhereNot("status", "REFUNDED")->get(["price"])
+            ->map(fn($trx) => $trx->price)->sum();
+        return $transactions * 0.01;
+    }
+
     public function getWalletByUserId(string $userId): float
     {
         $user = User::find($userId);

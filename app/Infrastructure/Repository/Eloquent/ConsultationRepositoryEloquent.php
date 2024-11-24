@@ -7,8 +7,6 @@ use App\Commons\Exceptions\NotFoundException;
 use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\Consultations\Entities\Consultation as EntitiesConsultation;
 use App\Domain\Consultations\Entities\ConsultationShort;
-use App\Domain\Consultations\Entities\NewConsultation;
-use App\Domain\Users\Entities\User;
 use App\Infrastructure\Repository\Eloquent\VeterinarianRepositoryEloquent;
 use App\Infrastructure\Repository\Models\Consultation;
 use App\Infrastructure\Repository\Models\ServiceBooking;

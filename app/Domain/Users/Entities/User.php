@@ -12,6 +12,7 @@ class User
     private string $role;
     private ?string $phone;
     private string $username;
+    private int $point = 0;
 
     public function __construct(
         string $id,
@@ -119,6 +120,17 @@ class User
             'role' => $this->role,
             'phone' => $this->phone,
             'username' => $this->username,
+            'points' => $this->point
         ];
+    }
+
+    public function getPoint(): int
+    {
+        return $this->point;
+    }
+
+    public function setPoint(int $point): void
+    {
+        $this->point = $point;
     }
 }

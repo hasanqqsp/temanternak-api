@@ -6,6 +6,7 @@ use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\Invitations\InvitationRepository;
 use App\Domain\Payouts\DisbursementRepository;
 use App\Domain\Refunds\RefundRepository;
+use App\Domain\Review\ReviewRepository;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
 use App\Domain\Transactions\TransactionRepository;
 use App\Domain\UserFiles\UserFileRepository;
@@ -20,6 +21,7 @@ use App\Infrastructure\Repository\Eloquent\ConsultationRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\DisbursementRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\InvitationRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\RefundRepositoryEloquent;
+use App\Infrastructure\Repository\Eloquent\ReviewRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\ServiceBookingRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\TransactionRepositoryEloquent;
 use App\Infrastructure\Repository\Eloquent\UserFileRepositoryEloquent;
@@ -57,6 +59,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(WalletLogRepository::class, WalletLogRepositoryEloquent::class);
         $this->app->singleton(RefundRepository::class, RefundRepositoryEloquent::class);
         $this->app->singleton(DisbursementRepository::class, DisbursementRepositoryEloquent::class);
+        $this->app->singleton(ReviewRepository::class, ReviewRepositoryEloquent::class);
     }
 
     /**
