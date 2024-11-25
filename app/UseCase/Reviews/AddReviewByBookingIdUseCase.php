@@ -23,6 +23,7 @@ class AddReviewByBookingIdUseCase
         // Validate booking ID
         $this->bookingRepository->checkIfExists($reviewData->getBookingId());
         $this->bookingRepository->checkIfAuthorized($reviewData->getBookingId(), $credentialId);
+        $this->reviewRepository->checkIfNotExistsByBookingId($reviewData->getBookingId());
 
         if ($this->bookingRepository->checkStatus($reviewData->getBookingId()) !== "COMPLETED") {
             throw new ClientException("Consultation not yet completed");

@@ -23,6 +23,12 @@ class ReviewRepositoryEloquent implements ReviewRepository
             );
         }
     }
+    public function checkIfNotExistsByBookingId($bookingId)
+    {
+        if (!Review::where("booking_id", $bookingId)->doesntExist()) {
+            throw new NotFoundException("Review with booking ID {$bookingId} already exists.");
+        }
+    }
 
     public function checkIfExistsByBookingId($bookingId)
     {

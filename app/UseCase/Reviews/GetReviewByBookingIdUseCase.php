@@ -15,6 +15,7 @@ class GetReviewByBookingIdUseCase
 
     public function execute(string $bookingId)
     {
+        $this->reviewRepository->checkIfExistsByBookingId($bookingId);
         return $this->reviewRepository->getReviewByBookingId($bookingId);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository\Eloquent;
 
 use App\Commons\Exceptions\NotFoundException;
+use App\Domain\Review\Entities\Review;
 use App\Domain\ServiceBookings\Entities\NewBooking;
 use App\Domain\ServiceBookings\Entities\ServiceBooking as EntitiesServiceBooking;
 use App\Domain\ServiceBookings\ServiceBookingRepository;
@@ -209,6 +210,15 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
                     ? 'BOOKER' : ($booking->veterinarian_id === $booking->canceller_id
                         ? 'VETERINARIAN' : "SYSTEM")
             );
+        }
+        if ($booking->review) {
+            $serviceBooking->setReview(new Review(
+                $booking->review->review,
+                $booking->review->stars,
+            ));
+        }
+        if ($booking->is_refundable !== null) {
+            $serviceBooking->setIsRefundable($booking->is_refundable);
         }
         return $serviceBooking;
     }

@@ -2,10 +2,11 @@
 
 namespace App\Domain\ServiceBookings\Entities;
 
+use App\Domain\Review\Entities\Review;
 use App\Domain\Transactions\Entities\Transaction;
 use App\Domain\Users\Entities\User;
 use App\Domain\VeterinarianServices\Entities\VetService;
-use App\Domain\VeterinarianServices\Entities\VetServiceOnly;
+
 use DateTime;
 
 class ServiceBooking
@@ -18,8 +19,10 @@ class ServiceBooking
     private ?Transaction $transaction;
     private string $status;
     private ?string $cancelledBy;
+    private ?Review $review; // Update the type hinting to Review
+    private ?bool $isRefundable;
 
-    public function __construct(string $id, DateTime $startTime, DateTime $endTime, User $booker, VetService $service, string $status, ?Transaction $transaction = null, ?string $cancelledBy = null)
+    public function __construct(string $id, DateTime $startTime, DateTime $endTime, User $booker, VetService $service, string $status, ?Transaction $transaction = null, ?string $cancelledBy = null, ?Review $review = null, ?bool $isRefundable = null)
     {
         $this->id = $id;
         $this->startTime = $startTime;
@@ -29,6 +32,8 @@ class ServiceBooking
         $this->transaction = $transaction;
         $this->status = $status;
         $this->cancelledBy = $cancelledBy;
+        $this->review = $review;
+        $this->isRefundable = $isRefundable;
     }
 
     public function getId(): string
@@ -71,6 +76,16 @@ class ServiceBooking
         return $this->cancelledBy;
     }
 
+    public function getReview(): ?Review // Update the return type to Review
+    {
+        return $this->review;
+    }
+
+    public function getIsRefundable(): ?bool
+    {
+        return $this->isRefundable;
+    }
+
     public function setId(string $id): void
     {
         $this->id = $id;
@@ -111,6 +126,16 @@ class ServiceBooking
         $this->cancelledBy = $cancelledBy;
     }
 
+    public function setReview(?Review $review): void // Update the parameter type to Review
+    {
+        $this->review = $review;
+    }
+
+    public function setIsRefundable(?bool $isRefundable): void
+    {
+        $this->isRefundable = $isRefundable;
+    }
+
     public function toArray(): array
     {
         $data = [
@@ -121,10 +146,15 @@ class ServiceBooking
             'service' => $this->service->toArray(),
             'transaction' => $this->transaction ? $this->transaction->toArray() : null,
             'status' => $this->status,
+            'review' => $this->review ? $this->review->toArray() : null, // Update to call toArray on Review
+
         ];
 
         if ($this->cancelledBy !== null) {
             $data['cancelledBy'] = $this->cancelledBy;
+        }
+        if ($this->isRefundable !== null) {
+            $data['isRefundable'] = $this->isRefundable;
         }
 
         return $data;

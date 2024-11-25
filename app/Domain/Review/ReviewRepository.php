@@ -12,4 +12,5 @@ interface ReviewRepository
     public function getReviewsByServiceId($serviceId);
     public function getReviewByBookingId($bookingId);
     public function checkIfExistsByBookingId($bookingId);
+    public function checkIfNotExistsByBookingId($bookingId);
 }
