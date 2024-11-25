@@ -4,6 +4,7 @@ namespace App\Infrastructure\Repository\Eloquent;
 
 use App\Domain\Consultations\Entities\Consultation;
 use App\Domain\Consultations\Entities\ConsultationShort;
+use App\Domain\Payouts\Entities\TransferDetail;
 use App\Domain\Wallets\Entities\WalletLogItem;
 use App\Domain\Wallets\WalletLogRepository;
 use App\Infrastructure\Repository\Models\User;
@@ -28,6 +29,11 @@ class WalletLogRepositoryEloquent implements WalletLogRepository
                         $log->value < 0 ? $log->value + $transfer_fee : $log->value - $transfer_fee,
                         null,
                         $log->updated_at,
+                        new TransferDetail(
+                            $log->disbursement->amount,
+                            $log->disbursement->bank_code,
+                            $log->disbursement->status,
+                        )
                     ))->toArray();
                 }
                 $settlement = $log->settlement;
@@ -52,6 +58,7 @@ class WalletLogRepositoryEloquent implements WalletLogRepository
                         $booking->id
                     ) : null,
                     $log->updated_at,
+                    null
                 ))->toArray();
             }
         );

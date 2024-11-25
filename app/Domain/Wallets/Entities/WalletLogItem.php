@@ -2,8 +2,8 @@
 
 namespace App\Domain\Wallets\Entities;
 
-use App\Domain\Consultations\Entities\Consultation;
 use App\Domain\Consultations\Entities\ConsultationShort;
+use App\Domain\Payouts\Entities\TransferDetail;
 
 class WalletLogItem
 {
@@ -15,6 +15,7 @@ class WalletLogItem
     private float $acceptedAmount;
     private ?ConsultationShort $consultation;
     private \DateTime $timestamp;
+    private ?TransferDetail $transferDetail;
 
     public function __construct(
         string $id,
@@ -24,7 +25,8 @@ class WalletLogItem
         float $platformFee,
         float $acceptedAmount,
         ?ConsultationShort $consultation,
-        \DateTime $timestamp
+        \DateTime $timestamp,
+        ?TransferDetail $transferDetail
     ) {
         $this->id = $id;
         $this->from = $from;
@@ -34,6 +36,7 @@ class WalletLogItem
         $this->acceptedAmount = $acceptedAmount;
         $this->consultation = $consultation;
         $this->timestamp = $timestamp;
+        $this->transferDetail = $transferDetail;
     }
 
     public function getId(): string
@@ -76,6 +79,11 @@ class WalletLogItem
         return $this->timestamp;
     }
 
+    public function getTransferDetail(): TransferDetail
+    {
+        return $this->transferDetail;
+    }
+
     public function setId(string $id): void
     {
         $this->id = $id;
@@ -116,6 +124,11 @@ class WalletLogItem
         $this->timestamp = $timestamp;
     }
 
+    public function setTransferDetail(TransferDetail $transferDetail): void
+    {
+        $this->transferDetail = $transferDetail;
+    }
+
     public function toArray(): array
     {
         return [
@@ -127,6 +140,7 @@ class WalletLogItem
             'acceptedAmount' => $this->acceptedAmount,
             'consultation' => $this->consultation ? $this->consultation->toArray() : null,
             'timestamp' => $this->timestamp->format('Y-m-d\TH:i:s.up'),
+            'transferDetail' => $this->transferDetail ? $this->transferDetail->toArray() : null,
         ];
     }
 }
