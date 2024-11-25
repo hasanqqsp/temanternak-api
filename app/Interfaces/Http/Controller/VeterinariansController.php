@@ -23,6 +23,8 @@ use App\UseCase\Veterinarians\GetVeterinarianByIdUseCase;
 use App\UseCase\Veterinarians\GetVeterinarianByUsernameUseCase;
 use App\UseCase\Veterinarians\GetVeterinarianWalletUseCase;
 use App\UseCase\Veterinarians\GetWorkingExperiencesForUpdateUseCase;
+use App\UseCase\Veterinarians\SuspendVeterinarianByIdUseCase;
+use App\UseCase\Veterinarians\UnsuspendVeterinarianByIdUseCase;
 use App\UseCase\Veterinarians\UpdateBankAndTaxUseCase;
 use App\UseCase\Veterinarians\UpdateEducationsUseCase;
 use App\UseCase\Veterinarians\UpdateGeneralIdentityUseCase;
@@ -54,6 +56,8 @@ class VeterinariansController extends Controller
     private $getWorkingExperiencesForUpdateUseCase;
     private $getOrganizationExperiencesForUpdateUseCase;
     private $getSpecializationsForUpdateUseCase;
+    private $suspendVeterinarianByIdUseCase;
+    private $unsuspendVeterinarianByIdUseCase;
 
     public function __construct(
         VeterinarianRepository $veterinarianRepository,
@@ -79,6 +83,8 @@ class VeterinariansController extends Controller
         $this->getWorkingExperiencesForUpdateUseCase = new GetWorkingExperiencesForUpdateUseCase($veterinarianRepository);
         $this->getOrganizationExperiencesForUpdateUseCase = new GetOrganizationExperiencesForUpdateUseCase($veterinarianRepository);
         $this->getSpecializationsForUpdateUseCase = new GetSpecializationsForUpdateUseCase($veterinarianRepository);
+        $this->suspendVeterinarianByIdUseCase = new SuspendVeterinarianByIdUseCase($userRepository);
+        $this->unsuspendVeterinarianByIdUseCase = new UnsuspendVeterinarianByIdUseCase($userRepository);
     }
 
     public function getById($id)
@@ -289,6 +295,25 @@ class VeterinariansController extends Controller
         $responseArray = [
             "status" => "success",
             "data" => $this->getBankAndTaxForUpdateUseCase->execute(request()->user()->id)->toArray()
+        ];
+        return response()->json($responseArray);
+    }
+
+    public function suspend($veterinarianId)
+    {
+        $this->suspendVeterinarianByIdUseCase->execute($veterinarianId);
+        $responseArray = [
+            "status" => "success",
+            "message" => "Veterinarian suspended successfully."
+        ];
+        return response()->json($responseArray);
+    }
+    public function unsuspend($veterinarianId)
+    {
+        $this->unsuspendVeterinarianByIdUseCase->execute($veterinarianId);
+        $responseArray = [
+            "status" => "success",
+            "message" => "Veterinarian unsuspended successfully."
         ];
         return response()->json($responseArray);
     }

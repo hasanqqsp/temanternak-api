@@ -317,9 +317,11 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
             }
             if (!$booking->consultation->veterinarian_attend_at && $booking->consultation->customer_attend_at) {
                 $booking->is_refundable = true;
+                (new UserRepositoryEloquent())->addPenaltyPoint($booking->veterinarian_id, 1);
             }
             if (!$booking->consultation->customer_attend_at && !$booking->consultation->veterinarian_attend_at) {
                 $booking->is_refundable = false;
+                (new UserRepositoryEloquent())->addPenaltyPoint($booking->veterinarian_id, 1);
             }
 
             $booking->save();

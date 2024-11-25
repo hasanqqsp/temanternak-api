@@ -13,6 +13,8 @@ class User
     private ?string $phone;
     private string $username;
     private int $point = 0;
+    private int $penaltyPoint = 0;
+    private bool $isSuspended = false;
 
     public function __construct(
         string $id,
@@ -22,7 +24,9 @@ class User
         string $updatedAt,
         string $role,
         ?string $phone,
-        string $username
+        string $username,
+        ?int $penaltyPoint = null,
+        bool $isSuspended = false
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -74,6 +78,21 @@ class User
         return $this->username;
     }
 
+    public function getPoint(): int
+    {
+        return $this->point;
+    }
+
+    public function getPenaltyPoint(): ?int
+    {
+        return $this->penaltyPoint;
+    }
+
+    public function getIsSuspended(): bool
+    {
+        return $this->isSuspended;
+    }
+
     public function setName(string $name): void
     {
         $this->name = $name;
@@ -109,9 +128,24 @@ class User
         $this->username = $username;
     }
 
+    public function setPoint(int $point): void
+    {
+        $this->point = $point;
+    }
+
+    public function setPenaltyPoint(?int $penaltyPoint): void
+    {
+        $this->penaltyPoint = $penaltyPoint;
+    }
+
+    public function setIsSuspended(bool $isSuspended = false): void
+    {
+        $this->isSuspended = $isSuspended;
+    }
+
     public function toArray(): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
@@ -120,17 +154,17 @@ class User
             'role' => $this->role,
             'phone' => $this->phone,
             'username' => $this->username,
-            'points' => $this->point
         ];
-    }
 
-    public function getPoint(): int
-    {
-        return $this->point;
-    }
+        if ($this->role === 'basic') {
+            $data['points'] = $this->point;
+        }
 
-    public function setPoint(int $point): void
-    {
-        $this->point = $point;
+        if ($this->role === 'veterinarian') {
+            $data['penaltyPoint'] = $this->penaltyPoint;
+            $data['isSuspended'] = $this->isSuspended;
+        }
+
+        return $data;
     }
 }

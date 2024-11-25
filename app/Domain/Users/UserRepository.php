@@ -31,4 +31,8 @@ interface UserRepository
     public function removeAllToken(string $id): void;
     public function getWalletByUserId(string $id): float;
     public function getLoyaltyPointByUserId(string $id): int;
+    public function addPenaltyPoint(string $id, int $point): void;
+    public function getPenaltyPoint(string $id): int;
+    public function suspendVeterinarian(string $id): void;
+    public function unsuspendVeterinarian(string $id): void;
 }

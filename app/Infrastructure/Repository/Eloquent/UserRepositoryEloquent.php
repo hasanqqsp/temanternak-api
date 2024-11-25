@@ -12,7 +12,6 @@ use App\Domain\Users\UserRepository;
 use App\Infrastructure\Repository\Models\Settlement;
 use App\Infrastructure\Repository\Models\Transaction;
 use App\Infrastructure\Repository\Models\User;
-use MongoDB\Laravel\Helpers\EloquentBuilder;
 
 class UserRepositoryEloquent implements UserRepository
 {
@@ -24,6 +23,38 @@ class UserRepositoryEloquent implements UserRepository
         }
     }
 
+    public function addPenaltyPoint(string $userId, int $points): void
+    {
+        $user = User::find($userId);
+        if ($user) {
+            $user->penalty_points += $points;
+            $user->save();
+        }
+    }
+
+    public function getPenaltyPoint(string $userId): int
+    {
+        $user = User::find($userId);
+        return $user ? $user->penalty_points : 0;
+    }
+
+    public function suspendVeterinarian(string $userId): void
+    {
+        $user = User::find($userId);
+        if ($user && $user->role === 'veterinarian') {
+            $user->is_suspended = true;
+            $user->save();
+        }
+    }
+
+    public function unsuspendVeterinarian(string $userId): void
+    {
+        $user = User::find($userId);
+        if ($user && $user->role === 'veterinarian') {
+            $user->is_suspended = false;
+            $user->save();
+        }
+    }
     public function getLoyaltyPointByUserId(string $userId): int
     {
         $points = $this->calculateLoyaltyPoints($userId);

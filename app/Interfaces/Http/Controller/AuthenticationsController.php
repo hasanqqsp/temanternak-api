@@ -65,7 +65,13 @@ class AuthenticationsController extends Controller
             $user->username
         ));
 
-        $userData->setPoint($this->getLoyaltyPointsByUserIdUseCase->execute($user->id));
+        if ($user->role == 'basic') {
+            $userData->setPoint($this->getLoyaltyPointsByUserIdUseCase->execute($user->id));
+        }
+        if ($user->role == 'veterinarian') {
+            $userData->setIsSuspended($user->is_suspended ?? false);
+            $userData->setPenaltyPoint($user->penalty_points ?? 0);
+        }
 
 
         return response()->json([

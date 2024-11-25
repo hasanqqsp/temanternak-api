@@ -23,9 +23,7 @@ use App\Infrastructure\Repository\Models\License;
 use App\Infrastructure\Repository\Models\OrganizationExperience;
 use App\Infrastructure\Repository\Models\User;
 use App\Infrastructure\Repository\Models\Veterinarian as ModelsVeterinarian;
-use App\Infrastructure\Repository\Models\VeterinarianRegistration;
 use App\Infrastructure\Repository\Models\WorkingExperience;
-use Tymon\JWTAuth\JWT;
 
 class VeterinarianRepositoryEloquent implements VeterinarianRepository
 {
