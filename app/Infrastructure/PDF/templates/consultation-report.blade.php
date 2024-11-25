@@ -137,7 +137,7 @@
 
             </section>
         @endif
-        @if (isset($callLogs) && $callLogs)
+        {{-- @if (isset($callLogs) && $callLogs)
             <section>
                 <p>Riwayat Panggilan</p>
                 <table class="table">
@@ -156,7 +156,7 @@
 
                 </table>
             </section>
-        @endif
+        @endif --}}
 
     </div>
 </body>

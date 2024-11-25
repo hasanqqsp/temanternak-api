@@ -7,11 +7,15 @@ use App\Commons\Exceptions\NotFoundException;
 use App\Domain\Consultations\ConsultationRepository;
 use App\Domain\Consultations\Entities\Consultation as EntitiesConsultation;
 use App\Domain\Consultations\Entities\ConsultationShort;
+use App\Domain\Review\Entities\Review;
 use App\Infrastructure\Repository\Eloquent\VeterinarianRepositoryEloquent;
 use App\Infrastructure\Repository\Models\Consultation;
 use App\Infrastructure\Repository\Models\ServiceBooking;
 use App\Infrastructure\Repository\Models\Settlement;
 use App\Infrastructure\Repository\Models\User as ModelsUser;
+use App\Infrastructure\Repository\Storage\S3Compatible\S3FileRepository;
+use App\UseCase\Consultations\GetConsultationReportByBookingIdUseCase;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 
 class ConsultationRepositoryEloquent implements ConsultationRepository
@@ -83,7 +87,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
 
     public function getByBookingId($bookingId): ConsultationShort
     {
-        $consultation = Consultation::where('booking_id', $bookingId)->first();
+        $consultation = Consultation::with("customer", "booking", "booking.review")->where('booking_id', $bookingId)->first();
         return $this->createConsultationShortEntity($consultation);
     }
 
@@ -122,6 +126,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
     private function createConsultationShortEntity($consultation)
     {
         $veterinarian = (new VeterinarianRepositoryEloquent())->getById($consultation->veterinarian_id);
+
         $entity = new ConsultationShort(
             $consultation->id,
             $consultation->service->name,
@@ -131,8 +136,16 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
             $consultation->duration,
             $consultation->customer->name,
             $consultation->status,
-            $consultation->booking_id
+            $consultation->booking_id,
+            null,
+            $consultation->booking->review ? new Review(
+                $consultation->booking->review->review,
+                $consultation->booking->review->stars
+            ) : null
         );
+        if ($consultation->status == 'COMPLETED') {
+            $entity->setReportFilePath($consultation->report);
+        }
 
         return $entity;
     }
@@ -212,7 +225,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
             ->get()->map(function ($consultation) {
                 $this->updateStatusIfNeeded($consultation);
 
-                return $this->createConsultationEntity($consultation)->toArray();
+                return $this->createConsultationShortEntity($consultation)->toArray();
             })->toArray();
     }
 
@@ -225,7 +238,7 @@ class ConsultationRepositoryEloquent implements ConsultationRepository
 
         return Consultation::where('customer_id', $customerId)->orderBy('end_time', 'desc')->get()->map(function ($consultation) {
             $this->updateStatusIfNeeded($consultation);
-            return $this->createConsultationEntity($consultation)->toArray();
+            return $this->createConsultationShortEntity($consultation)->toArray();
         })->toArray();
     }
 

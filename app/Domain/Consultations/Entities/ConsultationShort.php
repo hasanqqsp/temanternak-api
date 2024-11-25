@@ -2,6 +2,7 @@
 
 namespace App\Domain\Consultations\Entities;
 
+use App\Domain\Review\Entities\Review;
 use DateTime;
 
 class ConsultationShort
@@ -15,6 +16,8 @@ class ConsultationShort
     private string $bookerName;
     private string $status;
     private string $bookingId;
+    private ?string $reportFilePath;
+    private ?Review $review;
 
     public function getId(): string
     {
@@ -106,6 +109,26 @@ class ConsultationShort
         $this->bookingId = $bookingId;
     }
 
+    public function getReportFilePath(): ?string
+    {
+        return $this->reportFilePath;
+    }
+
+    public function setReportFilePath(?string $reportFilePath): void
+    {
+        $this->reportFilePath = $reportFilePath;
+    }
+
+    public function getReview(): ?Review
+    {
+        return $this->review;
+    }
+
+    public function setReview(?Review $review): void
+    {
+        $this->review = $review;
+    }
+
     public function __construct(
         string $id,
         string $serviceName,
@@ -115,7 +138,9 @@ class ConsultationShort
         int $duration,
         string $bookerName,
         string $status,
-        string $bookingId
+        string $bookingId,
+        ?string $reportFilePath = null,
+        ?Review $review = null
     ) {
         $this->id = $id;
         $this->serviceName = $serviceName;
@@ -126,6 +151,8 @@ class ConsultationShort
         $this->bookerName = $bookerName;
         $this->status = $status;
         $this->bookingId = $bookingId;
+        $this->reportFilePath = $reportFilePath;
+        $this->review = $review;
     }
 
     public function toArray(): array
@@ -140,6 +167,8 @@ class ConsultationShort
             'bookerName' => $this->bookerName,
             'status' => $this->status,
             'bookingId' => $this->bookingId,
+            'reportFilePath' => $this->reportFilePath,
+            'review' => $this->review ? $this->review->toArray() : null,
         ];
     }
 }

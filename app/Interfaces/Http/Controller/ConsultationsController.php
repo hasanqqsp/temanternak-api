@@ -134,6 +134,12 @@ class ConsultationsController extends Controller
     public function addResult(Request $request, $bookingId)
     {
         $this->addConsultationResultByBookingIdUseCase->execute($bookingId, $request->result, $request->user()->id);
+        $this->getConsultationReportByBookingIdUseCase
+            ->execute(
+                $bookingId,
+                $request->user()->id,
+                new DateTimeZone(geoip($request->ip())->timezone ?? "Asia/Jakarta")
+            );
         return response()->json([
             "status" => "success",
             "message" => "Consultation result successfully added"
