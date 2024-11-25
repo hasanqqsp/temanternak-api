@@ -13,4 +13,5 @@ interface ReviewRepository
     public function getReviewByBookingId($bookingId);
     public function checkIfExistsByBookingId($bookingId);
     public function checkIfNotExistsByBookingId($bookingId);
+    public function getAverageRatingByVeterinarianId($veterinarianId);
 }

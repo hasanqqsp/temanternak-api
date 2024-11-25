@@ -11,7 +11,8 @@ interface VeterinarianRepository
 {
     public function getById(string $id): Veterinarian;
     public function getByUsername(string $username): Veterinarian;
-    public function getAll(): array;
+    public function getAllPublic(): array;
+    public function getAllForAdmin(): array;
     public function updateGeneralIdentity(string $id, GeneralIdentity $generalIdentity);
     public function updateSpecializations(string $id, array $specializations);
     public function updateLicense(string $id, License $license);

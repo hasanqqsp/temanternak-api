@@ -12,6 +12,7 @@ use App\Domain\VeterinarianRegistrations\Entities\WorkingExperience;
 use App\Domain\Veterinarians\VeterinarianRepository;
 use App\Domain\VeterinarianSchedules\VeterinarianScheduleRepository;
 use App\Domain\Wallets\WalletLogRepository;
+use App\UseCase\Veterinarians\GetAllVeterinarianForAdminUseCase;
 use App\UseCase\Veterinarians\GetAllVeterinarianUseCase;
 use App\UseCase\Veterinarians\GetBankAndTaxForUpdateUseCase;
 use App\UseCase\Veterinarians\GetEducationsForUpdateUseCase;
@@ -34,7 +35,7 @@ use App\UseCase\Veterinarians\UpdateSpecializationsUseCase;
 use App\UseCase\Veterinarians\UpdateWorkingExperiencesUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-
+use Illuminate\Support\Facades\Auth;
 
 class VeterinariansController extends Controller
 {
@@ -58,6 +59,7 @@ class VeterinariansController extends Controller
     private $getSpecializationsForUpdateUseCase;
     private $suspendVeterinarianByIdUseCase;
     private $unsuspendVeterinarianByIdUseCase;
+    private $getAllVeterinarianForAdminUseCase;
 
     public function __construct(
         VeterinarianRepository $veterinarianRepository,
@@ -85,6 +87,7 @@ class VeterinariansController extends Controller
         $this->getSpecializationsForUpdateUseCase = new GetSpecializationsForUpdateUseCase($veterinarianRepository);
         $this->suspendVeterinarianByIdUseCase = new SuspendVeterinarianByIdUseCase($userRepository);
         $this->unsuspendVeterinarianByIdUseCase = new UnsuspendVeterinarianByIdUseCase($userRepository);
+        $this->getAllVeterinarianForAdminUseCase = new GetAllVeterinarianForAdminUseCase($veterinarianRepository);
     }
 
     public function getById($id)
@@ -96,14 +99,20 @@ class VeterinariansController extends Controller
         return response()->json($responseArray);
     }
 
-    public function get()
+    public function get(Request $request)
     {
         $data = [];
         $username = request()->query('username');
         if ($username) {
             $data = $this->getVeterinarianByUsernameUseCase->execute($username);
         } else {
-            $data = $this->getAllVeterinarianUseCase->execute();
+            if (request()->bearerToken() && $user = Auth::guard('sanctum')->user()) {
+                if ($user->role === 'superadmin' || $user->role === 'admin') {
+                    $data = $this->getAllVeterinarianForAdminUseCase->execute();
+                }
+            } else {
+                $data = $this->getAllVeterinarianUseCase->execute();
+            }
         }
         $responseArray = [
             "status" => "success",

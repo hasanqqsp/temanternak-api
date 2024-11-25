@@ -4,9 +4,9 @@ namespace App\UseCase\Veterinarians;
 
 use App\Domain\Veterinarians\VeterinarianRepository;
 
-class GetAllVeterinarianUseCase
+class GetAllVeterinarianForAdminUseCase
 {
-    private $veterinarianRepository;
+    protected $veterinarianRepository;
 
     public function __construct(VeterinarianRepository $veterinarianRepository)
     {
@@ -15,6 +15,6 @@ class GetAllVeterinarianUseCase
 
     public function execute()
     {
-        return $this->veterinarianRepository->getAllPublic();
+        return $this->veterinarianRepository->getAllForAdmin();
     }
 }

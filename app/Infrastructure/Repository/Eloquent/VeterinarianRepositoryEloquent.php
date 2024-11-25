@@ -11,7 +11,6 @@ use App\Domain\VeterinarianRegistrations\Entities\License as EntitiesLicense;
 use App\Domain\VeterinarianRegistrations\Entities\OrganizationExperience as EntitiesOrganizationExperience;
 use App\Domain\VeterinarianRegistrations\Entities\WorkingExperience as EntitiesWorkingExperience;
 use App\Domain\Veterinarians\Entities\Veterinarian;
-use App\Domain\Veterinarians\Entities\VeterinarianShort;
 use App\Domain\Veterinarians\Entities\VeterinarianShortForList;
 use App\Domain\Veterinarians\VeterinarianRepository;
 use App\Domain\VeterinarianSchedules\Entities\VeterinarianSchedule;
@@ -303,7 +302,9 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
             $data->specializations,
             $data->generalIdentity->whatsapp_number,
             $data->license->sip_number,
-            $data->license->strv_number
+            $data->license->strv_number,
+            $user->is_suspended ?? false,
+            $user->penalty_points ?? 0
         );
     }
 
@@ -342,9 +343,16 @@ class VeterinarianRepositoryEloquent implements VeterinarianRepository
         return $this->mapUserToVeterinarian($user);
     }
 
-    public function getAll(): array
+    public function getAllForAdmin(): array
     {
         return User::where("role", "veterinarian")->get()->map(function ($user) {
+            return $this->mapUserToVeterinarianShort($user)->toArray();
+        })->toArray();
+    }
+
+    public function getAllPublic(): array
+    {
+        return User::where("role", "veterinarian")->where('is_suspended', '!=', true)->get()->map(function ($user) {
             return $this->mapUserToVeterinarianShort($user)->toArray();
         })->toArray();
     }

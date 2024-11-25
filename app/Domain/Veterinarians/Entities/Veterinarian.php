@@ -20,6 +20,8 @@ class Veterinarian
     private string $biodata;
     private array $services;
     private ?array $schedules;
+    private bool $isSuspended;
+    private int $penaltyPoints;
 
     public function __construct(
         string $id,
@@ -37,7 +39,9 @@ class Veterinarian
         array $organizationExperiences,
         string $biodata,
         array $services,
-        ?array $schedules = null
+        ?array $schedules = null,
+        bool $isSuspended = false,
+        int $penaltyPoints = 0
     ) {
         $this->id = $id;
         $this->nameAndTitle = $nameAndTitle;
@@ -55,6 +59,8 @@ class Veterinarian
         $this->biodata = $biodata;
         $this->services = $services;
         $this->schedules = $schedules;
+        $this->isSuspended = $isSuspended;
+        $this->penaltyPoints = $penaltyPoints;
     }
 
     public function getId(): string
@@ -217,6 +223,26 @@ class Veterinarian
         $this->schedules = $schedules;
     }
 
+    public function getIsSuspended(): bool
+    {
+        return $this->isSuspended;
+    }
+
+    public function setIsSuspended(bool $isSuspended): void
+    {
+        $this->isSuspended = $isSuspended;
+    }
+
+    public function getPenaltyPoints(): int
+    {
+        return $this->penaltyPoints;
+    }
+
+    public function setPenaltyPoints(int $penaltyPoints): void
+    {
+        $this->penaltyPoints = $penaltyPoints;
+    }
+
     public function toArray(): array
     {
         return [
@@ -236,6 +262,8 @@ class Veterinarian
             'biodata' => $this->biodata,
             'services' => $this->services,
             'schedules' => $this->schedules ?? [],
+            'isSuspended' => $this->isSuspended,
+            'penaltyPoints' => $this->penaltyPoints,
         ];
     }
 }

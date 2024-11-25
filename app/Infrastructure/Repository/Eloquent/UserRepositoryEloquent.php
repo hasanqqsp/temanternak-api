@@ -23,6 +23,16 @@ class UserRepositoryEloquent implements UserRepository
         }
     }
 
+    public function getTotalBasicUsers(): int
+    {
+        return User::where('role', 'basic')->count();
+    }
+
+    public function getTotalVeterinarians(): int
+    {
+        return User::where('role', 'veterinarian')->count();
+    }
+
     public function addPenaltyPoint(string $userId, int $points): void
     {
         $user = User::find($userId);
@@ -208,7 +218,7 @@ class UserRepositoryEloquent implements UserRepository
     {
         $users = User::all()->toArray();
         return array_map(function ($user) {
-            return (new UserEntity(
+            $userEntity = new UserEntity(
                 $user["id"],
                 $user["name"],
                 $user["email"],
@@ -217,7 +227,11 @@ class UserRepositoryEloquent implements UserRepository
                 $user["role"],
                 $user["phone"],
                 $user["username"]
-            ))->toArray();
+            );
+            if ($user["role"] === "basic") {
+                $userEntity->setPoint($this->getLoyaltyPointByUserId($user["id"]));
+            }
+            return ($userEntity)->toArray();
         }, $users);
     }
 

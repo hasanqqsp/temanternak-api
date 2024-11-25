@@ -25,4 +25,9 @@ interface ServiceBookingRepository
     public function reschedule(string $bookingId, string $newStartTime);
     public function checkIsRefundable(string $bookingId);
     public function setRebookingId(string $bookingId, string $rebookingId);
+    public function getTotalTransactions();
+    public function getTotalTransactionsAmount();
+    public function getTotalTransactionsByVeterinarianId(string $veterinarianId);
+    public function getTotalTransactionsAmountByVeterinarianId(string $veterinarianId);
+    public function getTotalBookingTodayByVeterinarianId(string $veterinarianId);
 }

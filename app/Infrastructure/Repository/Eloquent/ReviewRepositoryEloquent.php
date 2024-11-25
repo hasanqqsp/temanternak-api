@@ -23,6 +23,14 @@ class ReviewRepositoryEloquent implements ReviewRepository
             );
         }
     }
+
+    public function getAverageRatingByVeterinarianId($veterinarianId)
+    {
+        $user = User::find($veterinarianId);
+        $averageRating = Review::whereIn("booking_id", $user->bookings->pluck("id"))->avg('stars');
+        return $averageRating;
+    }
+
     public function checkIfNotExistsByBookingId($bookingId)
     {
         if (!Review::where("booking_id", $bookingId)->doesntExist()) {

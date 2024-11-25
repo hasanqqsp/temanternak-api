@@ -35,4 +35,6 @@ interface UserRepository
     public function getPenaltyPoint(string $id): int;
     public function suspendVeterinarian(string $id): void;
     public function unsuspendVeterinarian(string $id): void;
+    public function getTotalBasicUsers(): int;
+    public function getTotalVeterinarians(): int;
 }

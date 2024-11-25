@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Interfaces\Http\Controller\AuthenticationsController;
 use App\Interfaces\Http\Controller\ConsultationsController;
+use App\Interfaces\Http\Controller\DashboardsController;
 use App\Interfaces\Http\Controller\InvitationsController;
 use App\Interfaces\Http\Controller\PayoutsController;
 use App\Interfaces\Http\Controller\ReviewsController;
@@ -89,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users/my/disbursements', [PayoutsController::class, 'getMy']);
         Route::post('/bookings/{bookingId}/consultations/result', [ConsultationsController::class, 'addResult']);
         Route::get('/bookings/{bookingId}/consultations/detail', [ConsultationsController::class, 'getDetail']);
+        Route::get('/dashboard/veterinarian', [DashboardsController::class, 'veterinarian']);
     });
     Route::middleware('ability:role-basic')->group(function () {
         Route::get('/veterinarians/services/{id}/startTimes', [VeterinarianSchedulesController::class, 'getAvailableStartTimes']);
@@ -122,6 +124,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/veterinarians/{veterinarianId}/suspension', [VeterinariansController::class, "unsuspend"]);
         Route::get('/users/{customerId}/transactions', [TransactionsController::class, 'getAllByCustomerId']);
         Route::get('/payouts/disbursements', [PayoutsController::class, 'getAll']);
+        Route::get('/dashboard/admin', [DashboardsController::class, 'admin']);
     });
 });
 

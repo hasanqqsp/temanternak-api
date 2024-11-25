@@ -12,8 +12,10 @@ class VeterinarianShortForList
     private $whatsappNumber;
     private $sipNumber;
     private $strvNumber;
+    private $isSuspended;
+    private $penaltyPoints;
 
-    public function __construct($id, $nameAndTitle, $username, $formalPicturePath, $specializations, $whatsappNumber, $sipNumber, $strvNumber)
+    public function __construct($id, $nameAndTitle, $username, $formalPicturePath, $specializations, $whatsappNumber, $sipNumber, $strvNumber, $isSuspended, $penaltyPoints)
     {
         $this->id = $id;
         $this->nameAndTitle = $nameAndTitle;
@@ -23,6 +25,8 @@ class VeterinarianShortForList
         $this->whatsappNumber = $whatsappNumber;
         $this->sipNumber = $sipNumber;
         $this->strvNumber = $strvNumber;
+        $this->isSuspended = $isSuspended;
+        $this->penaltyPoints = $penaltyPoints;
     }
 
     // Getters
@@ -66,6 +70,16 @@ class VeterinarianShortForList
         return $this->strvNumber;
     }
 
+    public function getIsSuspended()
+    {
+        return $this->isSuspended;
+    }
+
+    public function getPenaltyPoints()
+    {
+        return $this->penaltyPoints;
+    }
+
     // Setters
     public function setId($id)
     {
@@ -107,6 +121,16 @@ class VeterinarianShortForList
         $this->strvNumber = $strvNumber;
     }
 
+    public function setIsSuspended($isSuspended)
+    {
+        $this->isSuspended = $isSuspended;
+    }
+
+    public function setPenaltyPoints($penaltyPoints)
+    {
+        $this->penaltyPoints = $penaltyPoints;
+    }
+
     // Convert object to array
     public function toArray()
     {
@@ -119,6 +143,8 @@ class VeterinarianShortForList
             'whatsappNumber' => $this->whatsappNumber,
             'sipNumber' => $this->sipNumber,
             'strvNumber' => $this->strvNumber,
+            'isSuspended' => $this->isSuspended,
+            'penaltyPoints' => $this->penaltyPoints,
         ];
     }
 }

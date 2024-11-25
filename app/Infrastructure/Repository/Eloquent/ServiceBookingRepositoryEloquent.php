@@ -20,6 +20,16 @@ use Carbon\Carbon;
 
 class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
 {
+    public function getTotalBookingTodayByVeterinarianId($veterinarianId)
+    {
+        return ServiceBooking::where('veterinarian_id', $veterinarianId)
+            ->where(function ($query) {
+                $query->where('status', "COMPLETED")->orWhere('status', "CONFIRMED");
+            })
+            ->whereDate('start_time', Carbon::today())
+            ->count();
+    }
+
     public function reschedule($bookingId, $newStartTime)
     {
         $booking = ServiceBooking::find($bookingId);
@@ -31,6 +41,31 @@ class ServiceBookingRepositoryEloquent implements ServiceBookingRepository
             $booking->rescheduled_at = now();
             $booking->save();
         }
+    }
+
+    public function getTotalTransactions()
+    {
+        return ServiceBooking::where('status', "COMPLETED")->orWhere('status', "CONFIRMED")->count();
+    }
+    public function getTotalTransactionsByVeterinarianId($veterinarianId)
+    {
+        return ServiceBooking::where("veterinarian_id", $veterinarianId)->where(function ($query) {
+            $query->where('status', "COMPLETED")->orWhere('status', "CONFIRMED");
+        })->count();
+    }
+
+    public function getTotalTransactionsAmount()
+    {
+        return ServiceBooking::with("transaction")->where('status', "COMPLETED")->orWhere('status', "CONFIRMED")->get()->sum(fn($booking) => $booking->transaction ? $booking->transaction->price : 0);
+    }
+
+    public function getTotalTransactionsAmountByVeterinarianId($veterinarianId)
+    {
+        return ServiceBooking::with("transaction")
+            ->where("veterinarian_id", $veterinarianId)->where(function ($query) {
+                $query->where('status', "COMPLETED")->orWhere('status', "CONFIRMED");
+            })
+            ->get()->sum(fn($booking) => $booking->transaction ? $booking->transaction->price : 0);
     }
 
     public function setRebookingId($bookingId, $rebookingId)
