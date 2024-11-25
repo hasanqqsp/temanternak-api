@@ -8,6 +8,7 @@ use App\Domain\Users\Entities\NewUser;
 use App\Domain\Users\Entities\UpdateUser;
 use App\Domain\Users\UserRepository;
 use App\Services\Hash\HashingServiceInterface;
+use App\UseCase\Users\AddAdminUserUseCase;
 use App\UseCase\Users\AddUserByInvitationUseCase;
 use App\UseCase\Users\AddUserUseCase;
 use App\UseCase\Users\ChangeUserPasswordUseCase;
@@ -18,8 +19,10 @@ use App\UseCase\Users\GetUserByIdUseCase;
 use App\UseCase\Users\GetUserByUsernameUseCase;
 use App\UseCase\Users\UpdateUserUseCase;
 use Hidehalo\Nanoid\Client;
+
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -34,6 +37,7 @@ class UsersController extends Controller
     private $updateUserUseCase;
     private $changeUserPasswordUseCase;
     private $addUserByInvitationUseCase;
+    private $addAdminUserUseCase;
 
     public function __construct(
         UserRepository $userRepository,
@@ -49,6 +53,7 @@ class UsersController extends Controller
         $this->updateUserUseCase = new UpdateUserUseCase($userRepository);
         $this->changeUserPasswordUseCase = new ChangeUserPasswordUseCase($userRepository, $hashingService);
         $this->addUserByInvitationUseCase = new AddUserByInvitationUseCase($userRepository, $invitationRepository);
+        $this->addAdminUserUseCase = new AddAdminUserUseCase($userRepository);
     }
 
     public function getAllUsers()
@@ -84,6 +89,24 @@ class UsersController extends Controller
             $username = Str::slug($request->name) . "-" . $username;
         } else {
             $username = $request->username;
+        }
+        if ($request->bearerToken() && $user = Auth::guard('sanctum')->user()) {
+            if ($user->role === 'superadmin') {
+                $data = $this->addAdminUserUseCase->execute(new NewUser(
+                    $request->name,
+                    $request->email,
+                    Hash::make($request->password),
+                    $username,
+                    $request->phone,
+                    $request->invitation_id,
+                    $request->role
+                ))->toArray();
+            }
+            $responseArray = [
+                "status" => "success",
+                "data" => $data
+            ];
+            return response()->json($responseArray, 201);
         }
         $useCase = ($request->has('invitationId')) ? $this->addUserByInvitationUseCase : $this->addUserUseCase;
         $data = $useCase->execute(new NewUser(
