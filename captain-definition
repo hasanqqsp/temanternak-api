@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "dockerfileLines": [
+    "FROM php:8.2-fpm",
+
+    "# Install dependencies",
+    "RUN apt-get update && apt-get install -y \\",
+    "    git \\",
+    "    curl \\",
+    "    libpng-dev \\",
+    "    libjpeg-dev \\",
+    "    libfreetype6-dev \\",
+    "    zip \\",
+    "    unzip \\",
+    "    libonig-dev \\",
+    "    libxml2-dev \\",
+    "    sqlite3 \\",
+    "    libsqlite3-dev \\",
+    "    pkg-config \\",
+    "    libssl-dev",
+
+    "# Install PHP extensions",
+    "RUN docker-php-ext-configure gd --with-freetype --with-jpeg \\",
+    "    && docker-php-ext-install gd mbstring pdo pdo_mysql pdo_sqlite tokenizer xml",
+
+    "# Install MongoDB PHP extension",
+    "RUN pecl install mongodb \\",
+    "    && docker-php-ext-enable mongodb",
+
+    "# Install Composer",
+    "COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer",
+
+    "WORKDIR /var/www",
+
+    "# Copy project files",
+    "COPY . .",
+
+    "# Install Laravel dependencies (including mongodb package)",
+    "RUN composer install --no-dev --optimize-autoloader \\",
+    "    && composer require jenssegers/mongodb",
+
+    "# Set permissions",
+    "RUN chown -R www-data:www-data /var/www \\",
+    "    && chmod -R 755 /var/www/storage",
+
+    "EXPOSE 9000",
+
+    "CMD [\"php-fpm\"]"
+  ]
+}
