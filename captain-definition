@@ -21,7 +21,7 @@
 
     "# Install PHP extensions",
     "RUN docker-php-ext-configure gd --with-freetype --with-jpeg \\",
-    "    && docker-php-ext-install gd mbstring pdo pdo_mysql pdo_sqlite tokenizer xml",
+    "    && docker-php-ext-install gd mbstring pdo pdo_mysql pdo_sqlite xml",
 
     "# Install MongoDB PHP extension",
     "RUN pecl install mongodb \\",
